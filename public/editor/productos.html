@@ -256,19 +256,19 @@
                 ]);
 
                 if (productsResponse.success) {
-                    allProducts = productsResponse.data;
+                    allProducts = productsResponse.data.products || productsResponse.data || [];
                     applyFilters();
                     updateStats();
                 }
 
                 if (categoriesResponse.success) {
-                    categories = categoriesResponse.data;
+                    categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
                     renderCategoryFilter();
                     renderCategoryOptions();
                 }
 
                 if (zonesResponse.success) {
-                    zones = zonesResponse.data;
+                    zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
                     renderZoneOptions();
                 }
             } catch (e) {
