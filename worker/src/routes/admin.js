@@ -1,10 +1,10 @@
 // Rutas administrativas generales
 
 import { success, error } from '../utils/response.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requireAdmin, requireEditor } from '../middleware/auth.js';
 
 export async function handleGetStats(request, env) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
