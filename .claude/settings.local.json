@@ -12,7 +12,8 @@
       "Bash(wrangler r2 bucket:*)",
       "Bash(wrangler pages deploy:*)",
       "Bash(cmdkey:*)",
-      "Bash(git credential-manager:*)"
+      "Bash(git credential-manager:*)",
+      "Bash(gh auth login:*)"
     ]
   }
 }
