@@ -215,7 +215,7 @@
         function renderParentOptions() {
             const select = document.getElementById('zone-parent');
             select.innerHTML = '<option value="">Ninguna (raíz)</option>' +
-                allZones.map(zone => `<option value="${zone.id}">${zone.nombre} (${getTypeLabel(zone.tipo)})</option>`).join('');
+                allZones.map(zone => `<option value="${zone.id}">${zone.name} (${getTypeLabel(zone.tipo)})</option>`).join('');
         }
 
         function applyFilters() {
@@ -223,7 +223,7 @@
             const type = document.getElementById('filter-type').value;
 
             filteredZones = allZones.filter(zone => {
-                const matchSearch = !search || zone.nombre.toLowerCase().includes(search);
+                const matchSearch = !search || zone.name.toLowerCase().includes(search);
                 const matchType = !type || zone.tipo === type;
 
                 return matchSearch && matchType;
@@ -256,7 +256,7 @@
                     <tbody>
                         ${filteredZones.map(zone => `
                             <tr>
-                                <td><strong>${zone.nombre}</strong></td>
+                                <td><strong>${zone.name}</strong></td>
                                 <td>
                                     <span class="badge badge-${getTypeBadgeClass(zone.tipo)}">
                                         ${getTypeLabel(zone.tipo)}
@@ -376,7 +376,7 @@
 
             document.getElementById('modal-title').textContent = 'Editar Zona';
             document.getElementById('zone-id').value = zone.id;
-            document.getElementById('zone-nombre').value = zone.nombre || '';
+            document.getElementById('zone-nombre').value = zone.name || '';
             document.getElementById('zone-tipo').value = zone.tipo || 'ciudad';
             document.getElementById('zone-parent').value = zone.parent_id || '';
             document.getElementById('zone-activa').checked = zone.is_active !== false;

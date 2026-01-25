@@ -282,13 +282,13 @@
         function renderCategoryOptions() {
             const select = document.getElementById('event-categoria');
             select.innerHTML = '<option value="">Sin categoría</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
         function renderZoneOptions() {
             const select = document.getElementById('event-zona');
             select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
+                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
         }
 
         function applyFilters() {

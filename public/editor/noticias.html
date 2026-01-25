@@ -251,19 +251,19 @@
         function renderCategoryOptions() {
             const select = document.getElementById('news-categoria');
             select.innerHTML = '<option value="">Sin categoría</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
         function renderZoneOptions() {
             const select = document.getElementById('news-zona');
             select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
+                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
         }
 
         function renderCategoryFilter() {
             const select = document.getElementById('filter-category');
             select.innerHTML = '<option value="">Todas</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
         function applyFilters() {
@@ -273,11 +273,11 @@
 
             filteredNews = allNews.filter(news => {
                 const matchSearch = !search ||
-                    news.titulo.toLowerCase().includes(search) ||
-                    news.contenido.toLowerCase().includes(search);
+                    news.title.toLowerCase().includes(search) ||
+                    news.content.toLowerCase().includes(search);
 
-                const matchStatus = !status || news.estado === status;
-                const matchCategory = !category || news.categoria_id == category;
+                const matchStatus = !status || news.status === status;
+                const matchCategory = !category || news.category_id == category;
 
                 return matchSearch && matchStatus && matchCategory;
             });
@@ -310,26 +310,26 @@
                             <tr>
                                 <td>
                                     <div class="news-info">
-                                        <strong>${news.titulo}</strong>
+                                        <strong>${news.title}</strong>
                                         <br>
-                                        <small class="text-muted">${truncate(news.contenido, 80)}</small>
+                                        <small class="text-muted">${truncate(news.content, 80)}</small>
                                     </div>
                                 </td>
-                                <td>${news.autor_nombre || '-'}</td>
+                                <td>${news.author_name || '-'}</td>
                                 <td>
                                     <span class="badge badge-secondary">
-                                        ${news.categoria_nombre || '-'}
+                                        ${news.category_name || '-'}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(news.estado)}">
-                                        ${getStatusLabel(news.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(news.status)}">
+                                        ${getStatusLabel(news.status)}
                                     </span>
                                 </td>
                                 <td>${formatDate(news.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${news.estado === 'pendiente' ? `
+                                        ${news.status === 'pendiente' ? `
                                             <button class="btn btn-sm btn-success" onclick="approveNews(${news.id})" title="Aprobar">
                                                 ✅
                                             </button>
@@ -456,13 +456,13 @@
 
             document.getElementById('modal-title').textContent = 'Editar Noticia';
             document.getElementById('news-id').value = news.id;
-            document.getElementById('news-titulo').value = news.titulo || '';
-            document.getElementById('news-contenido').value = news.contenido || '';
-            document.getElementById('news-resumen').value = news.resumen || '';
-            document.getElementById('news-imagen').value = news.imagen_url || '';
-            document.getElementById('news-categoria').value = news.categoria_id || '';
-            document.getElementById('news-zona').value = news.zona_id || '';
-            document.getElementById('news-estado').value = news.estado || 'pendiente';
+            document.getElementById('news-titulo').value = news.title || '';
+            document.getElementById('news-contenido').value = news.content || '';
+            document.getElementById('news-resumen').value = news.summary || '';
+            document.getElementById('news-imagen').value = news.image_url || '';
+            document.getElementById('news-categoria').value = news.category_id || '';
+            document.getElementById('news-zona').value = news.zone_id || '';
+            document.getElementById('news-estado').value = news.status || 'pendiente';
             openModal();
         }
 
@@ -471,13 +471,13 @@
 
             const newsId = document.getElementById('news-id').value;
             const data = {
-                titulo: document.getElementById('news-titulo').value,
-                contenido: document.getElementById('news-contenido').value,
-                resumen: document.getElementById('news-resumen').value || null,
-                imagen_url: document.getElementById('news-imagen').value || null,
-                categoria_id: document.getElementById('news-categoria').value || null,
-                zona_id: document.getElementById('news-zona').value || null,
-                estado: document.getElementById('news-estado').value
+                title: document.getElementById('news-titulo').value,
+                content: document.getElementById('news-contenido').value,
+                summary: document.getElementById('news-resumen').value || null,
+                image_url: document.getElementById('news-imagen').value || null,
+                category_id: document.getElementById('news-categoria').value || null,
+                zone_id: document.getElementById('news-zona').value || null,
+                status: document.getElementById('news-estado').value
             };
 
             try {

@@ -302,11 +302,11 @@
 
             filteredProducts = allProducts.filter(product => {
                 const matchSearch = !search ||
-                    product.titulo.toLowerCase().includes(search) ||
-                    (product.descripcion && product.descripcion.toLowerCase().includes(search));
+                    product.title.toLowerCase().includes(search) ||
+                    (product.description && product.description.toLowerCase().includes(search));
 
-                const matchStatus = !status || product.estado === status;
-                const matchCategory = !category || product.categoria_id == category;
+                const matchStatus = !status || product.status === status;
+                const matchCategory = !category || product.category_id == category;
 
                 return matchSearch && matchStatus && matchCategory;
             });
@@ -340,28 +340,28 @@
                             <tr>
                                 <td>
                                     <div class="product-info">
-                                        <strong>${product.titulo}</strong>
-                                        ${product.descripcion ? `<br><small class="text-muted">${truncate(product.descripcion, 60)}</small>` : ''}
+                                        <strong>${product.title}</strong>
+                                        ${product.description ? `<br><small class="text-muted">${truncate(product.description, 60)}</small>` : ''}
                                     </div>
                                 </td>
-                                <td>${product.comerciante_nombre || '-'}</td>
+                                <td>${product.author_name || '-'}</td>
                                 <td>
                                     <span class="badge badge-secondary">
-                                        ${product.categoria_nombre || '-'}
+                                        ${product.category_name || '-'}
                                     </span>
                                 </td>
                                 <td>
-                                    ${product.precio ? `<strong>$${parseFloat(product.precio).toLocaleString()}</strong>` : '-'}
+                                    ${product.price ? `<strong>$${parseFloat(product.price).toLocaleString()}</strong>` : '-'}
                                 </td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(product.estado)}">
-                                        ${getStatusLabel(product.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(product.status)}">
+                                        ${getStatusLabel(product.status)}
                                     </span>
                                 </td>
                                 <td>${formatDate(product.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${product.estado === 'pendiente' ? `
+                                        ${product.status === 'pendiente' ? `
                                             <button class="btn btn-sm btn-success" onclick="approveProduct(${product.id})" title="Aprobar">
                                                 ✅
                                             </button>
@@ -490,18 +490,18 @@
 
             document.getElementById('modal-title').textContent = 'Editar Producto';
             document.getElementById('product-id').value = product.id;
-            document.getElementById('product-titulo').value = product.titulo || '';
-            document.getElementById('product-descripcion').value = product.descripcion || '';
-            document.getElementById('product-precio').value = product.precio || '';
-            document.getElementById('product-precio-original').value = product.precio_original || '';
-            document.getElementById('product-imagen').value = product.imagen_url || '';
-            document.getElementById('product-categoria').value = product.categoria_id || '';
-            document.getElementById('product-zona').value = product.zona_id || '';
-            document.getElementById('product-direccion').value = product.direccion || '';
-            document.getElementById('product-telefono').value = product.telefono || '';
+            document.getElementById('product-titulo').value = product.title || '';
+            document.getElementById('product-descripcion').value = product.description || '';
+            document.getElementById('product-precio').value = product.price || '';
+            document.getElementById('product-precio-original').value = product.price_original || '';
+            document.getElementById('product-imagen').value = product.image_url || '';
+            document.getElementById('product-categoria').value = product.category_id || '';
+            document.getElementById('product-zona').value = product.zone_id || '';
+            document.getElementById('product-direccion').value = product.address || '';
+            document.getElementById('product-telefono').value = product.phone || '';
             document.getElementById('product-whatsapp').value = product.whatsapp || '';
-            document.getElementById('product-condicion').value = product.condicion || 'nuevo';
-            document.getElementById('product-estado').value = product.estado || 'pendiente';
+            document.getElementById('product-condicion').value = product.condition || 'nuevo';
+            document.getElementById('product-estado').value = product.status || 'pendiente';
             openModal();
         }
 
@@ -510,18 +510,18 @@
 
             const productId = document.getElementById('product-id').value;
             const data = {
-                titulo: document.getElementById('product-titulo').value,
-                descripcion: document.getElementById('product-descripcion').value,
-                precio: parseFloat(document.getElementById('product-precio').value),
-                precio_original: document.getElementById('product-precio-original').value ? parseFloat(document.getElementById('product-precio-original').value) : null,
-                imagen_url: document.getElementById('product-imagen').value || null,
-                categoria_id: document.getElementById('product-categoria').value || null,
-                zona_id: document.getElementById('product-zona').value || null,
-                direccion: document.getElementById('product-direccion').value || null,
-                telefono: document.getElementById('product-telefono').value || null,
+                title: document.getElementById('product-titulo').value,
+                description: document.getElementById('product-descripcion').value,
+                price: parseFloat(document.getElementById('product-precio').value),
+                original_price: document.getElementById('product-precio-original').value ? parseFloat(document.getElementById('product-precio-original').value) : null,
+                image_url: document.getElementById('product-imagen').value || null,
+                category_id: document.getElementById('product-categoria').value || null,
+                zone_id: document.getElementById('product-zona').value || null,
+                address: document.getElementById('product-direccion').value || null,
+                phone: document.getElementById('product-telefono').value || null,
                 whatsapp: document.getElementById('product-whatsapp').value || null,
-                condicion: document.getElementById('product-condicion').value,
-                estado: document.getElementById('product-estado').value
+                condition: document.getElementById('product-condicion').value,
+                status: document.getElementById('product-estado').value
             };
 
             try {
