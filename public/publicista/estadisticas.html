@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Publicista Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/publicista/publicista.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">PUBLICISTA</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/publicista/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/publicista/mis-anuncios.html" class="admin-nav-item">
+                    <span class="icon">📺</span> Mis Anuncios
+                </a>
+                <a href="/publicista/estadisticas.html" class="admin-nav-item active">
+                    <span class="icon">📈</span> Estadísticas
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>📈 Estadísticas de Anuncios</h1>
+                <div class="admin-user">
+                    <span id="user-name">Publicista</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Overview Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-views">0</span>
+                            <span class="stat-label">Vistas Totales</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👆</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-clicks">0</span>
+                            <span class="stat-label">Clics Totales</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="avg-ctr">0%</span>
+                            <span class="stat-label">CTR Promedio</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-campaigns">0</span>
+                            <span class="stat-label">Campañas Activas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance by Ad -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h3 class="mb-3">📊 Rendimiento por Anuncio</h3>
+                        <div id="ads-performance">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance by Position -->
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="mb-3">📍 Rendimiento por Posición</h3>
+                        <div id="position-performance">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar publicista
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'publicista')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Publicista';
+
+        async function loadStatistics() {
+            try {
+                const response = await api.getAds({ publicista_id: user.id });
+
+                if (response.success) {
+                    const ads = response.data;
+
+                    // Calculate overall stats
+                    const totalViews = ads.reduce((sum, ad) => sum + (ad.vistas || 0), 0);
+                    const totalClicks = ads.reduce((sum, ad) => sum + (ad.clics || 0), 0);
+                    const avgCTR = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : 0;
+                    const activeCampaigns = ads.filter(a => a.estado === 'activo').length;
+
+                    document.getElementById('total-views').textContent = totalViews.toLocaleString();
+                    document.getElementById('total-clicks').textContent = totalClicks.toLocaleString();
+                    document.getElementById('avg-ctr').textContent = avgCTR + '%';
+                    document.getElementById('active-campaigns').textContent = activeCampaigns;
+
+                    // Render ads performance table
+                    renderAdsPerformance(ads);
+
+                    // Render position performance
+                    renderPositionPerformance(ads);
+                }
+            } catch (e) {
+                console.error('Error loading statistics:', e);
+                Components.showToast('Error cargando estadísticas', 'error');
+            }
+        }
+
+        function renderAdsPerformance(ads) {
+            const container = document.getElementById('ads-performance');
+
+            if (ads.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center p-4">No hay anuncios para mostrar estadísticas</p>';
+                return;
+            }
+
+            // Sort by views descending
+            const sortedAds = [...ads].sort((a, b) => (b.vistas || 0) - (a.vistas || 0));
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Anuncio</th>
+                            <th>Posición</th>
+                            <th>Vistas</th>
+                            <th>Clics</th>
+                            <th>CTR</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sortedAds.map(ad => {
+                            const views = ad.vistas || 0;
+                            const clicks = ad.clics || 0;
+                            const ctr = views > 0 ? ((clicks / views) * 100).toFixed(2) : 0;
+
+                            return `
+                                <tr>
+                                    <td><strong>${Utils.escapeHtml(ad.titulo)}</strong></td>
+                                    <td><span class="badge badge-secondary">${ad.posicion}</span></td>
+                                    <td>${views.toLocaleString()}</td>
+                                    <td>${clicks.toLocaleString()}</td>
+                                    <td><strong>${ctr}%</strong></td>
+                                    <td><span class="badge badge-${ad.estado === 'activo' ? 'success' : 'warning'}">${ad.estado}</span></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderPositionPerformance(ads) {
+            const container = document.getElementById('position-performance');
+
+            // Group by position
+            const positionStats = {};
+            ads.forEach(ad => {
+                if (!positionStats[ad.posicion]) {
+                    positionStats[ad.posicion] = {
+                        position: ad.posicion,
+                        count: 0,
+                        views: 0,
+                        clicks: 0
+                    };
+                }
+                positionStats[ad.posicion].count++;
+                positionStats[ad.posicion].views += ad.vistas || 0;
+                positionStats[ad.posicion].clicks += ad.clics || 0;
+            });
+
+            const positions = Object.values(positionStats);
+
+            if (positions.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center p-4">No hay datos de posiciones</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Posición</th>
+                            <th>Anuncios</th>
+                            <th>Vistas Totales</th>
+                            <th>Clics Totales</th>
+                            <th>CTR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${positions.map(pos => {
+                            const ctr = pos.views > 0 ? ((pos.clicks / pos.views) * 100).toFixed(2) : 0;
+
+                            return `
+                                <tr>
+                                    <td><span class="badge badge-primary">${pos.position}</span></td>
+                                    <td>${pos.count}</td>
+                                    <td>${pos.views.toLocaleString()}</td>
+                                    <td>${pos.clicks.toLocaleString()}</td>
+                                    <td><strong>${ctr}%</strong></td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Load statistics on page load
+        loadStatistics();
+    </script>
+</body>
+</html>

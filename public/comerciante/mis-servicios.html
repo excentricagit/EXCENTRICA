@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Servicios - Comerciante Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/comerciante/comerciante.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">COMERCIANTE</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/comerciante/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/comerciante/mis-productos.html" class="admin-nav-item">
+                    <span class="icon">🛒</span> Mis Productos
+                </a>
+                <a href="/comerciante/mis-servicios.html" class="admin-nav-item active">
+                    <span class="icon">🔧</span> Mis Servicios
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>🔧 Mis Servicios</h1>
+                <div class="admin-user">
+                    <span id="user-name">Comerciante</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">🔧</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-services">0</span>
+                            <span class="stat-label">Total servicios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="pending-services">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="approved-services">0</span>
+                            <span class="stat-label">Aprobados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="rejected-services">0</span>
+                            <span class="stat-label">Rechazados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters and Add button -->
+                <div class="d-flex gap-3 mb-4 flex-wrap justify-content-between">
+                    <div class="d-flex gap-3">
+                        <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
+                        <select id="filter-status" class="form-control" style="max-width: 150px;">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="aprobado">Aprobado</option>
+                            <option value="rechazado">Rechazado</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="addService()">
+                        <span>➕</span> Agregar Servicio
+                    </button>
+                </div>
+
+                <!-- Services Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="services-table-container">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar comerciante
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'comerciante')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Comerciante';
+
+        let allServices = [];
+        let filteredServices = [];
+
+        async function loadData() {
+            try {
+                const response = await api.getServicios({ comerciante_id: user.id });
+
+                if (response.success) {
+                    allServices = response.data;
+                    applyFilters();
+                    updateStats();
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                Components.showToast('Error cargando datos', 'error');
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const status = document.getElementById('filter-status').value;
+
+            filteredServices = allServices.filter(service => {
+                const matchSearch = !search ||
+                    service.nombre.toLowerCase().includes(search) ||
+                    (service.descripcion && service.descripcion.toLowerCase().includes(search));
+
+                const matchStatus = !status || service.estado === status;
+
+                return matchSearch && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('services-table-container');
+
+            if (filteredServices.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron servicios</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Servicio</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredServices.map(service => `
+                            <tr>
+                                <td>
+                                    <div class="service-info">
+                                        <strong>${service.nombre}</strong>
+                                        ${service.descripcion ? `<br><small class="text-muted">${truncate(service.descripcion, 60)}</small>` : ''}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-secondary">
+                                        ${service.categoria_nombre || '-'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-${getStatusBadgeClass(service.estado)}">
+                                        ${getStatusLabel(service.estado)}
+                                    </span>
+                                </td>
+                                <td>${formatDate(service.created_at)}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline" onclick="editService(${service.id})" title="Editar">
+                                            ✏️
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteService(${service.id})" title="Eliminar">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('total-services').textContent = allServices.length;
+            document.getElementById('pending-services').textContent = allServices.filter(s => s.estado === 'pendiente').length;
+            document.getElementById('approved-services').textContent = allServices.filter(s => s.estado === 'aprobado').length;
+            document.getElementById('rejected-services').textContent = allServices.filter(s => s.estado === 'rechazado').length;
+        }
+
+        function getStatusBadgeClass(status) {
+            const classes = {
+                pendiente: 'warning',
+                aprobado: 'success',
+                rechazado: 'danger'
+            };
+            return classes[status] || 'secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                pendiente: 'Pendiente',
+                aprobado: 'Aprobado',
+                rechazado: 'Rechazado'
+            };
+            return labels[status] || status;
+        }
+
+        function truncate(text, maxLength) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        async function deleteService(serviceId) {
+            if (!confirm('¿Eliminar este servicio? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const response = await api.deleteServicio(serviceId);
+                if (response.success) {
+                    Components.showToast('Servicio eliminado exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error deleting service:', e);
+                Components.showToast('Error eliminando servicio', 'error');
+            }
+        }
+
+        function editService(serviceId) {
+            // TODO: Implementar modal de edición
+            Components.showToast('Función de edición en desarrollo', 'info');
+        }
+
+        function addService() {
+            // TODO: Implementar modal de agregar servicio
+            Components.showToast('Función en desarrollo', 'info');
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-status').addEventListener('change', applyFilters);
+
+        // Load initial data
+        loadData();
+    </script>
+</body>
+</html>

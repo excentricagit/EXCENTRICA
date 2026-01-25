@@ -42,6 +42,31 @@ const App = {
 
             // Mostrar menú de usuario en header
             if (userMenu) {
+                // Determinar panel según rol
+                let panelLink = '';
+                let panelLabel = '';
+                switch(user.role) {
+                    case 'admin':
+                        panelLink = '/admin/';
+                        panelLabel = '⚙️ Panel Admin';
+                        break;
+                    case 'editor':
+                    case 'reporter':
+                    case 'periodista':
+                        panelLink = '/editor/';
+                        panelLabel = '📝 Panel Editor';
+                        break;
+                    case 'merchant':
+                    case 'comerciante':
+                        panelLink = '/comerciante/';
+                        panelLabel = '🏪 Mi Negocio';
+                        break;
+                    case 'publicista':
+                        panelLink = '/publicista/';
+                        panelLabel = '📺 Mis Anuncios';
+                        break;
+                }
+
                 userMenu.innerHTML = `
                     <div class="dropdown">
                         <button class="user-avatar-btn" onclick="this.parentElement.classList.toggle('active')">
@@ -50,7 +75,7 @@ const App = {
                         </button>
                         <div class="dropdown-menu">
                             <a href="/perfil.html" class="dropdown-item">👤 Mi Perfil</a>
-                            ${auth.isAdmin() ? '<a href="/admin/" class="dropdown-item">⚙️ Admin</a>' : ''}
+                            ${panelLink ? `<a href="${panelLink}" class="dropdown-item">${panelLabel}</a>` : ''}
                             <div class="dropdown-divider"></div>
                             <a href="#" class="dropdown-item" onclick="auth.logout(); return false;">🚪 Cerrar Sesión</a>
                         </div>
@@ -60,15 +85,47 @@ const App = {
 
             // Actualizar widget de usuario en sidebar (si existe)
             if (widgetUser) {
+                // Determinar panel según rol
+                let panelButton = '';
+                switch(user.role) {
+                    case 'admin':
+                        panelButton = `
+                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/admin/'">
+                                ⚙️ Panel Admin
+                            </button>
+                        `;
+                        break;
+                    case 'editor':
+                    case 'reporter':
+                    case 'periodista':
+                        panelButton = `
+                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/editor/'">
+                                📝 Panel Editor
+                            </button>
+                        `;
+                        break;
+                    case 'merchant':
+                    case 'comerciante':
+                        panelButton = `
+                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/comerciante/'">
+                                🏪 Mi Negocio
+                            </button>
+                        `;
+                        break;
+                    case 'publicista':
+                        panelButton = `
+                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/publicista/'">
+                                📺 Mis Anuncios
+                            </button>
+                        `;
+                        break;
+                }
+
                 widgetUser.innerHTML = `
                     <div class="widget-icon">👤</div>
                     <h3 class="widget-title">Hola, ${user.name.split(' ')[0]}</h3>
                     <p class="widget-text">${user.email}</p>
-                    ${auth.isAdmin() ? `
-                        <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/admin/'">
-                            ⚙️ Panel Admin
-                        </button>
-                    ` : ''}
+                    ${panelButton}
                     <button class="btn btn-outline btn-block" onclick="auth.logout()">
                         🚪 Cerrar Sesión
                     </button>

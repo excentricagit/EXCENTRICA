@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicista - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/publicista/publicista.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">PUBLICISTA</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/publicista/" class="admin-nav-item active">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/publicista/mis-anuncios.html" class="admin-nav-item">
+                    <span class="icon">📺</span> Mis Anuncios
+                </a>
+                <a href="/publicista/estadisticas.html" class="admin-nav-item">
+                    <span class="icon">📈</span> Estadísticas
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard - Publicista</h1>
+                <div class="admin-user">
+                    <span id="user-name">Publicista</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats cards -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📺</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-ads">-</span>
+                            <span class="stat-label">Mis Anuncios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-active">-</span>
+                            <span class="stat-label">Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-pending">-</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-views">-</span>
+                            <span class="stat-label">Vistas Totales</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="grid grid-2 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">📺 Anuncios pendientes de aprobación</h3>
+                            <p class="text-muted mb-3">Tienes <strong id="pending-ads">0</strong> anuncios esperando aprobación</p>
+                            <a href="/publicista/mis-anuncios.html?status=pending" class="btn btn-primary btn-sm">Ver anuncios pendientes</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">📈 Rendimiento de anuncios</h3>
+                            <p class="text-muted mb-3">Consulta las estadísticas de tus anuncios</p>
+                            <a href="/publicista/estadisticas.html" class="btn btn-primary btn-sm">Ver estadísticas</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent ads -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3 class="mb-3">🕐 Anuncios recientes</h3>
+                        <div id="recent-ads">
+                            <div class="text-center p-3"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar publicista
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'publicista')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Publicista';
+
+        async function loadDashboard() {
+            try {
+                // Get user's ads
+                const response = await api.getAds({ publicista_id: user.id });
+
+                if (response.success) {
+                    const ads = response.data;
+                    const totalAds = ads.length;
+                    const activeAds = ads.filter(a => a.estado === 'activo').length;
+                    const pendingAds = ads.filter(a => a.estado === 'pendiente').length;
+                    const totalViews = ads.reduce((sum, ad) => sum + (ad.vistas || 0), 0);
+
+                    document.getElementById('stat-ads').textContent = totalAds;
+                    document.getElementById('stat-active').textContent = activeAds;
+                    document.getElementById('stat-pending').textContent = pendingAds;
+                    document.getElementById('stat-views').textContent = totalViews.toLocaleString();
+                    document.getElementById('pending-ads').textContent = pendingAds;
+
+                    // Show recent ads
+                    const adsContainer = document.getElementById('recent-ads');
+
+                    if (ads.length > 0) {
+                        // Sort by date
+                        const sortedAds = [...ads].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                        adsContainer.innerHTML = `
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Posición</th>
+                                        <th>Estado</th>
+                                        <th>Vistas</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${sortedAds.slice(0, 10).map(ad => `
+                                        <tr>
+                                            <td><strong>${Utils.escapeHtml(ad.titulo)}</strong></td>
+                                            <td><span class="badge badge-secondary">${ad.posicion}</span></td>
+                                            <td><span class="badge badge-${ad.estado === 'activo' ? 'success' : 'warning'}">${ad.estado}</span></td>
+                                            <td>${ad.vistas || 0}</td>
+                                            <td>${Utils.formatDate(ad.created_at)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        adsContainer.innerHTML = '<p class="text-muted">No tienes anuncios aún. ¡Comienza creando tu primer anuncio!</p>';
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading dashboard:', e);
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

@@ -3,63 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos - Admin Excentrica</title>
+    <title>Eventos - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="/editor/editor.css">
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-logo">
+                        <div class="admin-logo">
                 <a href="/"><span>⚡</span> Excentrica</a>
-                <span class="admin-badge">ADMIN</span>
+                <span class="admin-badge">EDITOR</span>
             </div>
             <nav class="admin-nav">
-                <a href="/admin/" class="admin-nav-item">
+                <a href="/editor/" class="admin-nav-item">
                     <span class="icon">📊</span> Dashboard
                 </a>
-                <a href="/admin/usuarios.html" class="admin-nav-item">
-                    <span class="icon">👥</span> Usuarios
-                </a>
-                <a href="/admin/noticias.html" class="admin-nav-item">
+                <a href="/editor/noticias.html" class="admin-nav-item">
                     <span class="icon">📰</span> Noticias
                 </a>
-                <a href="/admin/productos.html" class="admin-nav-item">
+                <a href="/editor/productos.html" class="admin-nav-item">
                     <span class="icon">🛒</span> Productos
                 </a>
-                <a href="/admin/eventos.html" class="admin-nav-item active">
+                <a href="/editor/eventos.html" class="admin-nav-item active">
                     <span class="icon">📅</span> Eventos
                 </a>
-                <a href="/admin/categorias.html" class="admin-nav-item">
+                <a href="/editor/categorias.html" class="admin-nav-item">
                     <span class="icon">📁</span> Categorías
                 </a>
-                <a href="/admin/zonas.html" class="admin-nav-item">
+                <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
                 </a>
-                <a href="/admin/ads.html" class="admin-nav-item">
-                    <span class="icon">📺</span> Publicidad
-                </a>
-                <a href="/admin/cine.html" class="admin-nav-item">
+                <a href="/editor/cine.html" class="admin-nav-item">
                     <span class="icon">🎬</span> Cine
                 </a>
-                <a href="/admin/gastronomia.html" class="admin-nav-item">
+                <a href="/editor/gastronomia.html" class="admin-nav-item">
                     <span class="icon">🍽️</span> Gastronomía
                 </a>
-                <a href="/admin/alojamiento.html" class="admin-nav-item">
+                <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
                 </a>
-                <a href="/admin/transporte.html" class="admin-nav-item">
+                <a href="/editor/transporte.html" class="admin-nav-item">
                     <span class="icon">🚌</span> Transporte
                 </a>
-                <a href="/admin/servicios.html" class="admin-nav-item">
+                <a href="/editor/servicios.html" class="admin-nav-item">
                     <span class="icon">🔧</span> Servicios
                 </a>
-                <a href="/admin/puntos-interes.html" class="admin-nav-item">
+                <a href="/editor/puntos-interes.html" class="admin-nav-item">
                     <span class="icon">📍</span> Turismo
-                </a>
-                <a href="/admin/almacenamiento.html" class="admin-nav-item">
-                    <span class="icon">💾</span> Almacenamiento
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
@@ -76,7 +67,7 @@
             <header class="admin-header">
                 <h1>📅 Gestión de Eventos</h1>
                 <div class="admin-user">
-                    <span id="user-name">Administrador</span>
+                    <span id="user-name">Editor</span>
                 </div>
             </header>
 
@@ -153,11 +144,11 @@
     <script src="/js/components.js"></script>
     <script>
         // Verificar admin
-        if (!auth.requireAdmin()) {
+        if (!auth.getUser()) {
             // Se redirige automáticamente
         }
 
-        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
         let allEvents = [];
         let filteredEvents = [];

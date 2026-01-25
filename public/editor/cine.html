@@ -1,65 +1,56 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transporte - Admin Excentrica</title>
+    <title>Cine - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="/editor/editor.css">
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-logo">
+                        <div class="admin-logo">
                 <a href="/"><span>⚡</span> Excentrica</a>
-                <span class="admin-badge">ADMIN</span>
+                <span class="admin-badge">EDITOR</span>
             </div>
             <nav class="admin-nav">
-                <a href="/admin/" class="admin-nav-item">
+                <a href="/editor/" class="admin-nav-item">
                     <span class="icon">📊</span> Dashboard
                 </a>
-                <a href="/admin/usuarios.html" class="admin-nav-item">
-                    <span class="icon">👥</span> Usuarios
-                </a>
-                <a href="/admin/noticias.html" class="admin-nav-item">
+                <a href="/editor/noticias.html" class="admin-nav-item">
                     <span class="icon">📰</span> Noticias
                 </a>
-                <a href="/admin/productos.html" class="admin-nav-item">
+                <a href="/editor/productos.html" class="admin-nav-item">
                     <span class="icon">🛒</span> Productos
                 </a>
-                <a href="/admin/eventos.html" class="admin-nav-item">
+                <a href="/editor/eventos.html" class="admin-nav-item">
                     <span class="icon">📅</span> Eventos
                 </a>
-                <a href="/admin/categorias.html" class="admin-nav-item">
+                <a href="/editor/categorias.html" class="admin-nav-item">
                     <span class="icon">📁</span> Categorías
                 </a>
-                <a href="/admin/zonas.html" class="admin-nav-item">
+                <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
                 </a>
-                <a href="/admin/ads.html" class="admin-nav-item">
-                    <span class="icon">📺</span> Publicidad
+                <a href="/editor/cine.html" class="admin-nav-item active">
+                    <span class="icon">🎬</span> Cine
                 </a>
-                <a href="/admin/Tipo.html" class="admin-nav-item">
-                    <span class="icon">🎬</span> Tipo
-                </a>
-                <a href="/admin/gastronomia.html" class="admin-nav-item">
+                <a href="/editor/gastronomia.html" class="admin-nav-item">
                     <span class="icon">🍽️</span> Gastronomía
                 </a>
-                <a href="/admin/alojamiento.html" class="admin-nav-item">
+                <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
                 </a>
-                <a href="/admin/transporte.html" class="admin-nav-item active">
+                <a href="/editor/transporte.html" class="admin-nav-item">
                     <span class="icon">🚌</span> Transporte
                 </a>
-                <a href="/admin/servicios.html" class="admin-nav-item">
+                <a href="/editor/servicios.html" class="admin-nav-item">
                     <span class="icon">🔧</span> Servicios
                 </a>
-                <a href="/admin/puntos-interes.html" class="admin-nav-item">
+                <a href="/editor/puntos-interes.html" class="admin-nav-item">
                     <span class="icon">📍</span> Turismo
-                </a>
-                <a href="/admin/almacenamiento.html" class="admin-nav-item">
-                    <span class="icon">💾</span> Almacenamiento
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
@@ -74,9 +65,9 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🎬 Gestión de Tipo</h1>
+                <h1>🎬 Gestión de Cine</h1>
                 <div class="admin-user">
-                    <span id="user-name">Administrador</span>
+                    <span id="user-name">Editor</span>
                     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
                         <span>➕</span> Nueva Película
                     </button>
@@ -89,28 +80,28 @@
                     <div class="stat-card">
                         <div class="stat-icon">🎬</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="total-transports">0</span>
+                            <span class="stat-value" id="total-movies">0</span>
                             <span class="stat-label">Total películas</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="active-transports">0</span>
+                            <span class="stat-value" id="active-movies">0</span>
                             <span class="stat-label">Activas</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⏳</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="pending-transports">0</span>
+                            <span class="stat-value" id="pending-movies">0</span>
                             <span class="stat-label">Pendientes</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">❌</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="rejected-transports">0</span>
+                            <span class="stat-value" id="rejected-movies">0</span>
                             <span class="stat-label">Rechazadas</span>
                         </div>
                     </div>
@@ -125,18 +116,18 @@
                         <option value="aprobada">Aprobada</option>
                         <option value="rechazada">Rechazada</option>
                     </select>
-                    <select id="filter-type" class="form-control" style="max-width: 150px;">
-                        <option value="">Todos los tipos</option>
+                    <select id="filter-cinema" class="form-control" style="max-width: 150px;">
+                        <option value="">Todos los cines</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
                 </div>
 
-                <!-- Transports Table -->
+                <!-- Movies Table -->
                 <div class="card">
                     <div class="card-body">
-                        <div id="transports-table-container">
+                        <div id="movies-table-container">
                             <div class="text-center p-4">
                                 <div class="spinner"></div>
                             </div>
@@ -154,27 +145,27 @@
     <script src="/js/components.js"></script>
     <script>
         // Verificar admin
-        if (!auth.requireAdmin()) {
+        if (!auth.getUser()) {
             // Se redirige automáticamente
         }
 
-        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        let allTransports = [];
-        let filteredTransports = [];
+        let allMovies = [];
+        let filteredMovies = [];
 
         async function loadData() {
             try {
                 // TODO: Implementar API endpoint para películas
-                // const response = await api.getTipo();
+                // const response = await api.getCine();
                 // if (response.success) {
-                //     allTransports = response.data;
+                //     allMovies = response.data;
                 //     applyFilters();
                 //     updateStats();
                 // }
 
                 // Datos de ejemplo
-                allTransports = [];
+                allMovies = [];
                 applyFilters();
                 updateStats();
             } catch (e) {
@@ -186,26 +177,26 @@
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
             const status = document.getElementById('filter-status').value;
-            const Tipoma = document.getElementById('filter-type').value;
+            const cinema = document.getElementById('filter-cinema').value;
 
-            filteredTransports = allTransports.filter(Transport => {
+            filteredMovies = allMovies.filter(movie => {
                 const matchSearch = !search ||
-                    Transport.titulo.toLowerCase().includes(search) ||
-                    (Transport.descripcion && Transport.descripcion.toLowerCase().includes(search));
+                    movie.titulo.toLowerCase().includes(search) ||
+                    (movie.descripcion && movie.descripcion.toLowerCase().includes(search));
 
-                const matchStatus = !status || Transport.estado === status;
-                const matchTipoma = !Tipoma || Transport.Tipo_id == Tipoma;
+                const matchStatus = !status || movie.estado === status;
+                const matchCinema = !cinema || movie.cine_id == cinema;
 
-                return matchSearch && matchStatus && matchTipoma;
+                return matchSearch && matchStatus && matchCinema;
             });
 
             renderTable();
         }
 
         function renderTable() {
-            const container = document.getElementById('transports-table-container');
+            const container = document.getElementById('movies-table-container');
 
-            if (filteredTransports.length === 0) {
+            if (filteredMovies.length === 0) {
                 container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron películas</p>';
                 return;
             }
@@ -215,46 +206,46 @@
                     <thead>
                         <tr>
                             <th>Película</th>
-                            <th>Tipo</th>
+                            <th>Cine</th>
                             <th>Género</th>
-                            <th>Frecuencia</th>
+                            <th>Horarios</th>
                             <th>Estado</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredTransports.map(Transport => `
+                        ${filteredMovies.map(movie => `
                             <tr>
                                 <td>
-                                    <div class="transport-info">
-                                        <strong>${Transport.titulo}</strong>
-                                        ${Transport.descripcion ? `<br><small class="text-muted">${truncate(Transport.descripcion, 60)}</small>` : ''}
+                                    <div class="movie-info">
+                                        <strong>${movie.titulo}</strong>
+                                        ${movie.descripcion ? `<br><small class="text-muted">${truncate(movie.descripcion, 60)}</small>` : ''}
                                     </div>
                                 </td>
-                                <td>${Transport.Tipo_nombre || '-'}</td>
-                                <td>${Transport.genero || '-'}</td>
-                                <td><small>${Transport.Frecuencia || '-'}</small></td>
+                                <td>${movie.cine_nombre || '-'}</td>
+                                <td>${movie.genero || '-'}</td>
+                                <td><small>${movie.horarios || '-'}</small></td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(Transport.estado)}">
-                                        ${getStatusLabel(Transport.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(movie.estado)}">
+                                        ${getStatusLabel(movie.estado)}
                                     </span>
                                 </td>
-                                <td>${formatDate(Transport.created_at)}</td>
+                                <td>${formatDate(movie.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${Transport.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveTransport(${Transport.id})" title="Aprobar">
+                                        ${movie.estado === 'pendiente' ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveMovie(${movie.id})" title="Aprobar">
                                                 ✅
                                             </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectTransport(${Transport.id})" title="Rechazar">
+                                            <button class="btn btn-sm btn-danger" onclick="rejectMovie(${movie.id})" title="Rechazar">
                                                 ❌
                                             </button>
                                         ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editTransport(${Transport.id})" title="Editar">
+                                        <button class="btn btn-sm btn-outline" onclick="editMovie(${movie.id})" title="Editar">
                                             ✏️
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteTransport(${Transport.id})" title="Eliminar">
+                                        <button class="btn btn-sm btn-danger" onclick="deleteMovie(${movie.id})" title="Eliminar">
                                             🗑️
                                         </button>
                                     </div>
@@ -267,10 +258,10 @@
         }
 
         function updateStats() {
-            document.getElementById('total-transports').textContent = allTransports.length;
-            document.getElementById('active-transports').textContent = allTransports.filter(m => m.estado === 'aprobada').length;
-            document.getElementById('pending-transports').textContent = allTransports.filter(m => m.estado === 'pendiente').length;
-            document.getElementById('rejected-transports').textContent = allTransports.filter(m => m.estado === 'rechazada').length;
+            document.getElementById('total-movies').textContent = allMovies.length;
+            document.getElementById('active-movies').textContent = allMovies.filter(m => m.estado === 'aprobada').length;
+            document.getElementById('pending-movies').textContent = allMovies.filter(m => m.estado === 'pendiente').length;
+            document.getElementById('rejected-movies').textContent = allMovies.filter(m => m.estado === 'rechazada').length;
         }
 
         function getStatusBadgeClass(status) {
@@ -308,23 +299,23 @@
         function resetFilters() {
             document.getElementById('search').value = '';
             document.getElementById('filter-status').value = '';
-            document.getElementById('filter-type').value = '';
+            document.getElementById('filter-cinema').value = '';
             applyFilters();
         }
 
-        async function approveTransport(TransportId) {
+        async function approveMovie(movieId) {
             Components.showToast('Función en desarrollo', 'info');
         }
 
-        async function rejectTransport(TransportId) {
+        async function rejectMovie(movieId) {
             Components.showToast('Función en desarrollo', 'info');
         }
 
-        async function deleteTransport(TransportId) {
+        async function deleteMovie(movieId) {
             Components.showToast('Función en desarrollo', 'info');
         }
 
-        function editTransport(TransportId) {
+        function editMovie(movieId) {
             Components.showToast('Función de edición en desarrollo', 'info');
         }
 
@@ -335,11 +326,10 @@
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
         document.getElementById('filter-status').addEventListener('change', applyFilters);
-        document.getElementById('filter-type').addEventListener('change', applyFilters);
+        document.getElementById('filter-cinema').addEventListener('change', applyFilters);
 
         // Load initial data
         loadData();
     </script>
 </body>
 </html>
-

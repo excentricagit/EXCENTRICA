@@ -1,65 +1,56 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puntos de InterÃ©s - Admin Excentrica</title>
+    <title>Gastronomía - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="/editor/editor.css">
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-logo">
+                        <div class="admin-logo">
                 <a href="/"><span>⚡</span> Excentrica</a>
-                <span class="admin-badge">ADMIN</span>
+                <span class="admin-badge">EDITOR</span>
             </div>
             <nav class="admin-nav">
-                <a href="/admin/" class="admin-nav-item">
+                <a href="/editor/" class="admin-nav-item">
                     <span class="icon">📊</span> Dashboard
                 </a>
-                <a href="/admin/usuarios.html" class="admin-nav-item">
-                    <span class="icon">👥</span> Usuarios
-                </a>
-                <a href="/admin/noticias.html" class="admin-nav-item">
+                <a href="/editor/noticias.html" class="admin-nav-item">
                     <span class="icon">📰</span> Noticias
                 </a>
-                <a href="/admin/productos.html" class="admin-nav-item">
+                <a href="/editor/productos.html" class="admin-nav-item">
                     <span class="icon">🛒</span> Productos
                 </a>
-                <a href="/admin/eventos.html" class="admin-nav-item">
+                <a href="/editor/eventos.html" class="admin-nav-item">
                     <span class="icon">📅</span> Eventos
                 </a>
-                <a href="/admin/categorias.html" class="admin-nav-item">
+                <a href="/editor/categorias.html" class="admin-nav-item">
                     <span class="icon">📁</span> Categorías
                 </a>
-                <a href="/admin/zonas.html" class="admin-nav-item">
+                <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
                 </a>
-                <a href="/admin/ads.html" class="admin-nav-item">
-                    <span class="icon">📺</span> Publicidad
+                <a href="/editor/cine.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> Cine
                 </a>
-                <a href="/admin/CategorÃ­a.html" class="admin-nav-item">
-                    <span class="icon">🎬</span> CategorÃ­a
-                </a>
-                <a href="/admin/gastronomia.html" class="admin-nav-item">
+                <a href="/editor/gastronomia.html" class="admin-nav-item active">
                     <span class="icon">🍽️</span> Gastronomía
                 </a>
-                <a href="/admin/alojamiento.html" class="admin-nav-item">
+                <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
                 </a>
-                <a href="/admin/transporte.html" class="admin-nav-item">
+                <a href="/editor/transporte.html" class="admin-nav-item">
                     <span class="icon">🚌</span> Transporte
                 </a>
-                <a href="/admin/servicios.html" class="admin-nav-item">
+                <a href="/editor/servicios.html" class="admin-nav-item">
                     <span class="icon">🔧</span> Servicios
                 </a>
-                <a href="/admin/puntos-interes.html" class="admin-nav-item active">
+                <a href="/editor/puntos-interes.html" class="admin-nav-item">
                     <span class="icon">📍</span> Turismo
-                </a>
-                <a href="/admin/almacenamiento.html" class="admin-nav-item">
-                    <span class="icon">💾</span> Almacenamiento
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
@@ -74,11 +65,11 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🎬 Gestión de CategorÃ­a</h1>
+                <h1>🍽️ Gestión de Gastronomía</h1>
                 <div class="admin-user">
-                    <span id="user-name">Administrador</span>
+                    <span id="user-name">Editor</span>
                     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
-                        <span>➕</span> Nueva Película
+                        <span>➕</span> Nuevo Restaurante
                     </button>
                 </div>
             </header>
@@ -89,28 +80,28 @@
                     <div class="stat-card">
                         <div class="stat-icon">🎬</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="total-pois">0</span>
-                            <span class="stat-label">Total películas</span>
+                            <span class="stat-value" id="total-restaurants">0</span>
+                            <span class="stat-label">Total restaurantes</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="active-pois">0</span>
+                            <span class="stat-value" id="active-restaurants">0</span>
                             <span class="stat-label">Activas</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⏳</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="pending-pois">0</span>
+                            <span class="stat-value" id="pending-restaurants">0</span>
                             <span class="stat-label">Pendientes</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">❌</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="rejected-pois">0</span>
+                            <span class="stat-value" id="rejected-restaurants">0</span>
                             <span class="stat-label">Rechazadas</span>
                         </div>
                     </div>
@@ -126,17 +117,17 @@
                         <option value="rechazada">Rechazada</option>
                     </select>
                     <select id="filter-category" class="form-control" style="max-width: 150px;">
-                        <option value="">Todas las categorÃ­as</option>
+                        <option value="">Todas las categorías</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
                 </div>
 
-                <!-- POIs Table -->
+                <!-- Restaurants Table -->
                 <div class="card">
                     <div class="card-body">
-                        <div id="pois-table-container">
+                        <div id="restaurants-table-container">
                             <div class="text-center p-4">
                                 <div class="spinner"></div>
                             </div>
@@ -154,27 +145,27 @@
     <script src="/js/components.js"></script>
     <script>
         // Verificar admin
-        if (!auth.requireAdmin()) {
+        if (!auth.getUser()) {
             // Se redirige automáticamente
         }
 
-        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        let allPOIs = [];
-        let filteredPOIs = [];
+        let allRestaurants = [];
+        let filteredRestaurants = [];
 
         async function loadData() {
             try {
                 // TODO: Implementar API endpoint para películas
-                // const response = await api.getCategorÃ­a();
+                // const response = await api.getCine();
                 // if (response.success) {
-                //     allPOIs = response.data;
+                //     allRestaurants = response.data;
                 //     applyFilters();
                 //     updateStats();
                 // }
 
                 // Datos de ejemplo
-                allPOIs = [];
+                allRestaurants = [];
                 applyFilters();
                 updateStats();
             } catch (e) {
@@ -186,27 +177,27 @@
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
             const status = document.getElementById('filter-status').value;
-            const CategorÃ­ama = document.getElementById('filter-category').value;
+            const cinema = document.getElementById('filter-category').value;
 
-            filteredPOIs = allPOIs.filter(POI => {
+            filteredRestaurants = allRestaurants.filter(restaurant => {
                 const matchSearch = !search ||
-                    POI.titulo.toLowerCase().includes(search) ||
-                    (POI.descripcion && POI.descripcion.toLowerCase().includes(search));
+                    restaurant.titulo.toLowerCase().includes(search) ||
+                    (restaurant.descripcion && restaurant.descripcion.toLowerCase().includes(search));
 
-                const matchStatus = !status || POI.estado === status;
-                const matchCategorÃ­ama = !CategorÃ­ama || POI.CategorÃ­a_id == CategorÃ­ama;
+                const matchStatus = !status || restaurant.estado === status;
+                const matchCinema = !cinema || restaurant.cine_id == cinema;
 
-                return matchSearch && matchStatus && matchCategorÃ­ama;
+                return matchSearch && matchStatus && matchCinema;
             });
 
             renderTable();
         }
 
         function renderTable() {
-            const container = document.getElementById('pois-table-container');
+            const container = document.getElementById('restaurants-table-container');
 
-            if (filteredPOIs.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron películas</p>';
+            if (filteredRestaurants.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron restaurantes</p>';
                 return;
             }
 
@@ -214,47 +205,47 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Película</th>
-                            <th>CategorÃ­a</th>
-                            <th>Género</th>
-                            <th>DescripciÃ³n</th>
+                            <th>Restaurante</th>
+                            <th>Categoría</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
                             <th>Estado</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredPOIs.map(POI => `
+                        ${filteredRestaurants.map(restaurant => `
                             <tr>
                                 <td>
-                                    <div class="poi-info">
-                                        <strong>${POI.titulo}</strong>
-                                        ${POI.descripcion ? `<br><small class="text-muted">${truncate(POI.descripcion, 60)}</small>` : ''}
+                                    <div class="restaurant-info">
+                                        <strong>${restaurant.titulo}</strong>
+                                        ${restaurant.descripcion ? `<br><small class="text-muted">${truncate(restaurant.descripcion, 60)}</small>` : ''}
                                     </div>
                                 </td>
-                                <td>${POI.CategorÃ­a_nombre || '-'}</td>
-                                <td>${POI.genero || '-'}</td>
-                                <td><small>${POI.DescripciÃ³n || '-'}</small></td>
+                                <td>${restaurant.categoria_nombre || '-'}</td>
+                                <td>${restaurant.direccion || '-'}</td>
+                                <td><small>${restaurant.telefono || '-'}</small></td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(POI.estado)}">
-                                        ${getStatusLabel(POI.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(restaurant.estado)}">
+                                        ${getStatusLabel(restaurant.estado)}
                                     </span>
                                 </td>
-                                <td>${formatDate(POI.created_at)}</td>
+                                <td>${formatDate(restaurant.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${POI.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approvePOI(${POI.id})" title="Aprobar">
+                                        ${restaurant.estado === 'pendiente' ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveRestaurant(${restaurant.id})" title="Aprobar">
                                                 ✅
                                             </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectPOI(${POI.id})" title="Rechazar">
+                                            <button class="btn btn-sm btn-danger" onclick="rejectRestaurant(${restaurant.id})" title="Rechazar">
                                                 ❌
                                             </button>
                                         ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editPOI(${POI.id})" title="Editar">
+                                        <button class="btn btn-sm btn-outline" onclick="editRestaurant(${restaurant.id})" title="Editar">
                                             ✏️
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deletePOI(${POI.id})" title="Eliminar">
+                                        <button class="btn btn-sm btn-danger" onclick="deleteRestaurant(${restaurant.id})" title="Eliminar">
                                             🗑️
                                         </button>
                                     </div>
@@ -267,10 +258,10 @@
         }
 
         function updateStats() {
-            document.getElementById('total-pois').textContent = allPOIs.length;
-            document.getElementById('active-pois').textContent = allPOIs.filter(m => m.estado === 'aprobada').length;
-            document.getElementById('pending-pois').textContent = allPOIs.filter(m => m.estado === 'pendiente').length;
-            document.getElementById('rejected-pois').textContent = allPOIs.filter(m => m.estado === 'rechazada').length;
+            document.getElementById('total-restaurants').textContent = allRestaurants.length;
+            document.getElementById('active-restaurants').textContent = allRestaurants.filter(m => m.estado === 'aprobada').length;
+            document.getElementById('pending-restaurants').textContent = allRestaurants.filter(m => m.estado === 'pendiente').length;
+            document.getElementById('rejected-restaurants').textContent = allRestaurants.filter(m => m.estado === 'rechazada').length;
         }
 
         function getStatusBadgeClass(status) {
@@ -312,19 +303,19 @@
             applyFilters();
         }
 
-        async function approvePOI(POIId) {
+        async function approveRestaurant(restaurantId) {
             Components.showToast('Función en desarrollo', 'info');
         }
 
-        async function rejectPOI(POIId) {
+        async function rejectRestaurant(restaurantId) {
             Components.showToast('Función en desarrollo', 'info');
         }
 
-        async function deletePOI(POIId) {
+        async function deleteRestaurant(restaurantId) {
             Components.showToast('Función en desarrollo', 'info');
         }
 
-        function editPOI(POIId) {
+        function editRestaurant(restaurantId) {
             Components.showToast('Función de edición en desarrollo', 'info');
         }
 
@@ -342,4 +333,3 @@
     </script>
 </body>
 </html>
-

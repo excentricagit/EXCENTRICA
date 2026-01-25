@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/editor/editor.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">EDITOR</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/editor/" class="admin-nav-item active">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/editor/noticias.html" class="admin-nav-item">
+                    <span class="icon">📰</span> Noticias
+                </a>
+                <a href="/editor/productos.html" class="admin-nav-item">
+                    <span class="icon">🛒</span> Productos
+                </a>
+                <a href="/editor/eventos.html" class="admin-nav-item">
+                    <span class="icon">📅</span> Eventos
+                </a>
+                <a href="/editor/categorias.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Categorías
+                </a>
+                <a href="/editor/zonas.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Zonas
+                </a>
+                <a href="/editor/cine.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> Cine
+                </a>
+                <a href="/editor/gastronomia.html" class="admin-nav-item">
+                    <span class="icon">🍽️</span> Gastronomía
+                </a>
+                <a href="/editor/alojamiento.html" class="admin-nav-item">
+                    <span class="icon">🏨</span> Alojamiento
+                </a>
+                <a href="/editor/transporte.html" class="admin-nav-item">
+                    <span class="icon">🚌</span> Transporte
+                </a>
+                <a href="/editor/servicios.html" class="admin-nav-item">
+                    <span class="icon">🔧</span> Servicios
+                </a>
+                <a href="/editor/puntos-interes.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Turismo
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard - Editor</h1>
+                <div class="admin-user">
+                    <span id="user-name">Editor</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats cards -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📰</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-news">-</span>
+                            <span class="stat-label">Noticias</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-products">-</span>
+                            <span class="stat-label">Productos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-events">-</span>
+                            <span class="stat-label">Eventos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📁</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-categories">-</span>
+                            <span class="stat-label">Categorías</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending items -->
+                <div class="grid grid-2 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">⏳ Productos pendientes: <span id="pending-products">0</span></h3>
+                            <a href="/editor/productos.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">⏳ Noticias pendientes: <span id="pending-news">0</span></h3>
+                            <a href="/editor/noticias.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent activity -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3 class="mb-3">🕐 Contenido reciente</h3>
+                        <div id="recent-content">
+                            <div class="text-center p-3"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar editor
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'editor')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Editor';
+
+        async function loadDashboard() {
+            try {
+                const response = await api.getAdminStats();
+                if (response.success) {
+                    const data = response.data;
+
+                    document.getElementById('stat-news').textContent = data.counts.news || 0;
+                    document.getElementById('stat-products').textContent = data.counts.products || 0;
+                    document.getElementById('stat-events').textContent = data.counts.events || 0;
+                    document.getElementById('stat-categories').textContent = data.counts.categories || 0;
+                    document.getElementById('pending-products').textContent = data.counts.pending_products || 0;
+                    document.getElementById('pending-news').textContent = data.counts.pending_news || 0;
+
+                    // Recent content
+                    const contentContainer = document.getElementById('recent-content');
+                    const recentItems = [];
+
+                    if (data.recent?.news) {
+                        recentItems.push(...data.recent.news.map(n => ({...n, type: 'Noticia'})));
+                    }
+                    if (data.recent?.products) {
+                        recentItems.push(...data.recent.products.map(p => ({...p, type: 'Producto'})));
+                    }
+
+                    if (recentItems.length > 0) {
+                        contentContainer.innerHTML = `
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Título</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${recentItems.slice(0, 10).map(item => `
+                                        <tr>
+                                            <td><span class="badge badge-secondary">${item.type}</span></td>
+                                            <td>${Utils.escapeHtml(item.titulo || item.nombre)}</td>
+                                            <td><span class="badge badge-${item.estado === 'aprobada' || item.estado === 'aprobado' ? 'success' : 'warning'}">${item.estado}</span></td>
+                                            <td>${Utils.formatDate(item.created_at)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        contentContainer.innerHTML = '<p class="text-muted">No hay contenido reciente</p>';
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading dashboard:', e);
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

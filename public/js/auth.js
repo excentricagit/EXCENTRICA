@@ -35,7 +35,47 @@ class AuthService {
     }
 
     isEditor() {
-        return this.user && (this.user.role === 'admin' || this.user.role === 'editor');
+        return this.user && (
+            this.user.role === 'admin' ||
+            this.user.role === 'editor' ||
+            this.user.role === 'reporter' ||
+            this.user.role === 'periodista'
+        );
+    }
+
+    isComerciante() {
+        return this.user && (
+            this.user.role === 'admin' ||
+            this.user.role === 'merchant' ||
+            this.user.role === 'comerciante'
+        );
+    }
+
+    isPublicista() {
+        return this.user && (
+            this.user.role === 'admin' ||
+            this.user.role === 'publicista'
+        );
+    }
+
+    // Get panel URL for current user role
+    getPanelUrl() {
+        if (!this.user) return '/';
+        switch(this.user.role) {
+            case 'admin':
+                return '/admin/';
+            case 'editor':
+            case 'reporter':
+            case 'periodista':
+                return '/editor/';
+            case 'merchant':
+            case 'comerciante':
+                return '/comerciante/';
+            case 'publicista':
+                return '/publicista/';
+            default:
+                return '/';
+        }
     }
 
     async login(email, password) {

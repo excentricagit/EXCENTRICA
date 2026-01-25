@@ -3,63 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos - Admin Excentrica</title>
+    <title>Noticias - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/admin/admin.css">
+    <link rel="stylesheet" href="/editor/editor.css">
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-            <div class="admin-logo">
+                                    <div class="admin-logo">
                 <a href="/"><span>⚡</span> Excentrica</a>
-                <span class="admin-badge">ADMIN</span>
+                <span class="admin-badge">EDITOR</span>
             </div>
             <nav class="admin-nav">
-                <a href="/admin/" class="admin-nav-item">
+                <a href="/editor/" class="admin-nav-item">
                     <span class="icon">📊</span> Dashboard
                 </a>
-                <a href="/admin/usuarios.html" class="admin-nav-item">
-                    <span class="icon">👥</span> Usuarios
-                </a>
-                <a href="/admin/noticias.html" class="admin-nav-item">
+                <a href="/editor/noticias.html" class="admin-nav-item active">
                     <span class="icon">📰</span> Noticias
                 </a>
-                <a href="/admin/productos.html" class="admin-nav-item active">
+                <a href="/editor/productos.html" class="admin-nav-item">
                     <span class="icon">🛒</span> Productos
                 </a>
-                <a href="/admin/eventos.html" class="admin-nav-item">
+                <a href="/editor/eventos.html" class="admin-nav-item">
                     <span class="icon">📅</span> Eventos
                 </a>
-                <a href="/admin/categorias.html" class="admin-nav-item">
+                <a href="/editor/categorias.html" class="admin-nav-item">
                     <span class="icon">📁</span> Categorías
                 </a>
-                <a href="/admin/zonas.html" class="admin-nav-item">
+                <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
                 </a>
-                <a href="/admin/ads.html" class="admin-nav-item">
-                    <span class="icon">📺</span> Publicidad
-                </a>
-                <a href="/admin/cine.html" class="admin-nav-item">
+                <a href="/editor/cine.html" class="admin-nav-item">
                     <span class="icon">🎬</span> Cine
                 </a>
-                <a href="/admin/gastronomia.html" class="admin-nav-item">
+                <a href="/editor/gastronomia.html" class="admin-nav-item">
                     <span class="icon">🍽️</span> Gastronomía
                 </a>
-                <a href="/admin/alojamiento.html" class="admin-nav-item">
+                <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
                 </a>
-                <a href="/admin/transporte.html" class="admin-nav-item">
+                <a href="/editor/transporte.html" class="admin-nav-item">
                     <span class="icon">🚌</span> Transporte
                 </a>
-                <a href="/admin/servicios.html" class="admin-nav-item">
+                <a href="/editor/servicios.html" class="admin-nav-item">
                     <span class="icon">🔧</span> Servicios
                 </a>
-                <a href="/admin/puntos-interes.html" class="admin-nav-item">
+                <a href="/editor/puntos-interes.html" class="admin-nav-item">
                     <span class="icon">📍</span> Turismo
-                </a>
-                <a href="/admin/almacenamiento.html" class="admin-nav-item">
-                    <span class="icon">💾</span> Almacenamiento
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
@@ -74,9 +65,9 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🛒 Gestión de Productos</h1>
+                <h1>📰 Gestión de Noticias</h1>
                 <div class="admin-user">
-                    <span id="user-name">Administrador</span>
+                    <span id="user-name">Editor</span>
                 </div>
             </header>
 
@@ -84,31 +75,31 @@
                 <!-- Stats -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card">
-                        <div class="stat-icon">🛒</div>
+                        <div class="stat-icon">📰</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="total-products">0</span>
-                            <span class="stat-label">Total productos</span>
+                            <span class="stat-value" id="total-news">0</span>
+                            <span class="stat-label">Total noticias</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⏳</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="pending-products">0</span>
+                            <span class="stat-value" id="pending-news">0</span>
                             <span class="stat-label">Pendientes</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="approved-products">0</span>
-                            <span class="stat-label">Aprobados</span>
+                            <span class="stat-value" id="approved-news">0</span>
+                            <span class="stat-label">Aprobadas</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">❌</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="rejected-products">0</span>
-                            <span class="stat-label">Rechazados</span>
+                            <span class="stat-value" id="rejected-news">0</span>
+                            <span class="stat-label">Rechazadas</span>
                         </div>
                     </div>
                 </div>
@@ -119,8 +110,8 @@
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="rechazada">Rechazada</option>
                     </select>
                     <select id="filter-category" class="form-control" style="max-width: 150px;">
                         <option value="">Todas las categorías</option>
@@ -130,10 +121,10 @@
                     </button>
                 </div>
 
-                <!-- Products Table -->
+                <!-- News Table -->
                 <div class="card">
                     <div class="card-body">
-                        <div id="products-table-container">
+                        <div id="news-table-container">
                             <div class="text-center p-4">
                                 <div class="spinner"></div>
                             </div>
@@ -151,25 +142,25 @@
     <script src="/js/components.js"></script>
     <script>
         // Verificar admin
-        if (!auth.requireAdmin()) {
+        if (!auth.getUser()) {
             // Se redirige automáticamente
         }
 
-        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        let allProducts = [];
-        let filteredProducts = [];
+        let allNews = [];
+        let filteredNews = [];
         let categories = [];
 
         async function loadData() {
             try {
-                const [productsResponse, categoriesResponse] = await Promise.all([
-                    api.getProductos(),
-                    api.getCategorias('productos')
+                const [newsResponse, categoriesResponse] = await Promise.all([
+                    api.getNoticias(),
+                    api.getCategorias('noticias')
                 ]);
 
-                if (productsResponse.success) {
-                    allProducts = productsResponse.data;
+                if (newsResponse.success) {
+                    allNews = newsResponse.data;
                     applyFilters();
                     updateStats();
                 }
@@ -195,13 +186,13 @@
             const status = document.getElementById('filter-status').value;
             const category = document.getElementById('filter-category').value;
 
-            filteredProducts = allProducts.filter(product => {
+            filteredNews = allNews.filter(news => {
                 const matchSearch = !search ||
-                    product.titulo.toLowerCase().includes(search) ||
-                    (product.descripcion && product.descripcion.toLowerCase().includes(search));
+                    news.titulo.toLowerCase().includes(search) ||
+                    news.contenido.toLowerCase().includes(search);
 
-                const matchStatus = !status || product.estado === status;
-                const matchCategory = !category || product.categoria_id == category;
+                const matchStatus = !status || news.estado === status;
+                const matchCategory = !category || news.categoria_id == category;
 
                 return matchSearch && matchStatus && matchCategory;
             });
@@ -210,10 +201,10 @@
         }
 
         function renderTable() {
-            const container = document.getElementById('products-table-container');
+            const container = document.getElementById('news-table-container');
 
-            if (filteredProducts.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron productos</p>';
+            if (filteredNews.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron noticias</p>';
                 return;
             }
 
@@ -221,53 +212,50 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Producto</th>
-                            <th>Comerciante</th>
+                            <th>Noticia</th>
+                            <th>Autor</th>
                             <th>Categoría</th>
-                            <th>Precio</th>
                             <th>Estado</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredProducts.map(product => `
+                        ${filteredNews.map(news => `
                             <tr>
                                 <td>
-                                    <div class="product-info">
-                                        <strong>${product.titulo}</strong>
-                                        ${product.descripcion ? `<br><small class="text-muted">${truncate(product.descripcion, 60)}</small>` : ''}
+                                    <div class="news-info">
+                                        <strong>${news.titulo}</strong>
+                                        <br>
+                                        <small class="text-muted">${truncate(news.contenido, 80)}</small>
                                     </div>
                                 </td>
-                                <td>${product.comerciante_nombre || '-'}</td>
+                                <td>${news.autor_nombre || '-'}</td>
                                 <td>
                                     <span class="badge badge-secondary">
-                                        ${product.categoria_nombre || '-'}
+                                        ${news.categoria_nombre || '-'}
                                     </span>
                                 </td>
                                 <td>
-                                    ${product.precio ? `<strong>$${parseFloat(product.precio).toLocaleString()}</strong>` : '-'}
-                                </td>
-                                <td>
-                                    <span class="badge badge-${getStatusBadgeClass(product.estado)}">
-                                        ${getStatusLabel(product.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(news.estado)}">
+                                        ${getStatusLabel(news.estado)}
                                     </span>
                                 </td>
-                                <td>${formatDate(product.created_at)}</td>
+                                <td>${formatDate(news.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${product.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveProduct(${product.id})" title="Aprobar">
+                                        ${news.estado === 'pendiente' ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveNews(${news.id})" title="Aprobar">
                                                 ✅
                                             </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectProduct(${product.id})" title="Rechazar">
+                                            <button class="btn btn-sm btn-danger" onclick="rejectNews(${news.id})" title="Rechazar">
                                                 ❌
                                             </button>
                                         ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editProduct(${product.id})" title="Editar">
+                                        <button class="btn btn-sm btn-outline" onclick="editNews(${news.id})" title="Editar">
                                             ✏️
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})" title="Eliminar">
+                                        <button class="btn btn-sm btn-danger" onclick="deleteNews(${news.id})" title="Eliminar">
                                             🗑️
                                         </button>
                                     </div>
@@ -280,17 +268,17 @@
         }
 
         function updateStats() {
-            document.getElementById('total-products').textContent = allProducts.length;
-            document.getElementById('pending-products').textContent = allProducts.filter(p => p.estado === 'pendiente').length;
-            document.getElementById('approved-products').textContent = allProducts.filter(p => p.estado === 'aprobado').length;
-            document.getElementById('rejected-products').textContent = allProducts.filter(p => p.estado === 'rechazado').length;
+            document.getElementById('total-news').textContent = allNews.length;
+            document.getElementById('pending-news').textContent = allNews.filter(n => n.estado === 'pendiente').length;
+            document.getElementById('approved-news').textContent = allNews.filter(n => n.estado === 'aprobada').length;
+            document.getElementById('rejected-news').textContent = allNews.filter(n => n.estado === 'rechazada').length;
         }
 
         function getStatusBadgeClass(status) {
             const classes = {
                 pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
+                aprobada: 'success',
+                rechazada: 'danger'
             };
             return classes[status] || 'secondary';
         }
@@ -298,8 +286,8 @@
         function getStatusLabel(status) {
             const labels = {
                 pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                aprobada: 'Aprobada',
+                rechazada: 'Rechazada'
             };
             return labels[status] || status;
         }
@@ -325,52 +313,52 @@
             applyFilters();
         }
 
-        async function approveProduct(productId) {
-            if (!confirm('¿Aprobar este producto?')) return;
+        async function approveNews(newsId) {
+            if (!confirm('¿Aprobar esta noticia?')) return;
 
             try {
-                const response = await api.updateProducto(productId, { estado: 'aprobado' });
+                const response = await api.updateNoticia(newsId, { estado: 'aprobada' });
                 if (response.success) {
-                    Components.showToast('Producto aprobado exitosamente', 'success');
+                    Components.showToast('Noticia aprobada exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
-                console.error('Error approving product:', e);
-                Components.showToast('Error aprobando producto', 'error');
+                console.error('Error approving news:', e);
+                Components.showToast('Error aprobando noticia', 'error');
             }
         }
 
-        async function rejectProduct(productId) {
-            if (!confirm('¿Rechazar este producto?')) return;
+        async function rejectNews(newsId) {
+            if (!confirm('¿Rechazar esta noticia?')) return;
 
             try {
-                const response = await api.updateProducto(productId, { estado: 'rechazado' });
+                const response = await api.updateNoticia(newsId, { estado: 'rechazada' });
                 if (response.success) {
-                    Components.showToast('Producto rechazado', 'success');
+                    Components.showToast('Noticia rechazada', 'success');
                     loadData();
                 }
             } catch (e) {
-                console.error('Error rejecting product:', e);
-                Components.showToast('Error rechazando producto', 'error');
+                console.error('Error rejecting news:', e);
+                Components.showToast('Error rechazando noticia', 'error');
             }
         }
 
-        async function deleteProduct(productId) {
-            if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
+        async function deleteNews(newsId) {
+            if (!confirm('¿Eliminar esta noticia? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteProducto(productId);
+                const response = await api.deleteNoticia(newsId);
                 if (response.success) {
-                    Components.showToast('Producto eliminado exitosamente', 'success');
+                    Components.showToast('Noticia eliminada exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
-                console.error('Error deleting product:', e);
-                Components.showToast('Error eliminando producto', 'error');
+                console.error('Error deleting news:', e);
+                Components.showToast('Error eliminando noticia', 'error');
             }
         }
 
-        function editProduct(productId) {
+        function editNews(newsId) {
             // TODO: Implementar modal de edición
             Components.showToast('Función de edición en desarrollo', 'info');
         }
