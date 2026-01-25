@@ -135,6 +135,52 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar zona -->
+    <div class="modal-backdrop" id="zone-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="zone-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nueva Zona</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="zone-form" onsubmit="saveZone(event)">
+                <input type="hidden" id="zone-id">
+
+                <div class="form-group">
+                    <label for="zone-nombre">Nombre *</label>
+                    <input type="text" id="zone-nombre" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="zone-tipo">Tipo *</label>
+                    <select id="zone-tipo" class="form-control" required>
+                        <option value="provincia">Provincia</option>
+                        <option value="ciudad">Ciudad</option>
+                        <option value="barrio">Barrio</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="zone-parent">Zona Padre</label>
+                    <select id="zone-parent" class="form-control">
+                        <option value="">Ninguna (raíz)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="zone-activa">
+                        <input type="checkbox" id="zone-activa" checked> Zona activa
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -153,16 +199,23 @@
 
         async function loadZones() {
             try {
-                const response = await api.getZonas();
+                const response = await api.getAdminZones();
                 if (response.success) {
                     allZones = response.data;
                     applyFilters();
                     updateStats();
+                    renderParentOptions();
                 }
             } catch (e) {
                 console.error('Error loading zones:', e);
-                Components.showToast('Error cargando zonas', 'error');
+                Components.toast('Error cargando zonas', 'error');
             }
+        }
+
+        function renderParentOptions() {
+            const select = document.getElementById('zone-parent');
+            select.innerHTML = '<option value="">Ninguna (raíz)</option>' +
+                allZones.map(zone => `<option value="${zone.id}">${zone.nombre} (${getTypeLabel(zone.tipo)})</option>`).join('');
         }
 
         function applyFilters() {
@@ -282,14 +335,14 @@
             if (!confirm(`¿Está seguro que desea ${action} esta zona?`)) return;
 
             try {
-                const response = await api.updateZona(zoneId, { is_active: !currentStatus });
+                const response = await api.updateZone(zoneId, { is_active: !currentStatus });
                 if (response.success) {
-                    Components.showToast(`Zona ${action}da exitosamente`, 'success');
+                    Components.toast(`Zona ${action}da exitosamente`, 'success');
                     loadZones();
                 }
             } catch (e) {
                 console.error('Error updating zone:', e);
-                Components.showToast('Error actualizando zona', 'error');
+                Components.toast('Error actualizando zona', 'error');
             }
         }
 
@@ -297,25 +350,79 @@
             if (!confirm('¿Está seguro que desea eliminar esta zona? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteZona(zoneId);
+                const response = await api.deleteZone(zoneId);
                 if (response.success) {
-                    Components.showToast('Zona eliminada exitosamente', 'success');
+                    Components.toast('Zona eliminada exitosamente', 'success');
                     loadZones();
                 }
             } catch (e) {
                 console.error('Error deleting zone:', e);
-                Components.showToast('Error eliminando zona', 'error');
+                Components.toast('Error eliminando zona', 'error');
             }
         }
 
-        function editZone(zoneId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nueva Zona';
+            document.getElementById('zone-form').reset();
+            document.getElementById('zone-id').value = '';
+            document.getElementById('zone-tipo').value = 'ciudad';
+            document.getElementById('zone-activa').checked = true;
+            openModal();
         }
 
-        function showCreateModal() {
-            // TODO: Implementar modal de creación
-            Components.showToast('Función de creación en desarrollo', 'info');
+        function editZone(zoneId) {
+            const zone = allZones.find(z => z.id === zoneId);
+            if (!zone) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Zona';
+            document.getElementById('zone-id').value = zone.id;
+            document.getElementById('zone-nombre').value = zone.nombre || '';
+            document.getElementById('zone-tipo').value = zone.tipo || 'ciudad';
+            document.getElementById('zone-parent').value = zone.parent_id || '';
+            document.getElementById('zone-activa').checked = zone.is_active !== false;
+            openModal();
+        }
+
+        async function saveZone(event) {
+            event.preventDefault();
+
+            const zoneId = document.getElementById('zone-id').value;
+            const data = {
+                nombre: document.getElementById('zone-nombre').value,
+                tipo: document.getElementById('zone-tipo').value,
+                parent_id: document.getElementById('zone-parent').value || null,
+                is_active: document.getElementById('zone-activa').checked
+            };
+
+            try {
+                let response;
+                if (zoneId) {
+                    response = await api.updateZone(zoneId, data);
+                } else {
+                    response = await api.createZone(data);
+                }
+
+                if (response.success) {
+                    Components.toast(zoneId ? 'Zona actualizada exitosamente' : 'Zona creada exitosamente', 'success');
+                    closeModal();
+                    loadZones();
+                }
+            } catch (e) {
+                console.error('Error saving zone:', e);
+                Components.toast(e.message || 'Error guardando zona', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('zone-modal').classList.add('active');
+            document.getElementById('zone-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('zone-modal').classList.remove('active');
+            document.getElementById('zone-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Event listeners

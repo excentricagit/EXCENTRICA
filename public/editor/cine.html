@@ -138,6 +138,108 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar película/cine -->
+    <div class="modal-backdrop" id="movie-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="movie-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nueva Película/Cine</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="movie-form" onsubmit="saveMovie(event)">
+                <input type="hidden" id="movie-id">
+
+                <div class="form-group">
+                    <label for="movie-titulo">Título *</label>
+                    <input type="text" id="movie-titulo" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-descripcion">Descripción *</label>
+                    <textarea id="movie-descripcion" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-imagen">URL de Imagen/Poster</label>
+                    <input type="url" id="movie-imagen" class="form-control" placeholder="https://ejemplo.com/poster.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-genero">Género</label>
+                    <input type="text" id="movie-genero" class="form-control" placeholder="Acción, Drama, Comedia, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-duracion">Duración (minutos)</label>
+                    <input type="number" id="movie-duracion" class="form-control" placeholder="120">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-director">Director</label>
+                    <input type="text" id="movie-director" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-reparto">Reparto</label>
+                    <input type="text" id="movie-reparto" class="form-control" placeholder="Actores principales separados por coma">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-horarios">Horarios</label>
+                    <textarea id="movie-horarios" class="form-control" rows="2" placeholder="Ej: 14:00, 17:30, 20:00, 22:30"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-precio">Precio de Entrada</label>
+                    <input type="number" id="movie-precio" class="form-control" step="0.01" min="0" placeholder="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-categoria">Categoría</label>
+                    <select id="movie-categoria" class="form-control">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-zona">Zona</label>
+                    <select id="movie-zona" class="form-control">
+                        <option value="">Sin zona específica</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-direccion">Dirección del Cine</label>
+                    <input type="text" id="movie-direccion" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-telefono">Teléfono</label>
+                    <input type="tel" id="movie-telefono" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-web">Sitio Web</label>
+                    <input type="url" id="movie-web" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="movie-estado">Estado</label>
+                    <select id="movie-estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -153,25 +255,48 @@
 
         let allMovies = [];
         let filteredMovies = [];
+        let categories = [];
+        let zones = [];
 
         async function loadData() {
             try {
-                // TODO: Implementar API endpoint para películas
-                // const response = await api.getCine();
-                // if (response.success) {
-                //     allMovies = response.data;
-                //     applyFilters();
-                //     updateStats();
-                // }
+                const [moviesResponse, categoriesResponse, zonesResponse] = await Promise.all([
+                    api.getAdminProducts({ section: 'cine' }),
+                    api.getAdminCategories('productos'),
+                    api.getAdminZones()
+                ]);
 
-                // Datos de ejemplo
-                allMovies = [];
-                applyFilters();
-                updateStats();
+                if (moviesResponse.success) {
+                    allMovies = moviesResponse.data;
+                    applyFilters();
+                    updateStats();
+                }
+
+                if (categoriesResponse.success) {
+                    categories = categoriesResponse.data;
+                    renderCategoryOptions();
+                }
+
+                if (zonesResponse.success) {
+                    zones = zonesResponse.data;
+                    renderZoneOptions();
+                }
             } catch (e) {
                 console.error('Error loading data:', e);
-                Components.showToast('Error cargando datos', 'error');
+                Components.toast('Error cargando datos', 'error');
             }
+        }
+
+        function renderCategoryOptions() {
+            const select = document.getElementById('movie-categoria');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+        }
+
+        function renderZoneOptions() {
+            const select = document.getElementById('movie-zona');
+            select.innerHTML = '<option value="">Sin zona específica</option>' +
+                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
         }
 
         function applyFilters() {
@@ -304,23 +429,135 @@
         }
 
         async function approveMovie(movieId) {
-            Components.showToast('Función en desarrollo', 'info');
+            if (!confirm('¿Aprobar esta película?')) return;
+
+            try {
+                const response = await api.adminUpdateProduct(movieId, { estado: 'aprobado' });
+                if (response.success) {
+                    Components.toast('Película aprobada exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error approving movie:', e);
+                Components.toast('Error aprobando película', 'error');
+            }
         }
 
         async function rejectMovie(movieId) {
-            Components.showToast('Función en desarrollo', 'info');
+            if (!confirm('¿Rechazar esta película?')) return;
+
+            try {
+                const response = await api.adminUpdateProduct(movieId, { estado: 'rechazado' });
+                if (response.success) {
+                    Components.toast('Película rechazada', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error rejecting movie:', e);
+                Components.toast('Error rechazando película', 'error');
+            }
         }
 
         async function deleteMovie(movieId) {
-            Components.showToast('Función en desarrollo', 'info');
-        }
+            if (!confirm('¿Eliminar esta película? Esta acción no se puede deshacer.')) return;
 
-        function editMovie(movieId) {
-            Components.showToast('Función de edición en desarrollo', 'info');
+            try {
+                const response = await api.deleteProduct(movieId);
+                if (response.success) {
+                    Components.toast('Película eliminada exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error deleting movie:', e);
+                Components.toast('Error eliminando película', 'error');
+            }
         }
 
         function showCreateModal() {
-            Components.showToast('Función de creación en desarrollo', 'info');
+            document.getElementById('modal-title').textContent = 'Nueva Película/Cine';
+            document.getElementById('movie-form').reset();
+            document.getElementById('movie-id').value = '';
+            document.getElementById('movie-precio').value = '0';
+            document.getElementById('movie-estado').value = 'pendiente';
+            openModal();
+        }
+
+        function editMovie(movieId) {
+            const movie = allMovies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Película/Cine';
+            document.getElementById('movie-id').value = movie.id;
+            document.getElementById('movie-titulo').value = movie.titulo || '';
+            document.getElementById('movie-descripcion').value = movie.descripcion || '';
+            document.getElementById('movie-imagen').value = movie.imagen_url || '';
+            document.getElementById('movie-genero').value = movie.genero || '';
+            document.getElementById('movie-duracion').value = movie.duracion || '';
+            document.getElementById('movie-director').value = movie.director || '';
+            document.getElementById('movie-reparto').value = movie.reparto || '';
+            document.getElementById('movie-horarios').value = movie.horarios || '';
+            document.getElementById('movie-precio').value = movie.precio || '0';
+            document.getElementById('movie-categoria').value = movie.categoria_id || '';
+            document.getElementById('movie-zona').value = movie.zona_id || '';
+            document.getElementById('movie-direccion').value = movie.direccion || '';
+            document.getElementById('movie-telefono').value = movie.telefono || '';
+            document.getElementById('movie-web').value = movie.sitio_web || '';
+            document.getElementById('movie-estado').value = movie.estado || 'pendiente';
+            openModal();
+        }
+
+        async function saveMovie(event) {
+            event.preventDefault();
+
+            const movieId = document.getElementById('movie-id').value;
+            const data = {
+                titulo: document.getElementById('movie-titulo').value,
+                descripcion: document.getElementById('movie-descripcion').value,
+                imagen_url: document.getElementById('movie-imagen').value || null,
+                genero: document.getElementById('movie-genero').value || null,
+                duracion: document.getElementById('movie-duracion').value || null,
+                director: document.getElementById('movie-director').value || null,
+                reparto: document.getElementById('movie-reparto').value || null,
+                horarios: document.getElementById('movie-horarios').value || null,
+                precio: parseFloat(document.getElementById('movie-precio').value) || 0,
+                categoria_id: document.getElementById('movie-categoria').value || null,
+                zona_id: document.getElementById('movie-zona').value || null,
+                direccion: document.getElementById('movie-direccion').value || null,
+                telefono: document.getElementById('movie-telefono').value || null,
+                sitio_web: document.getElementById('movie-web').value || null,
+                estado: document.getElementById('movie-estado').value,
+                section: 'cine'
+            };
+
+            try {
+                let response;
+                if (movieId) {
+                    response = await api.adminUpdateProduct(movieId, data);
+                } else {
+                    response = await api.adminCreateProduct(data);
+                }
+
+                if (response.success) {
+                    Components.toast(movieId ? 'Película actualizada exitosamente' : 'Película creada exitosamente', 'success');
+                    closeModal();
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error saving movie:', e);
+                Components.toast(e.message || 'Error guardando película', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('movie-modal').classList.add('active');
+            document.getElementById('movie-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('movie-modal').classList.remove('active');
+            document.getElementById('movie-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Event listeners

@@ -133,6 +133,50 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar categoría -->
+    <div class="modal-backdrop" id="category-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="category-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nueva Categoría</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="category-form" onsubmit="saveCategory(event)">
+                <input type="hidden" id="category-id">
+
+                <div class="form-group">
+                    <label for="category-nombre">Nombre *</label>
+                    <input type="text" id="category-nombre" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category-descripcion">Descripción</label>
+                    <textarea id="category-descripcion" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category-seccion">Sección *</label>
+                    <select id="category-seccion" class="form-control" required>
+                        <option value="noticias">Noticias</option>
+                        <option value="productos">Productos</option>
+                        <option value="eventos">Eventos</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="category-activa">
+                        <input type="checkbox" id="category-activa" checked> Categoría activa
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -151,7 +195,7 @@
 
         async function loadCategories() {
             try {
-                const response = await api.getCategorias(currentSection);
+                const response = await api.getAdminCategories(currentSection);
                 if (response.success) {
                     allCategories = response.data;
                     renderTable();
@@ -159,7 +203,7 @@
                 }
             } catch (e) {
                 console.error('Error loading categories:', e);
-                Components.showToast('Error cargando categorías', 'error');
+                Components.toast('Error cargando categorías', 'error');
             }
         }
 
@@ -266,14 +310,14 @@
             if (!confirm(`¿Está seguro que desea ${action} esta categoría?`)) return;
 
             try {
-                const response = await api.updateCategoria(categoryId, { is_active: !currentStatus });
+                const response = await api.updateCategory(categoryId, { is_active: !currentStatus });
                 if (response.success) {
-                    Components.showToast(`Categoría ${action}da exitosamente`, 'success');
+                    Components.toast(`Categoría ${action}da exitosamente`, 'success');
                     loadCategories();
                 }
             } catch (e) {
                 console.error('Error updating category:', e);
-                Components.showToast('Error actualizando categoría', 'error');
+                Components.toast('Error actualizando categoría', 'error');
             }
         }
 
@@ -281,25 +325,79 @@
             if (!confirm('¿Está seguro que desea eliminar esta categoría? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteCategoria(categoryId);
+                const response = await api.deleteCategory(categoryId);
                 if (response.success) {
-                    Components.showToast('Categoría eliminada exitosamente', 'success');
+                    Components.toast('Categoría eliminada exitosamente', 'success');
                     loadCategories();
                 }
             } catch (e) {
                 console.error('Error deleting category:', e);
-                Components.showToast('Error eliminando categoría', 'error');
+                Components.toast('Error eliminando categoría', 'error');
             }
         }
 
-        function editCategory(categoryId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nueva Categoría';
+            document.getElementById('category-form').reset();
+            document.getElementById('category-id').value = '';
+            document.getElementById('category-seccion').value = currentSection;
+            document.getElementById('category-activa').checked = true;
+            openModal();
         }
 
-        function showCreateModal() {
-            // TODO: Implementar modal de creación
-            Components.showToast('Función de creación en desarrollo', 'info');
+        function editCategory(categoryId) {
+            const category = allCategories.find(c => c.id === categoryId);
+            if (!category) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Categoría';
+            document.getElementById('category-id').value = category.id;
+            document.getElementById('category-nombre').value = category.nombre || '';
+            document.getElementById('category-descripcion').value = category.descripcion || '';
+            document.getElementById('category-seccion').value = category.seccion || 'noticias';
+            document.getElementById('category-activa').checked = category.is_active !== false;
+            openModal();
+        }
+
+        async function saveCategory(event) {
+            event.preventDefault();
+
+            const categoryId = document.getElementById('category-id').value;
+            const data = {
+                nombre: document.getElementById('category-nombre').value,
+                descripcion: document.getElementById('category-descripcion').value || null,
+                seccion: document.getElementById('category-seccion').value,
+                is_active: document.getElementById('category-activa').checked
+            };
+
+            try {
+                let response;
+                if (categoryId) {
+                    response = await api.updateCategory(categoryId, data);
+                } else {
+                    response = await api.createCategory(data);
+                }
+
+                if (response.success) {
+                    Components.toast(categoryId ? 'Categoría actualizada exitosamente' : 'Categoría creada exitosamente', 'success');
+                    closeModal();
+                    loadCategories();
+                }
+            } catch (e) {
+                console.error('Error saving category:', e);
+                Components.toast(e.message || 'Error guardando categoría', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('category-modal').classList.add('active');
+            document.getElementById('category-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('category-modal').classList.remove('active');
+            document.getElementById('category-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Load initial data

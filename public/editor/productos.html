@@ -68,6 +68,9 @@
                 <h1>🛒 Gestión de Productos</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nuevo Producto
+                    </button>
                 </div>
             </header>
 
@@ -135,6 +138,97 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar producto -->
+    <div class="modal-backdrop" id="product-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="product-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nuevo Producto</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="product-form" onsubmit="saveProduct(event)">
+                <input type="hidden" id="product-id">
+
+                <div class="form-group">
+                    <label for="product-titulo">Título *</label>
+                    <input type="text" id="product-titulo" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-descripcion">Descripción *</label>
+                    <textarea id="product-descripcion" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-precio">Precio *</label>
+                    <input type="number" id="product-precio" class="form-control" step="0.01" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-precio-original">Precio Original (opcional)</label>
+                    <input type="number" id="product-precio-original" class="form-control" step="0.01" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-imagen">URL de Imagen</label>
+                    <input type="url" id="product-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-categoria">Categoría</label>
+                    <select id="product-categoria" class="form-control">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-zona">Zona</label>
+                    <select id="product-zona" class="form-control">
+                        <option value="">Sin zona específica</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-direccion">Dirección</label>
+                    <input type="text" id="product-direccion" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-telefono">Teléfono</label>
+                    <input type="tel" id="product-telefono" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-whatsapp">WhatsApp</label>
+                    <input type="tel" id="product-whatsapp" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="product-condicion">Condición</label>
+                    <select id="product-condicion" class="form-control">
+                        <option value="nuevo">Nuevo</option>
+                        <option value="usado">Usado</option>
+                        <option value="reacondicionado">Reacondicionado</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="product-estado">Estado</label>
+                    <select id="product-estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -151,12 +245,14 @@
         let allProducts = [];
         let filteredProducts = [];
         let categories = [];
+        let zones = [];
 
         async function loadData() {
             try {
-                const [productsResponse, categoriesResponse] = await Promise.all([
-                    api.getProductos(),
-                    api.getCategorias('productos')
+                const [productsResponse, categoriesResponse, zonesResponse] = await Promise.all([
+                    api.getAdminProducts(),
+                    api.getAdminCategories('productos'),
+                    api.getAdminZones()
                 ]);
 
                 if (productsResponse.success) {
@@ -168,11 +264,29 @@
                 if (categoriesResponse.success) {
                     categories = categoriesResponse.data;
                     renderCategoryFilter();
+                    renderCategoryOptions();
+                }
+
+                if (zonesResponse.success) {
+                    zones = zonesResponse.data;
+                    renderZoneOptions();
                 }
             } catch (e) {
                 console.error('Error loading data:', e);
-                Components.showToast('Error cargando datos', 'error');
+                Components.toast('Error cargando datos', 'error');
             }
+        }
+
+        function renderCategoryOptions() {
+            const select = document.getElementById('product-categoria');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+        }
+
+        function renderZoneOptions() {
+            const select = document.getElementById('product-zona');
+            select.innerHTML = '<option value="">Sin zona específica</option>' +
+                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
         }
 
         function renderCategoryFilter() {
@@ -320,14 +434,14 @@
             if (!confirm('¿Aprobar este producto?')) return;
 
             try {
-                const response = await api.updateProducto(productId, { estado: 'aprobado' });
+                const response = await api.adminUpdateProduct(productId, { estado: 'aprobado' });
                 if (response.success) {
-                    Components.showToast('Producto aprobado exitosamente', 'success');
+                    Components.toast('Producto aprobado exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error approving product:', e);
-                Components.showToast('Error aprobando producto', 'error');
+                Components.toast('Error aprobando producto', 'error');
             }
         }
 
@@ -335,14 +449,14 @@
             if (!confirm('¿Rechazar este producto?')) return;
 
             try {
-                const response = await api.updateProducto(productId, { estado: 'rechazado' });
+                const response = await api.adminUpdateProduct(productId, { estado: 'rechazado' });
                 if (response.success) {
-                    Components.showToast('Producto rechazado', 'success');
+                    Components.toast('Producto rechazado', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error rejecting product:', e);
-                Components.showToast('Error rechazando producto', 'error');
+                Components.toast('Error rechazando producto', 'error');
             }
         }
 
@@ -350,20 +464,95 @@
             if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteProducto(productId);
+                const response = await api.deleteProduct(productId);
                 if (response.success) {
-                    Components.showToast('Producto eliminado exitosamente', 'success');
+                    Components.toast('Producto eliminado exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error deleting product:', e);
-                Components.showToast('Error eliminando producto', 'error');
+                Components.toast('Error eliminando producto', 'error');
             }
         }
 
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nuevo Producto';
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-condicion').value = 'nuevo';
+            document.getElementById('product-estado').value = 'pendiente';
+            openModal();
+        }
+
         function editProduct(productId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Producto';
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('product-titulo').value = product.titulo || '';
+            document.getElementById('product-descripcion').value = product.descripcion || '';
+            document.getElementById('product-precio').value = product.precio || '';
+            document.getElementById('product-precio-original').value = product.precio_original || '';
+            document.getElementById('product-imagen').value = product.imagen_url || '';
+            document.getElementById('product-categoria').value = product.categoria_id || '';
+            document.getElementById('product-zona').value = product.zona_id || '';
+            document.getElementById('product-direccion').value = product.direccion || '';
+            document.getElementById('product-telefono').value = product.telefono || '';
+            document.getElementById('product-whatsapp').value = product.whatsapp || '';
+            document.getElementById('product-condicion').value = product.condicion || 'nuevo';
+            document.getElementById('product-estado').value = product.estado || 'pendiente';
+            openModal();
+        }
+
+        async function saveProduct(event) {
+            event.preventDefault();
+
+            const productId = document.getElementById('product-id').value;
+            const data = {
+                titulo: document.getElementById('product-titulo').value,
+                descripcion: document.getElementById('product-descripcion').value,
+                precio: parseFloat(document.getElementById('product-precio').value),
+                precio_original: document.getElementById('product-precio-original').value ? parseFloat(document.getElementById('product-precio-original').value) : null,
+                imagen_url: document.getElementById('product-imagen').value || null,
+                categoria_id: document.getElementById('product-categoria').value || null,
+                zona_id: document.getElementById('product-zona').value || null,
+                direccion: document.getElementById('product-direccion').value || null,
+                telefono: document.getElementById('product-telefono').value || null,
+                whatsapp: document.getElementById('product-whatsapp').value || null,
+                condicion: document.getElementById('product-condicion').value,
+                estado: document.getElementById('product-estado').value
+            };
+
+            try {
+                let response;
+                if (productId) {
+                    response = await api.adminUpdateProduct(productId, data);
+                } else {
+                    response = await api.adminCreateProduct(data);
+                }
+
+                if (response.success) {
+                    Components.toast(productId ? 'Producto actualizado exitosamente' : 'Producto creado exitosamente', 'success');
+                    closeModal();
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error saving product:', e);
+                Components.toast(e.message || 'Error guardando producto', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('product-modal').classList.add('active');
+            document.getElementById('product-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.getElementById('product-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Event listeners

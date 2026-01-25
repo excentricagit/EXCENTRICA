@@ -68,6 +68,9 @@
                 <h1>📅 Gestión de Eventos</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nuevo Evento
+                    </button>
                 </div>
             </header>
 
@@ -137,6 +140,98 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar evento -->
+    <div class="modal-backdrop" id="event-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="event-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nuevo Evento</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="event-form" onsubmit="saveEvent(event)">
+                <input type="hidden" id="event-id">
+
+                <div class="form-group">
+                    <label for="event-titulo">Título *</label>
+                    <input type="text" id="event-titulo" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-descripcion">Descripción *</label>
+                    <textarea id="event-descripcion" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-fecha">Fecha del Evento *</label>
+                    <input type="datetime-local" id="event-fecha" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-lugar">Lugar *</label>
+                    <input type="text" id="event-lugar" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-direccion">Dirección</label>
+                    <input type="text" id="event-direccion" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="event-precio">Precio de Entrada</label>
+                    <input type="number" id="event-precio" class="form-control" step="0.01" min="0" placeholder="0 para eventos gratuitos">
+                </div>
+
+                <div class="form-group">
+                    <label for="event-imagen">URL de Imagen</label>
+                    <input type="url" id="event-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="event-categoria">Categoría</label>
+                    <select id="event-categoria" class="form-control">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-zona">Zona</label>
+                    <select id="event-zona" class="form-control">
+                        <option value="">Sin zona específica</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="event-telefono">Teléfono de Contacto</label>
+                    <input type="tel" id="event-telefono" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="event-whatsapp">WhatsApp</label>
+                    <input type="tel" id="event-whatsapp" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="event-web">Sitio Web</label>
+                    <input type="url" id="event-web" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="event-estado">Estado</label>
+                    <select id="event-estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -152,19 +247,48 @@
 
         let allEvents = [];
         let filteredEvents = [];
+        let categories = [];
+        let zones = [];
 
         async function loadData() {
             try {
-                const response = await api.getEventos();
-                if (response.success) {
-                    allEvents = response.data;
+                const [eventsResponse, categoriesResponse, zonesResponse] = await Promise.all([
+                    api.getAdminEvents(),
+                    api.getAdminCategories('eventos'),
+                    api.getAdminZones()
+                ]);
+
+                if (eventsResponse.success) {
+                    allEvents = eventsResponse.data;
                     applyFilters();
                     updateStats();
                 }
+
+                if (categoriesResponse.success) {
+                    categories = categoriesResponse.data;
+                    renderCategoryOptions();
+                }
+
+                if (zonesResponse.success) {
+                    zones = zonesResponse.data;
+                    renderZoneOptions();
+                }
             } catch (e) {
                 console.error('Error loading data:', e);
-                Components.showToast('Error cargando datos', 'error');
+                Components.toast('Error cargando datos', 'error');
             }
+        }
+
+        function renderCategoryOptions() {
+            const select = document.getElementById('event-categoria');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+        }
+
+        function renderZoneOptions() {
+            const select = document.getElementById('event-zona');
+            select.innerHTML = '<option value="">Sin zona específica</option>' +
+                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
         }
 
         function applyFilters() {
@@ -326,14 +450,14 @@
             if (!confirm('¿Aprobar este evento?')) return;
 
             try {
-                const response = await api.updateEvento(eventId, { estado: 'aprobado' });
+                const response = await api.updateEvent(eventId, { estado: 'aprobado' });
                 if (response.success) {
-                    Components.showToast('Evento aprobado exitosamente', 'success');
+                    Components.toast('Evento aprobado exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error approving event:', e);
-                Components.showToast('Error aprobando evento', 'error');
+                Components.toast('Error aprobando evento', 'error');
             }
         }
 
@@ -341,14 +465,14 @@
             if (!confirm('¿Rechazar este evento?')) return;
 
             try {
-                const response = await api.updateEvento(eventId, { estado: 'rechazado' });
+                const response = await api.updateEvent(eventId, { estado: 'rechazado' });
                 if (response.success) {
-                    Components.showToast('Evento rechazado', 'success');
+                    Components.toast('Evento rechazado', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error rejecting event:', e);
-                Components.showToast('Error rechazando evento', 'error');
+                Components.toast('Error rechazando evento', 'error');
             }
         }
 
@@ -356,20 +480,104 @@
             if (!confirm('¿Eliminar este evento? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteEvento(eventId);
+                const response = await api.deleteEvent(eventId);
                 if (response.success) {
-                    Components.showToast('Evento eliminado exitosamente', 'success');
+                    Components.toast('Evento eliminado exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error deleting event:', e);
-                Components.showToast('Error eliminando evento', 'error');
+                Components.toast('Error eliminando evento', 'error');
             }
         }
 
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nuevo Evento';
+            document.getElementById('event-form').reset();
+            document.getElementById('event-id').value = '';
+            document.getElementById('event-precio').value = '0';
+            document.getElementById('event-estado').value = 'pendiente';
+            openModal();
+        }
+
         function editEvent(eventId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+            const event = allEvents.find(e => e.id === eventId);
+            if (!event) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Evento';
+            document.getElementById('event-id').value = event.id;
+            document.getElementById('event-titulo').value = event.titulo || '';
+            document.getElementById('event-descripcion').value = event.descripcion || '';
+
+            // Format datetime for input
+            if (event.fecha_evento) {
+                const date = new Date(event.fecha_evento);
+                const formattedDate = date.toISOString().slice(0, 16);
+                document.getElementById('event-fecha').value = formattedDate;
+            }
+
+            document.getElementById('event-lugar').value = event.lugar || '';
+            document.getElementById('event-direccion').value = event.direccion || '';
+            document.getElementById('event-precio').value = event.precio || '0';
+            document.getElementById('event-imagen').value = event.imagen_url || '';
+            document.getElementById('event-categoria').value = event.categoria_id || '';
+            document.getElementById('event-zona').value = event.zona_id || '';
+            document.getElementById('event-telefono').value = event.telefono || '';
+            document.getElementById('event-whatsapp').value = event.whatsapp || '';
+            document.getElementById('event-web').value = event.sitio_web || '';
+            document.getElementById('event-estado').value = event.estado || 'pendiente';
+            openModal();
+        }
+
+        async function saveEvent(event) {
+            event.preventDefault();
+
+            const eventId = document.getElementById('event-id').value;
+            const data = {
+                titulo: document.getElementById('event-titulo').value,
+                descripcion: document.getElementById('event-descripcion').value,
+                fecha_evento: document.getElementById('event-fecha').value,
+                lugar: document.getElementById('event-lugar').value,
+                direccion: document.getElementById('event-direccion').value || null,
+                precio: parseFloat(document.getElementById('event-precio').value) || 0,
+                imagen_url: document.getElementById('event-imagen').value || null,
+                categoria_id: document.getElementById('event-categoria').value || null,
+                zona_id: document.getElementById('event-zona').value || null,
+                telefono: document.getElementById('event-telefono').value || null,
+                whatsapp: document.getElementById('event-whatsapp').value || null,
+                sitio_web: document.getElementById('event-web').value || null,
+                estado: document.getElementById('event-estado').value
+            };
+
+            try {
+                let response;
+                if (eventId) {
+                    response = await api.updateEvent(eventId, data);
+                } else {
+                    response = await api.createEvent(data);
+                }
+
+                if (response.success) {
+                    Components.toast(eventId ? 'Evento actualizado exitosamente' : 'Evento creado exitosamente', 'success');
+                    closeModal();
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error saving event:', e);
+                Components.toast(e.message || 'Error guardando evento', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('event-modal').classList.add('active');
+            document.getElementById('event-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('event-modal').classList.remove('active');
+            document.getElementById('event-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Event listeners

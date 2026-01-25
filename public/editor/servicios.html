@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-                        <div class="admin-logo">
+            <div class="admin-logo">
                 <a href="/"><span>⚡</span> Excentrica</a>
                 <span class="admin-badge">EDITOR</span>
             </div>
@@ -65,11 +65,11 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🎬 Gestión de CategorÃ­a</h1>
+                <h1>🔧 Gestión de Servicios</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
                     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
-                        <span>➕</span> Nueva Película
+                        <span>➕</span> Nuevo Servicio
                     </button>
                 </div>
             </header>
@@ -78,31 +78,31 @@
                 <!-- Stats -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card">
-                        <div class="stat-icon">🎬</div>
+                        <div class="stat-icon">🔧</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="total-services">0</span>
-                            <span class="stat-label">Total películas</span>
+                            <span class="stat-value" id="total-items">0</span>
+                            <span class="stat-label">Total servicios</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="active-services">0</span>
-                            <span class="stat-label">Activas</span>
+                            <span class="stat-value" id="active-items">0</span>
+                            <span class="stat-label">Activos</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⏳</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="pending-services">0</span>
+                            <span class="stat-value" id="pending-items">0</span>
                             <span class="stat-label">Pendientes</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">❌</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="rejected-services">0</span>
-                            <span class="stat-label">Rechazadas</span>
+                            <span class="stat-value" id="rejected-items">0</span>
+                            <span class="stat-label">Rechazados</span>
                         </div>
                     </div>
                 </div>
@@ -113,21 +113,18 @@
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="aprobada">Aprobada</option>
-                        <option value="rechazada">Rechazada</option>
-                    </select>
-                    <select id="filter-category" class="form-control" style="max-width: 150px;">
-                        <option value="">Todas las categorÃ­as</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="rechazado">Rechazado</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
                 </div>
 
-                <!-- Services Table -->
+                <!-- Table -->
                 <div class="card">
                     <div class="card-body">
-                        <div id="services-table-container">
+                        <div id="items-table-container">
                             <div class="text-center p-4">
                                 <div class="spinner"></div>
                             </div>
@@ -138,66 +135,174 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar -->
+    <div class="modal-backdrop" id="item-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="item-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nuevo Servicio</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="item-form" onsubmit="saveItem(event)">
+                <input type="hidden" id="item-id">
+
+                <div class="form-group">
+                    <label for="item-titulo">Nombre *</label>
+                    <input type="text" id="item-titulo" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="item-descripcion">Descripción *</label>
+                    <textarea id="item-descripcion" class="form-control" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="item-imagen">URL de Imagen</label>
+                    <input type="url" id="item-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-categoria">Categoría</label>
+                    <select id="item-categoria" class="form-control">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="item-zona">Zona</label>
+                    <select id="item-zona" class="form-control">
+                        <option value="">Sin zona específica</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="item-direccion">Dirección</label>
+                    <input type="text" id="item-direccion" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-telefono">Teléfono</label>
+                    <input type="tel" id="item-telefono" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-whatsapp">WhatsApp</label>
+                    <input type="tel" id="item-whatsapp" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-horarios">Horarios</label>
+                    <textarea id="item-horarios" class="form-control" rows="2" placeholder="Ej: Lun-Vie 12:00-23:00"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="item-precio">Precio Promedio</label>
+                    <input type="number" id="item-precio" class="form-control" step="0.01" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-web">Sitio Web</label>
+                    <input type="url" id="item-web" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="item-estado">Estado</label>
+                    <select id="item-estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobado">Aprobado</option>
+                        <option value="rechazado">Rechazado</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script>
-        // Verificar admin
         if (!auth.getUser()) {
             // Se redirige automáticamente
         }
 
         document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        let allServices = [];
-        let filteredServices = [];
+        const SECTION = 'servicios';
+        let allItems = [];
+        let filteredItems = [];
+        let categories = [];
+        let zones = [];
 
         async function loadData() {
             try {
-                // TODO: Implementar API endpoint para películas
-                // const response = await api.getCategorÃ­a();
-                // if (response.success) {
-                //     allServices = response.data;
-                //     applyFilters();
-                //     updateStats();
-                // }
+                const [itemsResponse, categoriesResponse, zonesResponse] = await Promise.all([
+                    api.getAdminProducts({ section: SECTION }),
+                    api.getAdminCategories('productos'),
+                    api.getAdminZones()
+                ]);
 
-                // Datos de ejemplo
-                allServices = [];
-                applyFilters();
-                updateStats();
+                if (itemsResponse.success) {
+                    allItems = itemsResponse.data;
+                    applyFilters();
+                    updateStats();
+                }
+
+                if (categoriesResponse.success) {
+                    categories = categoriesResponse.data;
+                    renderCategoryOptions();
+                }
+
+                if (zonesResponse.success) {
+                    zones = zonesResponse.data;
+                    renderZoneOptions();
+                }
             } catch (e) {
                 console.error('Error loading data:', e);
-                Components.showToast('Error cargando datos', 'error');
+                Components.toast('Error cargando datos', 'error');
             }
+        }
+
+        function renderCategoryOptions() {
+            const select = document.getElementById('item-categoria');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+        }
+
+        function renderZoneOptions() {
+            const select = document.getElementById('item-zona');
+            select.innerHTML = '<option value="">Sin zona específica</option>' +
+                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
         }
 
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
             const status = document.getElementById('filter-status').value;
-            const CategorÃ­ama = document.getElementById('filter-category').value;
 
-            filteredServices = allServices.filter(Service => {
+            filteredItems = allItems.filter(item => {
                 const matchSearch = !search ||
-                    Service.titulo.toLowerCase().includes(search) ||
-                    (Service.descripcion && Service.descripcion.toLowerCase().includes(search));
+                    item.titulo.toLowerCase().includes(search) ||
+                    (item.descripcion && item.descripcion.toLowerCase().includes(search));
 
-                const matchStatus = !status || Service.estado === status;
-                const matchCategorÃ­ama = !CategorÃ­ama || Service.CategorÃ­a_id == CategorÃ­ama;
+                const matchStatus = !status || item.estado === status;
 
-                return matchSearch && matchStatus && matchCategorÃ­ama;
+                return matchSearch && matchStatus;
             });
 
             renderTable();
         }
 
         function renderTable() {
-            const container = document.getElementById('services-table-container');
+            const container = document.getElementById('items-table-container');
 
-            if (filteredServices.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron películas</p>';
+            if (filteredItems.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron registros</p>';
                 return;
             }
 
@@ -205,47 +310,47 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Película</th>
-                            <th>CategorÃ­a</th>
-                            <th>Género</th>
-                            <th>TelÃ©fono</th>
+                            <th>Nombre</th>
+                            <th>Zona</th>
+                            <th>Categoría</th>
                             <th>Estado</th>
                             <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredServices.map(Service => `
+                        ${filteredItems.map(item => `
                             <tr>
                                 <td>
-                                    <div class="service-info">
-                                        <strong>${Service.titulo}</strong>
-                                        ${Service.descripcion ? `<br><small class="text-muted">${truncate(Service.descripcion, 60)}</small>` : ''}
-                                    </div>
+                                    <strong>${item.titulo}</strong>
+                                    ${item.descripcion ? `<br><small class="text-muted">${truncate(item.descripcion, 60)}</small>` : ''}
                                 </td>
-                                <td>${Service.CategorÃ­a_nombre || '-'}</td>
-                                <td>${Service.genero || '-'}</td>
-                                <td><small>${Service.TelÃ©fono || '-'}</small></td>
+                                <td>${item.zona_nombre || '-'}</td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(Service.estado)}">
-                                        ${getStatusLabel(Service.estado)}
+                                    <span class="badge badge-secondary">
+                                        ${item.categoria_nombre || '-'}
                                     </span>
                                 </td>
-                                <td>${formatDate(Service.created_at)}</td>
+                                <td>
+                                    <span class="badge badge-${getStatusBadgeClass(item.estado)}">
+                                        ${getStatusLabel(item.estado)}
+                                    </span>
+                                </td>
+                                <td>${formatDate(item.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${Service.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveService(${Service.id})" title="Aprobar">
+                                        ${item.estado === 'pendiente' ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveItem(${item.id})" title="Aprobar">
                                                 ✅
                                             </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectService(${Service.id})" title="Rechazar">
+                                            <button class="btn btn-sm btn-danger" onclick="rejectItem(${item.id})" title="Rechazar">
                                                 ❌
                                             </button>
                                         ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editService(${Service.id})" title="Editar">
+                                        <button class="btn btn-sm btn-outline" onclick="editItem(${item.id})" title="Editar">
                                             ✏️
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteService(${Service.id})" title="Eliminar">
+                                        <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})" title="Eliminar">
                                             🗑️
                                         </button>
                                     </div>
@@ -258,17 +363,17 @@
         }
 
         function updateStats() {
-            document.getElementById('total-services').textContent = allServices.length;
-            document.getElementById('active-services').textContent = allServices.filter(m => m.estado === 'aprobada').length;
-            document.getElementById('pending-services').textContent = allServices.filter(m => m.estado === 'pendiente').length;
-            document.getElementById('rejected-services').textContent = allServices.filter(m => m.estado === 'rechazada').length;
+            document.getElementById('total-items').textContent = allItems.length;
+            document.getElementById('active-items').textContent = allItems.filter(i => i.estado === 'aprobado').length;
+            document.getElementById('pending-items').textContent = allItems.filter(i => i.estado === 'pendiente').length;
+            document.getElementById('rejected-items').textContent = allItems.filter(i => i.estado === 'rechazado').length;
         }
 
         function getStatusBadgeClass(status) {
             const classes = {
                 pendiente: 'warning',
-                aprobada: 'success',
-                rechazada: 'danger'
+                aprobado: 'success',
+                rechazado: 'danger'
             };
             return classes[status] || 'secondary';
         }
@@ -276,8 +381,8 @@
         function getStatusLabel(status) {
             const labels = {
                 pendiente: 'Pendiente',
-                aprobada: 'Aprobada',
-                rechazada: 'Rechazada'
+                aprobado: 'Aprobado',
+                rechazado: 'Rechazado'
             };
             return labels[status] || status;
         }
@@ -299,38 +404,140 @@
         function resetFilters() {
             document.getElementById('search').value = '';
             document.getElementById('filter-status').value = '';
-            document.getElementById('filter-category').value = '';
             applyFilters();
         }
 
-        async function approveService(ServiceId) {
-            Components.showToast('Función en desarrollo', 'info');
+        async function approveItem(itemId) {
+            if (!confirm('¿Aprobar este registro?')) return;
+
+            try {
+                const response = await api.adminUpdateProduct(itemId, { estado: 'aprobado' });
+                if (response.success) {
+                    Components.toast('Registro aprobado exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error approving item:', e);
+                Components.toast('Error aprobando registro', 'error');
+            }
         }
 
-        async function rejectService(ServiceId) {
-            Components.showToast('Función en desarrollo', 'info');
+        async function rejectItem(itemId) {
+            if (!confirm('¿Rechazar este registro?')) return;
+
+            try {
+                const response = await api.adminUpdateProduct(itemId, { estado: 'rechazado' });
+                if (response.success) {
+                    Components.toast('Registro rechazado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error rejecting item:', e);
+                Components.toast('Error rechazando registro', 'error');
+            }
         }
 
-        async function deleteService(ServiceId) {
-            Components.showToast('Función en desarrollo', 'info');
-        }
+        async function deleteItem(itemId) {
+            if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
 
-        function editService(ServiceId) {
-            Components.showToast('Función de edición en desarrollo', 'info');
+            try {
+                const response = await api.deleteProduct(itemId);
+                if (response.success) {
+                    Components.toast('Registro eliminado exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error deleting item:', e);
+                Components.toast('Error eliminando registro', 'error');
+            }
         }
 
         function showCreateModal() {
-            Components.showToast('Función de creación en desarrollo', 'info');
+            document.getElementById('modal-title').textContent = 'Nuevo Servicio';
+            document.getElementById('item-form').reset();
+            document.getElementById('item-id').value = '';
+            document.getElementById('item-estado').value = 'pendiente';
+            openModal();
+        }
+
+        function editItem(itemId) {
+            const item = allItems.find(i => i.id === itemId);
+            if (!item) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Servicio';
+            document.getElementById('item-id').value = item.id;
+            document.getElementById('item-titulo').value = item.titulo || '';
+            document.getElementById('item-descripcion').value = item.descripcion || '';
+            document.getElementById('item-imagen').value = item.imagen_url || '';
+            document.getElementById('item-categoria').value = item.categoria_id || '';
+            document.getElementById('item-zona').value = item.zona_id || '';
+            document.getElementById('item-direccion').value = item.direccion || '';
+            document.getElementById('item-telefono').value = item.telefono || '';
+            document.getElementById('item-whatsapp').value = item.whatsapp || '';
+            document.getElementById('item-horarios').value = item.horarios || '';
+            document.getElementById('item-precio').value = item.precio || '';
+            document.getElementById('item-web').value = item.sitio_web || '';
+            document.getElementById('item-estado').value = item.estado || 'pendiente';
+            openModal();
+        }
+
+        async function saveItem(event) {
+            event.preventDefault();
+
+            const itemId = document.getElementById('item-id').value;
+            const data = {
+                titulo: document.getElementById('item-titulo').value,
+                descripcion: document.getElementById('item-descripcion').value,
+                imagen_url: document.getElementById('item-imagen').value || null,
+                categoria_id: document.getElementById('item-categoria').value || null,
+                zona_id: document.getElementById('item-zona').value || null,
+                direccion: document.getElementById('item-direccion').value || null,
+                telefono: document.getElementById('item-telefono').value || null,
+                whatsapp: document.getElementById('item-whatsapp').value || null,
+                horarios: document.getElementById('item-horarios').value || null,
+                precio: document.getElementById('item-precio').value ? parseFloat(document.getElementById('item-precio').value) : null,
+                sitio_web: document.getElementById('item-web').value || null,
+                estado: document.getElementById('item-estado').value,
+                section: SECTION
+            };
+
+            try {
+                let response;
+                if (itemId) {
+                    response = await api.adminUpdateProduct(itemId, data);
+                } else {
+                    response = await api.adminCreateProduct(data);
+                }
+
+                if (response.success) {
+                    Components.toast(itemId ? 'Registro actualizado exitosamente' : 'Registro creado exitosamente', 'success');
+                    closeModal();
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error saving item:', e);
+                Components.toast(e.message || 'Error guardando registro', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('item-modal').classList.add('active');
+            document.getElementById('item-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('item-modal').classList.remove('active');
+            document.getElementById('item-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
         document.getElementById('filter-status').addEventListener('change', applyFilters);
-        document.getElementById('filter-category').addEventListener('change', applyFilters);
 
         // Load initial data
         loadData();
     </script>
 </body>
 </html>
-

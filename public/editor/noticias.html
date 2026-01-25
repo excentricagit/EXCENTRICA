@@ -68,6 +68,9 @@
                 <h1>📰 Gestión de Noticias</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nueva Noticia
+                    </button>
                 </div>
             </header>
 
@@ -135,6 +138,68 @@
         </main>
     </div>
 
+    <!-- Modal para crear/editar noticia -->
+    <div class="modal-backdrop" id="news-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="news-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nueva Noticia</h3>
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="news-form" onsubmit="saveNews(event)">
+                <input type="hidden" id="news-id">
+
+                <div class="form-group">
+                    <label for="news-titulo">Título *</label>
+                    <input type="text" id="news-titulo" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="news-contenido">Contenido *</label>
+                    <textarea id="news-contenido" class="form-control" rows="6" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="news-resumen">Resumen</label>
+                    <textarea id="news-resumen" class="form-control" rows="2" placeholder="Breve resumen de la noticia"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="news-imagen">URL de Imagen</label>
+                    <input type="url" id="news-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                </div>
+
+                <div class="form-group">
+                    <label for="news-categoria">Categoría</label>
+                    <select id="news-categoria" class="form-control">
+                        <option value="">Sin categoría</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="news-zona">Zona</label>
+                    <select id="news-zona" class="form-control">
+                        <option value="">Sin zona específica</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="news-estado">Estado</label>
+                    <select id="news-estado" class="form-control">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="rechazada">Rechazada</option>
+                    </select>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -151,12 +216,14 @@
         let allNews = [];
         let filteredNews = [];
         let categories = [];
+        let zones = [];
 
         async function loadData() {
             try {
-                const [newsResponse, categoriesResponse] = await Promise.all([
-                    api.getNoticias(),
-                    api.getCategorias('noticias')
+                const [newsResponse, categoriesResponse, zonesResponse] = await Promise.all([
+                    api.getAdminNews(),
+                    api.getAdminCategories('noticias'),
+                    api.getAdminZones()
                 ]);
 
                 if (newsResponse.success) {
@@ -168,11 +235,29 @@
                 if (categoriesResponse.success) {
                     categories = categoriesResponse.data;
                     renderCategoryFilter();
+                    renderCategoryOptions();
+                }
+
+                if (zonesResponse.success) {
+                    zones = zonesResponse.data;
+                    renderZoneOptions();
                 }
             } catch (e) {
                 console.error('Error loading data:', e);
-                Components.showToast('Error cargando datos', 'error');
+                Components.toast('Error cargando datos', 'error');
             }
+        }
+
+        function renderCategoryOptions() {
+            const select = document.getElementById('news-categoria');
+            select.innerHTML = '<option value="">Sin categoría</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+        }
+
+        function renderZoneOptions() {
+            const select = document.getElementById('news-zona');
+            select.innerHTML = '<option value="">Sin zona específica</option>' +
+                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
         }
 
         function renderCategoryFilter() {
@@ -317,14 +402,14 @@
             if (!confirm('¿Aprobar esta noticia?')) return;
 
             try {
-                const response = await api.updateNoticia(newsId, { estado: 'aprobada' });
+                const response = await api.updateNews(newsId, { estado: 'aprobada' });
                 if (response.success) {
-                    Components.showToast('Noticia aprobada exitosamente', 'success');
+                    Components.toast('Noticia aprobada exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error approving news:', e);
-                Components.showToast('Error aprobando noticia', 'error');
+                Components.toast('Error aprobando noticia', 'error');
             }
         }
 
@@ -332,14 +417,14 @@
             if (!confirm('¿Rechazar esta noticia?')) return;
 
             try {
-                const response = await api.updateNoticia(newsId, { estado: 'rechazada' });
+                const response = await api.updateNews(newsId, { estado: 'rechazada' });
                 if (response.success) {
-                    Components.showToast('Noticia rechazada', 'success');
+                    Components.toast('Noticia rechazada', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error rejecting news:', e);
-                Components.showToast('Error rechazando noticia', 'error');
+                Components.toast('Error rechazando noticia', 'error');
             }
         }
 
@@ -347,20 +432,83 @@
             if (!confirm('¿Eliminar esta noticia? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteNoticia(newsId);
+                const response = await api.deleteNews(newsId);
                 if (response.success) {
-                    Components.showToast('Noticia eliminada exitosamente', 'success');
+                    Components.toast('Noticia eliminada exitosamente', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error deleting news:', e);
-                Components.showToast('Error eliminando noticia', 'error');
+                Components.toast('Error eliminando noticia', 'error');
             }
         }
 
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nueva Noticia';
+            document.getElementById('news-form').reset();
+            document.getElementById('news-id').value = '';
+            openModal();
+        }
+
         function editNews(newsId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+            const news = allNews.find(n => n.id === newsId);
+            if (!news) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Noticia';
+            document.getElementById('news-id').value = news.id;
+            document.getElementById('news-titulo').value = news.titulo || '';
+            document.getElementById('news-contenido').value = news.contenido || '';
+            document.getElementById('news-resumen').value = news.resumen || '';
+            document.getElementById('news-imagen').value = news.imagen_url || '';
+            document.getElementById('news-categoria').value = news.categoria_id || '';
+            document.getElementById('news-zona').value = news.zona_id || '';
+            document.getElementById('news-estado').value = news.estado || 'pendiente';
+            openModal();
+        }
+
+        async function saveNews(event) {
+            event.preventDefault();
+
+            const newsId = document.getElementById('news-id').value;
+            const data = {
+                titulo: document.getElementById('news-titulo').value,
+                contenido: document.getElementById('news-contenido').value,
+                resumen: document.getElementById('news-resumen').value || null,
+                imagen_url: document.getElementById('news-imagen').value || null,
+                categoria_id: document.getElementById('news-categoria').value || null,
+                zona_id: document.getElementById('news-zona').value || null,
+                estado: document.getElementById('news-estado').value
+            };
+
+            try {
+                let response;
+                if (newsId) {
+                    response = await api.updateNews(newsId, data);
+                } else {
+                    response = await api.createNews(data);
+                }
+
+                if (response.success) {
+                    Components.toast(newsId ? 'Noticia actualizada exitosamente' : 'Noticia creada exitosamente', 'success');
+                    closeModal();
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error saving news:', e);
+                Components.toast(e.message || 'Error guardando noticia', 'error');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('news-modal').classList.add('active');
+            document.getElementById('news-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('news-modal').classList.remove('active');
+            document.getElementById('news-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         // Event listeners
