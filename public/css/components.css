@@ -886,31 +886,31 @@
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
     box-shadow: var(--shadow);
 }
 
 .widget-icon {
-    font-size: 48px;
+    font-size: 32px;
     text-align: center;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 .widget-user .widget-title,
 .widget-sponsored .widget-title,
 .widget-social .widget-title {
     text-align: center;
-    font-size: var(--font-size-lg);
-    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-xs);
 }
 
 .widget-text {
     text-align: center;
     color: var(--text-secondary);
-    font-size: var(--font-size-sm);
-    margin-bottom: var(--spacing-lg);
-    line-height: 1.5;
+    font-size: var(--font-size-xs);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.4;
 }
 
 .widget-user {
@@ -945,8 +945,8 @@
 .social-icons-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-sm);
-    margin-top: var(--spacing-md);
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
 }
 
 .social-icons-grid .social-icon {
@@ -970,6 +970,6 @@
 }
 
 .social-icons-grid .social-icon svg {
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
 }

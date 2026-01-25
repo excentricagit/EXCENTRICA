@@ -149,7 +149,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     z-index: var(--z-fixed);
-    padding: var(--spacing-lg) 0;
+    padding: var(--spacing-md) 0;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
 }
 
@@ -175,13 +175,13 @@ body {
 .sidebar-nav-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md) var(--spacing-lg);
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
     color: var(--text-secondary);
     font-weight: 500;
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
     transition: all var(--transition-fast);
-    border-left: 4px solid transparent;
+    border-left: 3px solid transparent;
     position: relative;
 }
 
@@ -200,8 +200,8 @@ body {
 }
 
 .sidebar-nav-item .icon {
-    font-size: var(--font-size-xl);
-    min-width: 28px;
+    font-size: var(--font-size-lg);
+    min-width: 24px;
     text-align: center;
 }
 
@@ -209,12 +209,12 @@ body {
 .sidebar-divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-    margin: var(--spacing-md) 0;
+    margin: var(--spacing-sm) 0;
 }
 
 .sidebar-section-title {
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: var(--font-size-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
     font-weight: 600;
     color: var(--text-muted);
     text-transform: uppercase;
@@ -229,7 +229,7 @@ body {
     margin-top: var(--header-height);
     margin-left: var(--sidebar-width);
     min-height: calc(100vh - var(--header-height));
-    padding: var(--spacing-xl) var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
     background: var(--bg-primary);
 }
 
@@ -257,8 +257,8 @@ body {
 /* Layout simple con sidebar */
 .layout-sidebar {
     display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: var(--spacing-xl);
+    grid-template-columns: 1fr 280px;
+    gap: var(--spacing-lg);
     max-width: var(--container-max);
     margin: 0 auto;
 }
