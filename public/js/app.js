@@ -35,11 +35,12 @@ const App = {
         const userMenu = document.querySelector('.user-menu');
         const authButtons = document.querySelector('.auth-buttons');
         const userDropdown = document.querySelector('.user-dropdown');
+        const widgetUser = document.querySelector('.widget-user');
 
         if (auth.isAuthenticated()) {
             const user = auth.getUser();
 
-            // Mostrar menú de usuario
+            // Mostrar menú de usuario en header
             if (userMenu) {
                 userMenu.innerHTML = `
                     <div class="dropdown">
@@ -57,14 +58,42 @@ const App = {
                 `;
             }
 
+            // Actualizar widget de usuario en sidebar (si existe)
+            if (widgetUser) {
+                widgetUser.innerHTML = `
+                    <div class="widget-icon">👤</div>
+                    <h3 class="widget-title">Hola, ${user.name.split(' ')[0]}</h3>
+                    <p class="widget-text">${user.email}</p>
+                    ${auth.isAdmin() ? `
+                        <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/admin/'">
+                            ⚙️ Panel Admin
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-outline btn-block" onclick="auth.logout()">
+                        🚪 Cerrar Sesión
+                    </button>
+                `;
+            }
+
             // Ocultar botones de auth
             if (authButtons) authButtons.style.display = 'none';
         } else {
-            // Mostrar botones de login/registro
+            // Mostrar botones de login/registro en header
             if (userMenu) {
                 userMenu.innerHTML = `
                     <a href="/login.html" class="btn btn-outline btn-sm">Ingresar</a>
                     <a href="/registro.html" class="btn btn-primary btn-sm hide-mobile">Registrarse</a>
+                `;
+            }
+
+            // Mostrar botones de login en widget (si existe)
+            if (widgetUser) {
+                widgetUser.innerHTML = `
+                    <div class="widget-icon">👤</div>
+                    <h3 class="widget-title">Únete a Excentrica</h3>
+                    <p class="widget-text">Iniciá sesión para dar likes y guardar favoritos.</p>
+                    <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/login.html'">Iniciar Sesión</button>
+                    <button class="btn btn-outline btn-block" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
                 `;
             }
         }

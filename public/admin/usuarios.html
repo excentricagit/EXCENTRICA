@@ -66,42 +66,6 @@
             </header>
 
             <div class="admin-content">
-                <!-- Filters -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="grid grid-4 gap-3">
-                            <div class="form-group">
-                                <label for="search">Buscar</label>
-                                <input type="text" id="search" class="form-control" placeholder="Nombre, email o teléfono...">
-                            </div>
-                            <div class="form-group">
-                                <label for="filter-role">Rol</label>
-                                <select id="filter-role" class="form-control">
-                                    <option value="">Todos los roles</option>
-                                    <option value="admin">Administrador</option>
-                                    <option value="usuario">Usuario</option>
-                                    <option value="comerciante">Comerciante</option>
-                                    <option value="periodista">Periodista</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="filter-status">Estado</label>
-                                <select id="filter-status" class="form-control">
-                                    <option value="">Todos</option>
-                                    <option value="active">Activos</option>
-                                    <option value="inactive">Inactivos</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>&nbsp;</label>
-                                <button class="btn btn-outline w-100" onclick="resetFilters()">
-                                    Limpiar filtros
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Stats -->
                 <div class="grid grid-4 mb-4">
                     <div class="stat-card">
@@ -132,6 +96,26 @@
                             <span class="stat-label">Periodistas</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
+                    <select id="filter-role" class="form-control" style="max-width: 150px;">
+                        <option value="">Todos los roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="user">Usuario</option>
+                        <option value="merchant">Comerciante</option>
+                        <option value="reporter">Periodista</option>
+                    </select>
+                    <select id="filter-status" class="form-control" style="max-width: 120px;">
+                        <option value="">Estado</option>
+                        <option value="active">Activo</option>
+                        <option value="inactive">Inactivo</option>
+                    </select>
+                    <button class="btn btn-outline btn-sm" onclick="resetFilters()">
+                        Limpiar
+                    </button>
                 </div>
 
                 <!-- Users Table -->
@@ -166,15 +150,22 @@
 
         async function loadUsers() {
             try {
+                console.log('Cargando usuarios...');
                 const response = await api.getUsers();
+                console.log('Respuesta de API:', response);
+
                 if (response.success) {
-                    allUsers = response.data;
+                    allUsers = response.data || [];
+                    console.log('Usuarios cargados:', allUsers.length, allUsers);
                     applyFilters();
                     updateStats();
+                } else {
+                    console.error('Error en respuesta:', response.error);
+                    Components.showToast(response.error || 'Error cargando usuarios', 'error');
                 }
             } catch (e) {
                 console.error('Error loading users:', e);
-                Components.showToast('Error cargando usuarios', 'error');
+                Components.showToast('Error cargando usuarios: ' + e.message, 'error');
             }
         }
 
@@ -185,18 +176,19 @@
 
             filteredUsers = allUsers.filter(user => {
                 const matchSearch = !search ||
-                    user.name.toLowerCase().includes(search) ||
-                    user.email.toLowerCase().includes(search) ||
+                    (user.name && user.name.toLowerCase().includes(search)) ||
+                    (user.email && user.email.toLowerCase().includes(search)) ||
                     (user.phone && user.phone.includes(search));
 
                 const matchRole = !role || user.role === role;
                 const matchStatus = !status ||
-                    (status === 'active' && user.is_active) ||
-                    (status === 'inactive' && !user.is_active);
+                    (status === 'active' && (user.is_active || user.status === 'active')) ||
+                    (status === 'inactive' && (!user.is_active || user.status === 'inactive'));
 
                 return matchSearch && matchRole && matchStatus;
             });
 
+            console.log('Filtros aplicados. Usuarios filtrados:', filteredUsers.length);
             renderTable();
         }
 
@@ -264,17 +256,27 @@
         }
 
         function updateStats() {
-            document.getElementById('total-users').textContent = allUsers.length;
-            document.getElementById('active-users').textContent = allUsers.filter(u => u.is_active).length;
-            document.getElementById('comerciante-users').textContent = allUsers.filter(u => u.role === 'comerciante').length;
-            document.getElementById('periodista-users').textContent = allUsers.filter(u => u.role === 'periodista').length;
+            const total = allUsers.length;
+            const activos = allUsers.filter(u => u.is_active || u.status === 'active').length;
+            const comerciantes = allUsers.filter(u => u.role === 'merchant' || u.role === 'comerciante').length;
+            const periodistas = allUsers.filter(u => u.role === 'reporter' || u.role === 'periodista').length;
+
+            console.log('Actualizando stats:', { total, activos, comerciantes, periodistas });
+
+            document.getElementById('total-users').textContent = total;
+            document.getElementById('active-users').textContent = activos;
+            document.getElementById('comerciante-users').textContent = comerciantes;
+            document.getElementById('periodista-users').textContent = periodistas;
         }
 
         function getRoleBadgeClass(role) {
             const classes = {
                 admin: 'danger',
+                merchant: 'primary',
                 comerciante: 'primary',
+                reporter: 'info',
                 periodista: 'info',
+                user: 'secondary',
                 usuario: 'secondary'
             };
             return classes[role] || 'secondary';
@@ -283,8 +285,11 @@
         function getRoleLabel(role) {
             const labels = {
                 admin: 'Administrador',
+                merchant: 'Comerciante',
                 comerciante: 'Comerciante',
+                reporter: 'Periodista',
                 periodista: 'Periodista',
+                user: 'Usuario',
                 usuario: 'Usuario'
             };
             return labels[role] || role;
