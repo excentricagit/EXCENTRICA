@@ -99,36 +99,47 @@ export async function handleAdminUpdateZone(request, env, id) {
     if (authError) return authError;
 
     try {
-        const { name, description, is_active } = await request.json();
+        const body = await request.json();
+        const { name, description, is_active } = body;
+
+        console.log('Update zone request:', { id, body });
 
         const existing = await env.DB.prepare('SELECT * FROM zones WHERE id = ?').bind(id).first();
         if (!existing) {
+            console.log('Zone not found:', id);
             return notFound('Zona no encontrada');
         }
+
+        console.log('Existing zone:', existing);
 
         let slug = existing.slug;
         if (name && name !== existing.name) {
             slug = generateSlug(name);
         }
 
-        await env.DB.prepare(`
+        console.log('Updating with:', { name, slug, description, is_active });
+
+        const result = await env.DB.prepare(`
             UPDATE zones SET
-                name = COALESCE(?, name),
+                name = ?,
                 slug = ?,
-                description = COALESCE(?, description),
-                is_active = COALESCE(?, is_active)
+                description = ?,
+                is_active = ?
             WHERE id = ?
         `).bind(
-            name || null,
+            name || existing.name,
             slug,
-            description || null,
-            is_active !== undefined ? (is_active ? 1 : 0) : null,
+            description !== undefined ? description : existing.description,
+            is_active !== undefined ? (is_active ? 1 : 0) : existing.is_active,
             id
         ).run();
+
+        console.log('Update result:', result);
 
         return success(null, 'Zona actualizada');
 
     } catch (e) {
+        console.error('Error updating zone:', e);
         return error('Error actualizando zona: ' + e.message, 500);
     }
 }
