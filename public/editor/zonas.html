@@ -333,18 +333,27 @@
                 is_active: document.getElementById('zone-activa').checked
             };
 
+            console.log('Saving zone:', { zoneId, data });
+
             try {
                 let response;
                 if (zoneId) {
+                    console.log('Updating zone:', zoneId);
                     response = await api.updateZone(zoneId, data);
+                    console.log('Update response:', response);
                 } else {
+                    console.log('Creating zone');
                     response = await api.createZone(data);
+                    console.log('Create response:', response);
                 }
 
                 if (response.success) {
                     Components.toast(zoneId ? 'Zona actualizada exitosamente' : 'Zona creada exitosamente', 'success');
                     closeModal();
                     loadZones();
+                } else {
+                    console.error('API returned failure:', response);
+                    Components.toast(response.message || 'Error guardando zona', 'error');
                 }
             } catch (e) {
                 console.error('Error saving zone:', e);
