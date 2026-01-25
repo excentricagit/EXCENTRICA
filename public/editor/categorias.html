@@ -150,8 +150,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="category-descripcion">Descripción</label>
-                    <textarea id="category-descripcion" class="form-control" rows="3"></textarea>
+                    <label for="category-icono">Icono (emoji)</label>
+                    <input type="text" id="category-icono" class="form-control" placeholder="📰" maxlength="4">
+                    <small class="text-muted">Usa un emoji para representar la categoría</small>
                 </div>
 
                 <div class="form-group">
@@ -225,10 +226,8 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
+                            <th>Categoría</th>
                             <th>Sección</th>
-                            <th>Items</th>
                             <th>Estado</th>
                             <th>Creada</th>
                             <th>Acciones</th>
@@ -237,14 +236,16 @@
                     <tbody>
                         ${allCategories.map(category => `
                             <tr>
-                                <td><strong>${category.nombre}</strong></td>
-                                <td>${category.descripcion || '-'}</td>
                                 <td>
-                                    <span class="badge badge-${getSectionBadgeClass(category.seccion)}">
-                                        ${getSectionLabel(category.seccion)}
+                                    <strong>${category.icon || '📁'} ${category.name}</strong>
+                                    <br>
+                                    <small class="text-muted">Slug: ${category.slug}</small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-${getSectionBadgeClass(category.section)}">
+                                        ${getSectionLabel(category.section)}
                                     </span>
                                 </td>
-                                <td>${category.items_count || 0}</td>
                                 <td>
                                     <span class="badge badge-${category.is_active ? 'success' : 'secondary'}">
                                         ${category.is_active ? 'Activa' : 'Inactiva'}
@@ -351,9 +352,9 @@
 
             document.getElementById('modal-title').textContent = 'Editar Categoría';
             document.getElementById('category-id').value = category.id;
-            document.getElementById('category-nombre').value = category.nombre || '';
-            document.getElementById('category-descripcion').value = category.descripcion || '';
-            document.getElementById('category-seccion').value = category.seccion || 'noticias';
+            document.getElementById('category-nombre').value = category.name || '';
+            document.getElementById('category-icono').value = category.icon || '';
+            document.getElementById('category-seccion').value = category.section || 'noticias';
             document.getElementById('category-activa').checked = category.is_active !== false;
             openModal();
         }
@@ -363,9 +364,9 @@
 
             const categoryId = document.getElementById('category-id').value;
             const data = {
-                nombre: document.getElementById('category-nombre').value,
-                descripcion: document.getElementById('category-descripcion').value || null,
-                seccion: document.getElementById('category-seccion').value,
+                name: document.getElementById('category-nombre').value,
+                icon: document.getElementById('category-icono').value || null,
+                section: document.getElementById('category-seccion').value,
                 is_active: document.getElementById('category-activa').checked
             };
 
