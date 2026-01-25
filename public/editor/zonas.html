@@ -85,37 +85,24 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🗺️</div>
+                        <div class="stat-icon">✅</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="provinces-count">0</span>
-                            <span class="stat-label">Provincias</span>
+                            <span class="stat-value" id="active-zones">0</span>
+                            <span class="stat-label">Activas</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🏙️</div>
+                        <div class="stat-icon">❌</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="cities-count">0</span>
-                            <span class="stat-label">Ciudades</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🏘️</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="neighborhoods-count">0</span>
-                            <span class="stat-label">Barrios</span>
+                            <span class="stat-value" id="inactive-zones">0</span>
+                            <span class="stat-label">Inactivas</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Compact filters -->
                 <div class="d-flex gap-3 mb-4 flex-wrap">
-                    <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
-                    <select id="filter-type" class="form-control" style="max-width: 150px;">
-                        <option value="">Todos los tipos</option>
-                        <option value="provincia">Provincia</option>
-                        <option value="ciudad">Ciudad</option>
-                        <option value="barrio">Barrio</option>
-                    </select>
+                    <input type="text" id="search" class="form-control" placeholder="Buscar zona..." style="max-width: 250px;">
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
@@ -152,19 +139,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="zone-tipo">Tipo *</label>
-                    <select id="zone-tipo" class="form-control" required>
-                        <option value="provincia">Provincia</option>
-                        <option value="ciudad">Ciudad</option>
-                        <option value="barrio">Barrio</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="zone-parent">Zona Padre</label>
-                    <select id="zone-parent" class="form-control">
-                        <option value="">Ninguna (raíz)</option>
-                    </select>
+                    <label for="zone-descripcion">Descripción</label>
+                    <textarea id="zone-descripcion" class="form-control" rows="3" placeholder="Descripción de la zona (opcional)"></textarea>
                 </div>
 
                 <div class="form-group">
@@ -212,21 +188,15 @@
             }
         }
 
-        function renderParentOptions() {
-            const select = document.getElementById('zone-parent');
-            select.innerHTML = '<option value="">Ninguna (raíz)</option>' +
-                allZones.map(zone => `<option value="${zone.id}">${zone.name} (${getTypeLabel(zone.tipo)})</option>`).join('');
-        }
-
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
-            const type = document.getElementById('filter-type').value;
 
             filteredZones = allZones.filter(zone => {
-                const matchSearch = !search || zone.name.toLowerCase().includes(search);
-                const matchType = !type || zone.tipo === type;
+                const matchSearch = !search ||
+                    zone.name.toLowerCase().includes(search) ||
+                    (zone.description && zone.description.toLowerCase().includes(search));
 
-                return matchSearch && matchType;
+                return matchSearch;
             });
 
             renderTable();
@@ -245,9 +215,7 @@
                     <thead>
                         <tr>
                             <th>Zona</th>
-                            <th>Tipo</th>
-                            <th>Padre</th>
-                            <th>Items</th>
+                            <th>Descripción</th>
                             <th>Estado</th>
                             <th>Creada</th>
                             <th>Acciones</th>
@@ -257,13 +225,7 @@
                         ${filteredZones.map(zone => `
                             <tr>
                                 <td><strong>${zone.name}</strong></td>
-                                <td>
-                                    <span class="badge badge-${getTypeBadgeClass(zone.tipo)}">
-                                        ${getTypeLabel(zone.tipo)}
-                                    </span>
-                                </td>
-                                <td>${zone.parent_nombre || '-'}</td>
-                                <td>${zone.items_count || 0}</td>
+                                <td><small class="text-muted">${zone.description || '-'}</small></td>
                                 <td>
                                     <span class="badge badge-${zone.is_active ? 'success' : 'secondary'}">
                                         ${zone.is_active ? 'Activa' : 'Inactiva'}
@@ -292,27 +254,8 @@
 
         function updateStats() {
             document.getElementById('total-zones').textContent = allZones.length;
-            document.getElementById('provinces-count').textContent = allZones.filter(z => z.tipo === 'provincia').length;
-            document.getElementById('cities-count').textContent = allZones.filter(z => z.tipo === 'ciudad').length;
-            document.getElementById('neighborhoods-count').textContent = allZones.filter(z => z.tipo === 'barrio').length;
-        }
-
-        function getTypeBadgeClass(type) {
-            const classes = {
-                provincia: 'primary',
-                ciudad: 'info',
-                barrio: 'secondary'
-            };
-            return classes[type] || 'secondary';
-        }
-
-        function getTypeLabel(type) {
-            const labels = {
-                provincia: 'Provincia',
-                ciudad: 'Ciudad',
-                barrio: 'Barrio'
-            };
-            return labels[type] || type;
+            document.getElementById('active-zones').textContent = allZones.filter(z => z.is_active).length;
+            document.getElementById('inactive-zones').textContent = allZones.filter(z => !z.is_active).length;
         }
 
         function formatDate(dateString) {
@@ -326,7 +269,6 @@
 
         function resetFilters() {
             document.getElementById('search').value = '';
-            document.getElementById('filter-type').value = '';
             applyFilters();
         }
 
@@ -377,8 +319,7 @@
             document.getElementById('modal-title').textContent = 'Editar Zona';
             document.getElementById('zone-id').value = zone.id;
             document.getElementById('zone-nombre').value = zone.name || '';
-            document.getElementById('zone-tipo').value = zone.tipo || 'ciudad';
-            document.getElementById('zone-parent').value = zone.parent_id || '';
+            document.getElementById('zone-descripcion').value = zone.description || '';
             document.getElementById('zone-activa').checked = zone.is_active !== false;
             openModal();
         }
@@ -388,9 +329,8 @@
 
             const zoneId = document.getElementById('zone-id').value;
             const data = {
-                nombre: document.getElementById('zone-nombre').value,
-                tipo: document.getElementById('zone-tipo').value,
-                parent_id: document.getElementById('zone-parent').value || null,
+                name: document.getElementById('zone-nombre').value,
+                description: document.getElementById('zone-descripcion').value || null,
                 is_active: document.getElementById('zone-activa').checked
             };
 
@@ -427,7 +367,6 @@
 
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
-        document.getElementById('filter-type').addEventListener('change', applyFilters);
 
         // Load initial data
         loadZones();

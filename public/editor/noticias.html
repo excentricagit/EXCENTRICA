@@ -112,9 +112,9 @@
                     <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobada">Aprobada</option>
-                        <option value="rechazada">Rechazada</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="published">Publicada</option>
+                        <option value="rejected">Rechazada</option>
                     </select>
                     <select id="filter-category" class="form-control" style="max-width: 150px;">
                         <option value="">Todas las categorías</option>
@@ -186,9 +186,9 @@
                 <div class="form-group">
                     <label for="news-estado">Estado</label>
                     <select id="news-estado" class="form-control">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobada">Aprobada</option>
-                        <option value="rechazada">Rechazada</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="published">Publicada</option>
+                        <option value="rejected">Rechazada</option>
                     </select>
                 </div>
 
@@ -329,7 +329,7 @@
                                 <td>${formatDate(news.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${news.status === 'pendiente' ? `
+                                        ${news.status === 'pending' ? `
                                             <button class="btn btn-sm btn-success" onclick="approveNews(${news.id})" title="Aprobar">
                                                 ✅
                                             </button>
@@ -354,25 +354,25 @@
 
         function updateStats() {
             document.getElementById('total-news').textContent = allNews.length;
-            document.getElementById('pending-news').textContent = allNews.filter(n => n.estado === 'pendiente').length;
-            document.getElementById('approved-news').textContent = allNews.filter(n => n.estado === 'aprobada').length;
-            document.getElementById('rejected-news').textContent = allNews.filter(n => n.estado === 'rechazada').length;
+            document.getElementById('pending-news').textContent = allNews.filter(n => n.status === 'pending').length;
+            document.getElementById('approved-news').textContent = allNews.filter(n => n.status === 'published').length;
+            document.getElementById('rejected-news').textContent = allNews.filter(n => n.status === 'rejected').length;
         }
 
         function getStatusBadgeClass(status) {
             const classes = {
-                pendiente: 'warning',
-                aprobada: 'success',
-                rechazada: 'danger'
+                pending: 'warning',
+                published: 'success',
+                rejected: 'danger'
             };
             return classes[status] || 'secondary';
         }
 
         function getStatusLabel(status) {
             const labels = {
-                pendiente: 'Pendiente',
-                aprobada: 'Aprobada',
-                rechazada: 'Rechazada'
+                pending: 'Pendiente',
+                published: 'Publicada',
+                rejected: 'Rechazada'
             };
             return labels[status] || status;
         }
@@ -402,7 +402,7 @@
             if (!confirm('¿Aprobar esta noticia?')) return;
 
             try {
-                const response = await api.updateNews(newsId, { estado: 'aprobada' });
+                const response = await api.updateNews(newsId, { status: 'published' });
                 if (response.success) {
                     Components.toast('Noticia aprobada exitosamente', 'success');
                     loadData();
@@ -417,7 +417,7 @@
             if (!confirm('¿Rechazar esta noticia?')) return;
 
             try {
-                const response = await api.updateNews(newsId, { estado: 'rechazada' });
+                const response = await api.updateNews(newsId, { status: 'rejected' });
                 if (response.success) {
                     Components.toast('Noticia rechazada', 'success');
                     loadData();
@@ -462,7 +462,7 @@
             document.getElementById('news-imagen').value = news.image_url || '';
             document.getElementById('news-categoria').value = news.category_id || '';
             document.getElementById('news-zona').value = news.zone_id || '';
-            document.getElementById('news-estado').value = news.status || 'pendiente';
+            document.getElementById('news-estado').value = news.status || 'pending';
             openModal();
         }
 
