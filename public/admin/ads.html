@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -40,6 +40,24 @@
                 <a href="/admin/ads.html" class="admin-nav-item active">
                     <span class="icon">📺</span> Publicidad
                 </a>
+                <a href="/admin/cine.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> Cine
+                </a>
+                <a href="/admin/gastronomia.html" class="admin-nav-item">
+                    <span class="icon">🍽️</span> Gastronomía
+                </a>
+                <a href="/admin/alojamiento.html" class="admin-nav-item">
+                    <span class="icon">🏨</span> Alojamiento
+                </a>
+                <a href="/admin/transporte.html" class="admin-nav-item">
+                    <span class="icon">🚌</span> Transporte
+                </a>
+                <a href="/admin/servicios.html" class="admin-nav-item">
+                    <span class="icon">🔧</span> Servicios
+                </a>
+                <a href="/admin/puntos-interes.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Turismo
+                </a>
                 <a href="/admin/almacenamiento.html" class="admin-nav-item">
                     <span class="icon">💾</span> Almacenamiento
                 </a>
@@ -66,45 +84,8 @@
             </header>
 
             <div class="admin-content">
-                <!-- Filters -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="grid grid-4 gap-3">
-                            <div class="form-group">
-                                <label for="search">Buscar</label>
-                                <input type="text" id="search" class="form-control" placeholder="Título o anunciante...">
-                            </div>
-                            <div class="form-group">
-                                <label for="filter-type">Tipo</label>
-                                <select id="filter-type" class="form-control">
-                                    <option value="">Todos</option>
-                                    <option value="banner">Banner</option>
-                                    <option value="sidebar">Sidebar</option>
-                                    <option value="popup">Popup</option>
-                                    <option value="destacado">Destacado</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="filter-status">Estado</label>
-                                <select id="filter-status" class="form-control">
-                                    <option value="">Todos</option>
-                                    <option value="active">Activas</option>
-                                    <option value="inactive">Inactivas</option>
-                                    <option value="expired">Vencidas</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>&nbsp;</label>
-                                <button class="btn btn-outline w-100" onclick="resetFilters()">
-                                    Limpiar filtros
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Stats -->
-                <div class="grid grid-4 mb-4">
+                <div class="stats-grid mb-4">
                     <div class="stat-card">
                         <div class="stat-icon">📺</div>
                         <div class="stat-info">
@@ -133,6 +114,27 @@
                             <span class="stat-label">Clicks</span>
                         </div>
                     </div>
+                </div>
+
+                <!-- Compact filters -->
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
+                    <select id="filter-type" class="form-control" style="max-width: 150px;">
+                        <option value="">Todos los tipos</option>
+                        <option value="banner">Banner</option>
+                        <option value="sidebar">Sidebar</option>
+                        <option value="popup">Popup</option>
+                        <option value="destacado">Destacado</option>
+                    </select>
+                    <select id="filter-status" class="form-control" style="max-width: 120px;">
+                        <option value="">Estado</option>
+                        <option value="active">Activas</option>
+                        <option value="inactive">Inactivas</option>
+                        <option value="expired">Vencidas</option>
+                    </select>
+                    <button class="btn btn-outline btn-sm" onclick="resetFilters()">
+                        Limpiar
+                    </button>
                 </div>
 
                 <!-- Ads Table -->

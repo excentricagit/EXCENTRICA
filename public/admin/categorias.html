@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -40,6 +40,24 @@
                 <a href="/admin/ads.html" class="admin-nav-item">
                     <span class="icon">📺</span> Publicidad
                 </a>
+                <a href="/admin/cine.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> Cine
+                </a>
+                <a href="/admin/gastronomia.html" class="admin-nav-item">
+                    <span class="icon">🍽️</span> Gastronomía
+                </a>
+                <a href="/admin/alojamiento.html" class="admin-nav-item">
+                    <span class="icon">🏨</span> Alojamiento
+                </a>
+                <a href="/admin/transporte.html" class="admin-nav-item">
+                    <span class="icon">🚌</span> Transporte
+                </a>
+                <a href="/admin/servicios.html" class="admin-nav-item">
+                    <span class="icon">🔧</span> Servicios
+                </a>
+                <a href="/admin/puntos-interes.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Turismo
+                </a>
                 <a href="/admin/almacenamiento.html" class="admin-nav-item">
                     <span class="icon">💾</span> Almacenamiento
                 </a>
@@ -66,25 +84,8 @@
             </header>
 
             <div class="admin-content">
-                <!-- Section tabs -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="tabs">
-                            <button class="tab-btn active" onclick="switchSection('noticias')">
-                                📰 Noticias
-                            </button>
-                            <button class="tab-btn" onclick="switchSection('productos')">
-                                🛒 Productos
-                            </button>
-                            <button class="tab-btn" onclick="switchSection('eventos')">
-                                📅 Eventos
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Stats -->
-                <div class="grid grid-3 mb-4">
+                <div class="stats-grid mb-4">
                     <div class="stat-card">
                         <div class="stat-icon">📁</div>
                         <div class="stat-info">
@@ -106,6 +107,25 @@
                             <span class="stat-label">Items en categorías</span>
                         </div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🔒</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="inactive-categories">0</span>
+                            <span class="stat-label">Inactivas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compact filters -->
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <select id="filter-section" class="form-control" style="max-width: 150px;">
+                        <option value="noticias">Noticias</option>
+                        <option value="productos">Productos</option>
+                        <option value="eventos">Eventos</option>
+                    </select>
+                    <button class="btn btn-outline btn-sm" onclick="switchSection(document.getElementById('filter-section').value)">
+                        Cambiar sección
+                    </button>
                 </div>
 
                 <!-- Categories Table -->
@@ -154,13 +174,7 @@
 
         function switchSection(section) {
             currentSection = section;
-
-            // Update tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
+            document.getElementById('filter-section').value = section;
             loadCategories();
         }
 
@@ -226,6 +240,7 @@
             document.getElementById('total-categories').textContent = allCategories.length;
             document.getElementById('active-categories').textContent = allCategories.filter(c => c.is_active).length;
             document.getElementById('items-in-categories').textContent = allCategories.reduce((sum, c) => sum + (c.items_count || 0), 0);
+            document.getElementById('inactive-categories').textContent = allCategories.filter(c => !c.is_active).length;
         }
 
         function getSectionBadgeClass(section) {

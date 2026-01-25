@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos - Admin Excentrica</title>
+    <title>Servicios - Admin Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/admin/admin.css">
 </head>
@@ -28,7 +28,7 @@
                 <a href="/admin/productos.html" class="admin-nav-item">
                     <span class="icon">🛒</span> Productos
                 </a>
-                <a href="/admin/eventos.html" class="admin-nav-item active">
+                <a href="/admin/eventos.html" class="admin-nav-item">
                     <span class="icon">📅</span> Eventos
                 </a>
                 <a href="/admin/categorias.html" class="admin-nav-item">
@@ -40,8 +40,8 @@
                 <a href="/admin/ads.html" class="admin-nav-item">
                     <span class="icon">📺</span> Publicidad
                 </a>
-                <a href="/admin/cine.html" class="admin-nav-item">
-                    <span class="icon">🎬</span> Cine
+                <a href="/admin/CategorÃ­a.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> CategorÃ­a
                 </a>
                 <a href="/admin/gastronomia.html" class="admin-nav-item">
                     <span class="icon">🍽️</span> Gastronomía
@@ -52,7 +52,7 @@
                 <a href="/admin/transporte.html" class="admin-nav-item">
                     <span class="icon">🚌</span> Transporte
                 </a>
-                <a href="/admin/servicios.html" class="admin-nav-item">
+                <a href="/admin/servicios.html" class="admin-nav-item active">
                     <span class="icon">🔧</span> Servicios
                 </a>
                 <a href="/admin/puntos-interes.html" class="admin-nav-item">
@@ -74,9 +74,12 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>📅 Gestión de Eventos</h1>
+                <h1>🎬 Gestión de CategorÃ­a</h1>
                 <div class="admin-user">
                     <span id="user-name">Administrador</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nueva Película
+                    </button>
                 </div>
             </header>
 
@@ -84,31 +87,31 @@
                 <!-- Stats -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card">
-                        <div class="stat-icon">📅</div>
+                        <div class="stat-icon">🎬</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="total-events">0</span>
-                            <span class="stat-label">Total eventos</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⏳</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="pending-events">0</span>
-                            <span class="stat-label">Pendientes</span>
+                            <span class="stat-value" id="total-services">0</span>
+                            <span class="stat-label">Total películas</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="approved-events">0</span>
-                            <span class="stat-label">Aprobados</span>
+                            <span class="stat-value" id="active-services">0</span>
+                            <span class="stat-label">Activas</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🔜</div>
+                        <div class="stat-icon">⏳</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="upcoming-events">0</span>
-                            <span class="stat-label">Próximos</span>
+                            <span class="stat-value" id="pending-services">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="rejected-services">0</span>
+                            <span class="stat-label">Rechazadas</span>
                         </div>
                     </div>
                 </div>
@@ -119,23 +122,21 @@
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
                         <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
+                        <option value="aprobada">Aprobada</option>
+                        <option value="rechazada">Rechazada</option>
                     </select>
-                    <select id="filter-date" class="form-control" style="max-width: 150px;">
-                        <option value="">Todas las fechas</option>
-                        <option value="upcoming">Próximos</option>
-                        <option value="past">Pasados</option>
+                    <select id="filter-category" class="form-control" style="max-width: 150px;">
+                        <option value="">Todas las categorÃ­as</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
                 </div>
 
-                <!-- Events Table -->
+                <!-- Services Table -->
                 <div class="card">
                     <div class="card-body">
-                        <div id="events-table-container">
+                        <div id="services-table-container">
                             <div class="text-center p-4">
                                 <div class="spinner"></div>
                             </div>
@@ -159,17 +160,23 @@
 
         document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
 
-        let allEvents = [];
-        let filteredEvents = [];
+        let allServices = [];
+        let filteredServices = [];
 
         async function loadData() {
             try {
-                const response = await api.getEventos();
-                if (response.success) {
-                    allEvents = response.data;
-                    applyFilters();
-                    updateStats();
-                }
+                // TODO: Implementar API endpoint para películas
+                // const response = await api.getCategorÃ­a();
+                // if (response.success) {
+                //     allServices = response.data;
+                //     applyFilters();
+                //     updateStats();
+                // }
+
+                // Datos de ejemplo
+                allServices = [];
+                applyFilters();
+                updateStats();
             } catch (e) {
                 console.error('Error loading data:', e);
                 Components.showToast('Error cargando datos', 'error');
@@ -179,34 +186,27 @@
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
             const status = document.getElementById('filter-status').value;
-            const dateFilter = document.getElementById('filter-date').value;
-            const now = new Date();
+            const CategorÃ­ama = document.getElementById('filter-category').value;
 
-            filteredEvents = allEvents.filter(event => {
+            filteredServices = allServices.filter(Service => {
                 const matchSearch = !search ||
-                    event.titulo.toLowerCase().includes(search) ||
-                    (event.descripcion && event.descripcion.toLowerCase().includes(search));
+                    Service.titulo.toLowerCase().includes(search) ||
+                    (Service.descripcion && Service.descripcion.toLowerCase().includes(search));
 
-                const matchStatus = !status || event.estado === status;
+                const matchStatus = !status || Service.estado === status;
+                const matchCategorÃ­ama = !CategorÃ­ama || Service.CategorÃ­a_id == CategorÃ­ama;
 
-                let matchDate = true;
-                if (dateFilter === 'upcoming') {
-                    matchDate = new Date(event.fecha_evento) >= now;
-                } else if (dateFilter === 'past') {
-                    matchDate = new Date(event.fecha_evento) < now;
-                }
-
-                return matchSearch && matchStatus && matchDate;
+                return matchSearch && matchStatus && matchCategorÃ­ama;
             });
 
             renderTable();
         }
 
         function renderTable() {
-            const container = document.getElementById('events-table-container');
+            const container = document.getElementById('services-table-container');
 
-            if (filteredEvents.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron eventos</p>';
+            if (filteredServices.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron películas</p>';
                 return;
             }
 
@@ -214,50 +214,47 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Evento</th>
-                            <th>Organizador</th>
-                            <th>Fecha</th>
-                            <th>Lugar</th>
+                            <th>Película</th>
+                            <th>CategorÃ­a</th>
+                            <th>Género</th>
+                            <th>TelÃ©fono</th>
                             <th>Estado</th>
-                            <th>Creado</th>
+                            <th>Fecha</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredEvents.map(event => `
+                        ${filteredServices.map(Service => `
                             <tr>
                                 <td>
-                                    <div class="event-info">
-                                        <strong>${event.titulo}</strong>
-                                        ${event.descripcion ? `<br><small class="text-muted">${truncate(event.descripcion, 60)}</small>` : ''}
+                                    <div class="service-info">
+                                        <strong>${Service.titulo}</strong>
+                                        ${Service.descripcion ? `<br><small class="text-muted">${truncate(Service.descripcion, 60)}</small>` : ''}
                                     </div>
                                 </td>
-                                <td>${event.organizador_nombre || '-'}</td>
+                                <td>${Service.CategorÃ­a_nombre || '-'}</td>
+                                <td>${Service.genero || '-'}</td>
+                                <td><small>${Service.TelÃ©fono || '-'}</small></td>
                                 <td>
-                                    <strong>${formatEventDate(event.fecha_evento)}</strong>
-                                    ${isUpcoming(event.fecha_evento) ? '<br><span class="badge badge-info">Próximo</span>' : ''}
-                                </td>
-                                <td>${event.lugar || '-'}</td>
-                                <td>
-                                    <span class="badge badge-${getStatusBadgeClass(event.estado)}">
-                                        ${getStatusLabel(event.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(Service.estado)}">
+                                        ${getStatusLabel(Service.estado)}
                                     </span>
                                 </td>
-                                <td>${formatDate(event.created_at)}</td>
+                                <td>${formatDate(Service.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${event.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveEvent(${event.id})" title="Aprobar">
+                                        ${Service.estado === 'pendiente' ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveService(${Service.id})" title="Aprobar">
                                                 ✅
                                             </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectEvent(${event.id})" title="Rechazar">
+                                            <button class="btn btn-sm btn-danger" onclick="rejectService(${Service.id})" title="Rechazar">
                                                 ❌
                                             </button>
                                         ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editEvent(${event.id})" title="Editar">
+                                        <button class="btn btn-sm btn-outline" onclick="editService(${Service.id})" title="Editar">
                                             ✏️
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteEvent(${event.id})" title="Eliminar">
+                                        <button class="btn btn-sm btn-danger" onclick="deleteService(${Service.id})" title="Eliminar">
                                             🗑️
                                         </button>
                                     </div>
@@ -270,18 +267,17 @@
         }
 
         function updateStats() {
-            const now = new Date();
-            document.getElementById('total-events').textContent = allEvents.length;
-            document.getElementById('pending-events').textContent = allEvents.filter(e => e.estado === 'pendiente').length;
-            document.getElementById('approved-events').textContent = allEvents.filter(e => e.estado === 'aprobado').length;
-            document.getElementById('upcoming-events').textContent = allEvents.filter(e => new Date(e.fecha_evento) >= now).length;
+            document.getElementById('total-services').textContent = allServices.length;
+            document.getElementById('active-services').textContent = allServices.filter(m => m.estado === 'aprobada').length;
+            document.getElementById('pending-services').textContent = allServices.filter(m => m.estado === 'pendiente').length;
+            document.getElementById('rejected-services').textContent = allServices.filter(m => m.estado === 'rechazada').length;
         }
 
         function getStatusBadgeClass(status) {
             const classes = {
                 pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
+                aprobada: 'success',
+                rechazada: 'danger'
             };
             return classes[status] || 'secondary';
         }
@@ -289,8 +285,8 @@
         function getStatusLabel(status) {
             const labels = {
                 pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                aprobada: 'Aprobada',
+                rechazada: 'Rechazada'
             };
             return labels[status] || status;
         }
@@ -309,85 +305,41 @@
             });
         }
 
-        function formatEventDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        function isUpcoming(dateString) {
-            return new Date(dateString) >= new Date();
-        }
-
         function resetFilters() {
             document.getElementById('search').value = '';
             document.getElementById('filter-status').value = '';
-            document.getElementById('filter-date').value = '';
+            document.getElementById('filter-category').value = '';
             applyFilters();
         }
 
-        async function approveEvent(eventId) {
-            if (!confirm('¿Aprobar este evento?')) return;
-
-            try {
-                const response = await api.updateEvento(eventId, { estado: 'aprobado' });
-                if (response.success) {
-                    Components.showToast('Evento aprobado exitosamente', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error approving event:', e);
-                Components.showToast('Error aprobando evento', 'error');
-            }
+        async function approveService(ServiceId) {
+            Components.showToast('Función en desarrollo', 'info');
         }
 
-        async function rejectEvent(eventId) {
-            if (!confirm('¿Rechazar este evento?')) return;
-
-            try {
-                const response = await api.updateEvento(eventId, { estado: 'rechazado' });
-                if (response.success) {
-                    Components.showToast('Evento rechazado', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error rejecting event:', e);
-                Components.showToast('Error rechazando evento', 'error');
-            }
+        async function rejectService(ServiceId) {
+            Components.showToast('Función en desarrollo', 'info');
         }
 
-        async function deleteEvent(eventId) {
-            if (!confirm('¿Eliminar este evento? Esta acción no se puede deshacer.')) return;
-
-            try {
-                const response = await api.deleteEvento(eventId);
-                if (response.success) {
-                    Components.showToast('Evento eliminado exitosamente', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error deleting event:', e);
-                Components.showToast('Error eliminando evento', 'error');
-            }
+        async function deleteService(ServiceId) {
+            Components.showToast('Función en desarrollo', 'info');
         }
 
-        function editEvent(eventId) {
-            // TODO: Implementar modal de edición
+        function editService(ServiceId) {
             Components.showToast('Función de edición en desarrollo', 'info');
+        }
+
+        function showCreateModal() {
+            Components.showToast('Función de creación en desarrollo', 'info');
         }
 
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
         document.getElementById('filter-status').addEventListener('change', applyFilters);
-        document.getElementById('filter-date').addEventListener('change', applyFilters);
+        document.getElementById('filter-category').addEventListener('change', applyFilters);
 
         // Load initial data
         loadData();
     </script>
 </body>
 </html>
+

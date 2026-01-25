@@ -108,10 +108,13 @@ body {
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius-lg);
     transition: all var(--transition-fast);
+    color: var(--primary);
+    font-weight: 600;
 }
 
 .user-avatar-btn:hover {
     background: var(--bg-tertiary);
+    color: var(--primary-light);
 }
 
 /* Mobile menu toggle */
