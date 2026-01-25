@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias - Excentrica</title>
+    <title>Gastronomía - Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
 
         <div class="sidebar-section-title">Explorar</div>
 
-        <a href="/noticias.html" class="sidebar-nav-item active">
+        <a href="/noticias.html" class="sidebar-nav-item">
             <span class="icon">📰</span>
             <span>Noticias</span>
         </a>
@@ -39,7 +39,7 @@
 
         <div class="sidebar-section-title">Servicios</div>
 
-        <a href="/gastronomia.html" class="sidebar-nav-item">
+        <a href="/gastronomia.html" class="sidebar-nav-item active">
             <span class="icon">🍽️</span>
             <span>Gastronomía</span>
         </a>
@@ -101,19 +101,24 @@
     <main class="main">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title">📰 Noticias</h1>
-                <p class="page-subtitle">Las últimas noticias de Santiago del Estero</p>
+                <h1 class="page-title">🍽️ Gastronomía</h1>
+                <p class="page-subtitle">Restaurantes y servicios gastronómicos en Santiago del Estero</p>
             </div>
 
             <!-- Filtros -->
             <div class="d-flex gap-3 mb-4 flex-wrap">
+                <input type="text" id="search-input" placeholder="Buscar restaurantes..."
+                       class="form-control" style="max-width:250px;">
                 <select id="category-filter" class="form-control" style="max-width:200px;">
                     <option value="">Todas las categorías</option>
                 </select>
+                <select id="zone-filter" class="form-control" style="max-width:150px;">
+                    <option value="">Todas las zonas</option>
+                </select>
             </div>
 
-            <!-- Lista de noticias -->
-            <div id="news-list" class="feed">
+            <!-- Grid de gastronomía -->
+            <div id="gastronomy-grid" class="grid grid-3">
                 <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
             </div>
 
@@ -139,44 +144,54 @@
     <script>
         let currentPage = 1;
 
-        async function loadNews(page = 1) {
+        async function loadGastronomy(page = 1) {
             currentPage = page;
+            const search = document.getElementById('search-input').value;
             const category = document.getElementById('category-filter').value;
-            Components.showLoading('#news-list');
+            const zone = document.getElementById('zone-filter').value;
+
+            Components.showLoading('#gastronomy-grid');
 
             try {
-                const response = await api.getNews({ page, limit: 10, category });
-                const container = document.getElementById('news-list');
+                const response = await api.getGastronomy({ page, limit: 12, search, category, zone });
+                const container = document.getElementById('gastronomy-grid');
 
-                if (response.success && response.data.news.length > 0) {
-                    container.innerHTML = response.data.news.map(n => Components.newsCard(n)).join('');
+                if (response.success && response.data.gastronomy.length > 0) {
+                    container.innerHTML = response.data.gastronomy.map(g => Components.gastronomyCard(g)).join('');
                     document.getElementById('pagination').innerHTML = Components.pagination(
                         response.data.pagination.page,
                         response.data.pagination.pages,
-                        'loadNews'
+                        'loadGastronomy'
                     );
                 } else {
-                    Components.showEmpty(container, 'No hay noticias disponibles', '📰');
+                    Components.showEmpty(container, 'No hay restaurantes disponibles', '🍽️');
                     document.getElementById('pagination').innerHTML = '';
                 }
             } catch (e) {
-                Components.showError('#news-list', 'Error cargando noticias');
+                Components.showError('#gastronomy-grid', 'Error cargando restaurantes');
             }
 
-            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null });
+            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null, zone: zone || null, search: search || null });
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await App.loadCategories('category-filter', 'noticias');
+        const debouncedSearch = Utils.debounce(() => loadGastronomy(1), 500);
 
-            // Leer parámetros de URL
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Promise.all([
+                App.loadCategories('category-filter', 'gastronomia'),
+                App.loadZones('zone-filter')
+            ]);
+
             const params = Utils.getUrlParams();
             if (params.category) document.getElementById('category-filter').value = params.category;
+            if (params.zone) document.getElementById('zone-filter').value = params.zone;
+            if (params.search) document.getElementById('search-input').value = params.search;
 
-            loadNews(parseInt(params.page) || 1);
+            loadGastronomy(parseInt(params.page) || 1);
 
-            // Filtros
-            document.getElementById('category-filter').addEventListener('change', () => loadNews(1));
+            document.getElementById('search-input').addEventListener('input', debouncedSearch);
+            document.getElementById('category-filter').addEventListener('change', () => loadGastronomy(1));
+            document.getElementById('zone-filter').addEventListener('change', () => loadGastronomy(1));
         });
     </script>
 </body>

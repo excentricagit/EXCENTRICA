@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mercadería - Excentrica</title>
+    <title>Cine - Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -22,7 +22,7 @@
             <span class="icon">📰</span>
             <span>Noticias</span>
         </a>
-        <a href="/mercaderia.html" class="sidebar-nav-item active">
+        <a href="/mercaderia.html" class="sidebar-nav-item">
             <span class="icon">🛒</span>
             <span>Mercadería</span>
         </a>
@@ -62,7 +62,7 @@
 
         <div class="sidebar-divider"></div>
 
-        <a href="/cine.html" class="sidebar-nav-item">
+        <a href="/cine.html" class="sidebar-nav-item active">
             <span class="icon">🎬</span>
             <span>Cine</span>
         </a>
@@ -100,39 +100,25 @@
 
     <main class="main">
         <div class="container">
-            <div class="page-header d-flex justify-between align-center flex-wrap gap-3">
-                <div>
-                    <h1 class="page-title">🛒 Mercadería</h1>
-                    <p class="page-subtitle">Comprá y vendé en Santiago del Estero</p>
-                </div>
-                <a href="/publicar-producto.html" class="btn btn-primary">+ Publicar producto</a>
+            <div class="page-header">
+                <h1 class="page-title">🎬 Cine</h1>
+                <p class="page-subtitle">Cines y carteleras en Santiago del Estero</p>
             </div>
 
             <!-- Filtros -->
             <div class="d-flex gap-3 mb-4 flex-wrap">
-                <input type="text" id="search-input" placeholder="Buscar productos..."
-                       class="form-control" style="max-width:250px;">
-                <select id="category-filter" class="form-control" style="max-width:180px;">
-                    <option value="">Categorías</option>
+                <select id="cinema-filter" class="form-control" style="max-width:250px;">
+                    <option value="">Todos los cines</option>
                 </select>
                 <select id="zone-filter" class="form-control" style="max-width:150px;">
-                    <option value="">Zonas</option>
-                </select>
-                <select id="condition-filter" class="form-control" style="max-width:150px;">
-                    <option value="">Condición</option>
-                    <option value="new">Nuevo</option>
-                    <option value="used">Usado</option>
-                    <option value="refurbished">Reacondicionado</option>
+                    <option value="">Todas las zonas</option>
                 </select>
             </div>
 
-            <!-- Grid de productos -->
-            <div id="products-grid" class="grid grid-4">
+            <!-- Lista de cines con sus películas -->
+            <div id="cinemas-list">
                 <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
             </div>
-
-            <!-- Paginación -->
-            <div id="pagination" class="mt-4"></div>
         </div>
     </main>
 
@@ -151,55 +137,86 @@
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
     <script>
-        let currentPage = 1;
+        async function loadCinemas() {
+            const cinemaFilter = document.getElementById('cinema-filter').value;
+            const zoneFilter = document.getElementById('zone-filter').value;
 
-        async function loadProducts(page = 1) {
-            currentPage = page;
-            const search = document.getElementById('search-input').value;
-            const category = document.getElementById('category-filter').value;
-            const zone = document.getElementById('zone-filter').value;
-            const condition = document.getElementById('condition-filter').value;
-
-            Components.showLoading('#products-grid');
+            Components.showLoading('#cinemas-list');
 
             try {
-                const response = await api.getProducts({ page, limit: 12, search, category, zone, condition });
-                const container = document.getElementById('products-grid');
+                const response = await api.getCinemas({ cinema: cinemaFilter, zone: zoneFilter });
+                const container = document.getElementById('cinemas-list');
 
-                if (response.success && response.data.products.length > 0) {
-                    container.innerHTML = response.data.products.map(p => Components.productCard(p)).join('');
-                    document.getElementById('pagination').innerHTML = Components.pagination(
-                        response.data.pagination.page,
-                        response.data.pagination.pages,
-                        'loadProducts'
-                    );
+                if (response.success && response.data.cinemas.length > 0) {
+                    container.innerHTML = response.data.cinemas.map(cinema => {
+                        const moviesHtml = cinema.movies && cinema.movies.length > 0
+                            ? `<div class="grid grid-4 mt-3">
+                                ${cinema.movies.map(movie => Components.movieCard(movie)).join('')}
+                               </div>`
+                            : '<p class="text-muted mt-3">No hay películas en cartelera</p>';
+
+                        return `
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="d-flex justify-between align-center mb-3">
+                                        <div>
+                                            <h2 class="card-title mb-1">${cinema.name}</h2>
+                                            <p class="text-muted mb-0">
+                                                <span>📍 ${cinema.address || 'Dirección no disponible'}</span>
+                                                ${cinema.zone ? `<span class="ml-3">🗺️ ${cinema.zone}</span>` : ''}
+                                            </p>
+                                        </div>
+                                        ${cinema.phone ? `<a href="tel:${cinema.phone}" class="btn btn-outline">📞 Llamar</a>` : ''}
+                                    </div>
+                                    ${cinema.description ? `<p class="mb-3">${cinema.description}</p>` : ''}
+                                    <h3 class="h5 mb-2">🎥 Películas en cartelera</h3>
+                                    ${moviesHtml}
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
                 } else {
-                    Components.showEmpty(container, 'No hay productos disponibles', '🛒');
-                    document.getElementById('pagination').innerHTML = '';
+                    Components.showEmpty(container, 'No hay cines disponibles', '🎬');
                 }
             } catch (e) {
-                Components.showError('#products-grid', 'Error cargando productos');
+                Components.showError('#cinemas-list', 'Error cargando cines');
+            }
+
+            Utils.updateUrl({ cinema: cinemaFilter || null, zone: zoneFilter || null });
+        }
+
+        async function loadCinemaOptions() {
+            try {
+                const response = await api.getCinemas({});
+                const select = document.getElementById('cinema-filter');
+
+                if (response.success && response.data.cinemas.length > 0) {
+                    response.data.cinemas.forEach(cinema => {
+                        const option = document.createElement('option');
+                        option.value = cinema.id;
+                        option.textContent = cinema.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (e) {
+                console.error('Error loading cinema options:', e);
             }
         }
 
-        const debouncedSearch = Utils.debounce(() => loadProducts(1), 500);
-
         document.addEventListener('DOMContentLoaded', async () => {
             await Promise.all([
-                App.loadCategories('category-filter', 'mercaderia'),
+                loadCinemaOptions(),
                 App.loadZones('zone-filter')
             ]);
 
             const params = Utils.getUrlParams();
-            if (params.category) document.getElementById('category-filter').value = params.category;
+            if (params.cinema) document.getElementById('cinema-filter').value = params.cinema;
             if (params.zone) document.getElementById('zone-filter').value = params.zone;
 
-            loadProducts(parseInt(params.page) || 1);
+            loadCinemas();
 
-            document.getElementById('search-input').addEventListener('input', debouncedSearch);
-            document.getElementById('category-filter').addEventListener('change', () => loadProducts(1));
-            document.getElementById('zone-filter').addEventListener('change', () => loadProducts(1));
-            document.getElementById('condition-filter').addEventListener('change', () => loadProducts(1));
+            document.getElementById('cinema-filter').addEventListener('change', loadCinemas);
+            document.getElementById('zone-filter').addEventListener('change', loadCinemas);
         });
     </script>
 </body>

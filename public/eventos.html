@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noticias - Excentrica</title>
+    <title>Eventos - Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
@@ -18,7 +18,7 @@
 
         <div class="sidebar-section-title">Explorar</div>
 
-        <a href="/noticias.html" class="sidebar-nav-item active">
+        <a href="/noticias.html" class="sidebar-nav-item">
             <span class="icon">📰</span>
             <span>Noticias</span>
         </a>
@@ -26,7 +26,7 @@
             <span class="icon">🛒</span>
             <span>Mercadería</span>
         </a>
-        <a href="/eventos.html" class="sidebar-nav-item">
+        <a href="/eventos.html" class="sidebar-nav-item active">
             <span class="icon">📅</span>
             <span>Eventos</span>
         </a>
@@ -101,19 +101,24 @@
     <main class="main">
         <div class="container">
             <div class="page-header">
-                <h1 class="page-title">📰 Noticias</h1>
-                <p class="page-subtitle">Las últimas noticias de Santiago del Estero</p>
+                <h1 class="page-title">📅 Eventos</h1>
+                <p class="page-subtitle">Descubrí los eventos en Santiago del Estero</p>
             </div>
 
             <!-- Filtros -->
             <div class="d-flex gap-3 mb-4 flex-wrap">
+                <input type="date" id="date-from-filter" class="form-control" style="max-width:180px;" placeholder="Desde">
+                <input type="date" id="date-to-filter" class="form-control" style="max-width:180px;" placeholder="Hasta">
                 <select id="category-filter" class="form-control" style="max-width:200px;">
                     <option value="">Todas las categorías</option>
                 </select>
+                <select id="zone-filter" class="form-control" style="max-width:150px;">
+                    <option value="">Todas las zonas</option>
+                </select>
             </div>
 
-            <!-- Lista de noticias -->
-            <div id="news-list" class="feed">
+            <!-- Grid de eventos -->
+            <div id="events-grid" class="grid grid-3">
                 <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
             </div>
 
@@ -139,44 +144,53 @@
     <script>
         let currentPage = 1;
 
-        async function loadNews(page = 1) {
+        async function loadEvents(page = 1) {
             currentPage = page;
+            const dateFrom = document.getElementById('date-from-filter').value;
+            const dateTo = document.getElementById('date-to-filter').value;
             const category = document.getElementById('category-filter').value;
-            Components.showLoading('#news-list');
+            const zone = document.getElementById('zone-filter').value;
+
+            Components.showLoading('#events-grid');
 
             try {
-                const response = await api.getNews({ page, limit: 10, category });
-                const container = document.getElementById('news-list');
+                const response = await api.getEvents({ page, limit: 12, dateFrom, dateTo, category, zone });
+                const container = document.getElementById('events-grid');
 
-                if (response.success && response.data.news.length > 0) {
-                    container.innerHTML = response.data.news.map(n => Components.newsCard(n)).join('');
+                if (response.success && response.data.events.length > 0) {
+                    container.innerHTML = response.data.events.map(e => Components.eventCard(e)).join('');
                     document.getElementById('pagination').innerHTML = Components.pagination(
                         response.data.pagination.page,
                         response.data.pagination.pages,
-                        'loadNews'
+                        'loadEvents'
                     );
                 } else {
-                    Components.showEmpty(container, 'No hay noticias disponibles', '📰');
+                    Components.showEmpty(container, 'No hay eventos disponibles', '📅');
                     document.getElementById('pagination').innerHTML = '';
                 }
             } catch (e) {
-                Components.showError('#news-list', 'Error cargando noticias');
+                Components.showError('#events-grid', 'Error cargando eventos');
             }
 
-            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null });
+            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null, zone: zone || null });
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            await App.loadCategories('category-filter', 'noticias');
+            await Promise.all([
+                App.loadCategories('category-filter', 'eventos'),
+                App.loadZones('zone-filter')
+            ]);
 
-            // Leer parámetros de URL
             const params = Utils.getUrlParams();
             if (params.category) document.getElementById('category-filter').value = params.category;
+            if (params.zone) document.getElementById('zone-filter').value = params.zone;
 
-            loadNews(parseInt(params.page) || 1);
+            loadEvents(parseInt(params.page) || 1);
 
-            // Filtros
-            document.getElementById('category-filter').addEventListener('change', () => loadNews(1));
+            document.getElementById('date-from-filter').addEventListener('change', () => loadEvents(1));
+            document.getElementById('date-to-filter').addEventListener('change', () => loadEvents(1));
+            document.getElementById('category-filter').addEventListener('change', () => loadEvents(1));
+            document.getElementById('zone-filter').addEventListener('change', () => loadEvents(1));
         });
     </script>
 </body>

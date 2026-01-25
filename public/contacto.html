@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacto - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        .contact-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .contact-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+        .contact-hero p {
+            font-size: 1.25rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .whatsapp-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: #25D366;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        }
+        .whatsapp-button:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+            color: white;
+        }
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .benefit-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+        }
+        .benefit-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .benefit-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+        .benefit-card p {
+            color: #666;
+            margin: 0;
+        }
+        .contact-form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            margin-top: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .submit-button {
+            background: #667eea;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        .submit-button:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+        .submit-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar de Navegación Lateral Fijo -->
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">
+            <span class="icon">🏠</span>
+            <span>Inicio</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-title">Explorar</div>
+
+        <a href="/noticias.html" class="sidebar-nav-item">
+            <span class="icon">📰</span>
+            <span>Noticias</span>
+        </a>
+        <a href="/mercaderia.html" class="sidebar-nav-item">
+            <span class="icon">🛒</span>
+            <span>Mercadería</span>
+        </a>
+        <a href="/eventos.html" class="sidebar-nav-item">
+            <span class="icon">📅</span>
+            <span>Eventos</span>
+        </a>
+        <a href="/videos.html" class="sidebar-nav-item">
+            <span class="icon">🎥</span>
+            <span>Videos</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-title">Servicios</div>
+
+        <a href="/gastronomia.html" class="sidebar-nav-item">
+            <span class="icon">🍽️</span>
+            <span>Gastronomía</span>
+        </a>
+        <a href="/alojamiento.html" class="sidebar-nav-item">
+            <span class="icon">🏨</span>
+            <span>Alojamiento</span>
+        </a>
+        <a href="/transporte.html" class="sidebar-nav-item">
+            <span class="icon">🚌</span>
+            <span>Transporte</span>
+        </a>
+        <a href="/servicios.html" class="sidebar-nav-item">
+            <span class="icon">🔧</span>
+            <span>Servicios</span>
+        </a>
+        <a href="/puntos-interes.html" class="sidebar-nav-item">
+            <span class="icon">📍</span>
+            <span>Turismo</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <a href="/cine.html" class="sidebar-nav-item">
+            <span class="icon">🎬</span>
+            <span>Cine</span>
+        </a>
+        <a href="/contacto.html" class="sidebar-nav-item active">
+            <span class="icon">📞</span>
+            <span>Contacto</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <a href="/perfil.html" class="sidebar-nav-item">
+            <span class="icon">👤</span>
+            <span>Mi Perfil</span>
+        </a>
+        <a href="/mensajes.html" class="sidebar-nav-item">
+            <span class="icon">💬</span>
+            <span>Mensajes</span>
+        </a>
+        <a href="/configuracion.html" class="sidebar-nav-item">
+            <span class="icon">⚙️</span>
+            <span>Configuración</span>
+        </a>
+    </nav>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo"><span>⚡</span> Excentrica</a>
+            <div class="header-search">
+                <input type="search" placeholder="Buscar en Excentrica..." />
+            </div>
+            <div class="user-menu"></div>
+            <button class="menu-toggle"><span></span><span></span><span></span></button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="contact-hero">
+                <h1>Sumate a Excentrica</h1>
+                <p>Conecta con miles de usuarios en Santiago del Estero. Publica tu negocio y aumenta tu visibilidad.</p>
+                <div class="mt-4">
+                    <a href="https://wa.me/5493854000000?text=Hola,%20quiero%20publicar%20mi%20negocio%20en%20Excentrica"
+                       class="whatsapp-button" target="_blank" rel="noopener">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        Contactanos por WhatsApp
+                    </a>
+                </div>
+            </div>
+
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="icon">🎯</div>
+                    <h3>Mayor Visibilidad</h3>
+                    <p>Llega a miles de personas que buscan tus servicios en la zona</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">📱</div>
+                    <h3>Presencia Digital</h3>
+                    <p>Tu negocio disponible 24/7 en web y móvil</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">💬</div>
+                    <h3>Contacto Directo</h3>
+                    <p>Recibe mensajes y consultas de clientes potenciales</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="icon">📊</div>
+                    <h3>Estadísticas</h3>
+                    <p>Mide el impacto y rendimiento de tu publicación</p>
+                </div>
+            </div>
+
+            <div class="contact-form-section">
+                <h2 class="mb-3">Solicita información</h2>
+                <p class="text-muted mb-4">Completa el formulario y nos pondremos en contacto contigo a la brevedad</p>
+
+                <form id="contact-form">
+                    <div class="form-group">
+                        <label for="name">Nombre completo *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Teléfono / WhatsApp *</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="+54 9 385 4000000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="business-type">Tipo de negocio *</label>
+                        <select id="business-type" name="businessType" required>
+                            <option value="">Selecciona una opción</option>
+                            <option value="gastronomia">Gastronomía</option>
+                            <option value="alojamiento">Alojamiento</option>
+                            <option value="transporte">Transporte</option>
+                            <option value="servicios">Servicios</option>
+                            <option value="turismo">Turismo</option>
+                            <option value="cine">Cine</option>
+                            <option value="eventos">Eventos</option>
+                            <option value="mercaderia">Mercadería</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Mensaje *</label>
+                        <textarea id="message" name="message" required placeholder="Cuéntanos sobre tu negocio y cómo podemos ayudarte..."></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-button">
+                        Enviar solicitud
+                    </button>
+                </form>
+
+                <div id="form-message" class="mt-3" style="display: none;"></div>
+            </div>
+
+            <div class="text-center mt-5 mb-4">
+                <p class="text-muted">
+                    ¿Prefieres llamarnos? <a href="tel:+5493854000000" class="text-primary">📞 +54 9 385 4000000</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Excentrica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const messageDiv = document.getElementById('form-message');
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                businessType: document.getElementById('business-type').value,
+                message: document.getElementById('message').value
+            };
+
+            try {
+                const response = await api.submitContactForm(formData);
+
+                if (response.success) {
+                    messageDiv.style.display = 'block';
+                    messageDiv.className = 'alert alert-success';
+                    messageDiv.innerHTML = '<strong>¡Gracias por tu interés!</strong> Hemos recibido tu solicitud y nos pondremos en contacto contigo pronto.';
+
+                    e.target.reset();
+                } else {
+                    throw new Error(response.message || 'Error al enviar el formulario');
+                }
+            } catch (error) {
+                messageDiv.style.display = 'block';
+                messageDiv.className = 'alert alert-error';
+                messageDiv.innerHTML = '<strong>Error:</strong> No pudimos enviar tu solicitud. Por favor, intenta contactarnos por WhatsApp.';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar solicitud';
+            }
+        });
+    </script>
+</body>
+</html>
