@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/">🔥 Excentrica</a>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/" class="admin-nav-item active">📊 Dashboard</a>
+                <a href="/admin/usuarios.html" class="admin-nav-item">👥 Usuarios</a>
+                <a href="/admin/noticias.html" class="admin-nav-item">📰 Noticias</a>
+                <a href="/admin/productos.html" class="admin-nav-item">🛒 Productos</a>
+                <a href="/admin/eventos.html" class="admin-nav-item">📅 Eventos</a>
+                <a href="/admin/categorias.html" class="admin-nav-item">📁 Categorías</a>
+                <a href="/admin/zonas.html" class="admin-nav-item">📍 Zonas</a>
+                <a href="/admin/ads.html" class="admin-nav-item">📺 Publicidad</a>
+                <a href="/admin/almacenamiento.html" class="admin-nav-item">💾 Almacenamiento</a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">🏠 Volver al sitio</a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">🚪 Cerrar sesión</a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard</h1>
+                <div class="admin-user">
+                    <span id="user-name">Admin</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats cards -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-users">-</span>
+                            <span class="stat-label">Usuarios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📰</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-news">-</span>
+                            <span class="stat-label">Noticias</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-products">-</span>
+                            <span class="stat-label">Productos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-events">-</span>
+                            <span class="stat-label">Eventos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending items -->
+                <div class="grid grid-2 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">⏳ Productos pendientes: <span id="pending-products">0</span></h3>
+                            <a href="/admin/productos.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">⏳ Noticias pendientes: <span id="pending-news">0</span></h3>
+                            <a href="/admin/noticias.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent activity -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3 class="mb-3">🕐 Últimos usuarios registrados</h3>
+                        <div id="recent-users">
+                            <div class="text-center p-3"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar admin
+        if (!auth.requireAdmin()) {
+            // Se redirige automáticamente
+        }
+
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Admin';
+
+        async function loadDashboard() {
+            try {
+                const response = await api.getAdminStats();
+                if (response.success) {
+                    const data = response.data;
+
+                    document.getElementById('stat-users').textContent = data.counts.users;
+                    document.getElementById('stat-news').textContent = data.counts.news;
+                    document.getElementById('stat-products').textContent = data.counts.products;
+                    document.getElementById('stat-events').textContent = data.counts.events;
+                    document.getElementById('pending-products').textContent = data.counts.pending_products;
+                    document.getElementById('pending-news').textContent = data.counts.pending_news;
+
+                    // Usuarios recientes
+                    const usersContainer = document.getElementById('recent-users');
+                    if (data.recent.users.length > 0) {
+                        usersContainer.innerHTML = `
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.recent.users.map(u => `
+                                        <tr>
+                                            <td>${Utils.escapeHtml(u.name)}</td>
+                                            <td>${Utils.escapeHtml(u.email)}</td>
+                                            <td>${Utils.formatDate(u.created_at)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        usersContainer.innerHTML = '<p class="text-muted">No hay usuarios recientes</p>';
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading dashboard:', e);
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

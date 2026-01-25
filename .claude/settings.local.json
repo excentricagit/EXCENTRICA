@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./deploy-cloudflare.bat)",
+      "Bash(wrangler --version:*)",
+      "Bash(wrangler login:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(wrangler d1 create:*)",
+      "Bash(wrangler d1 execute:*)",
+      "Bash(wrangler r2 bucket:*)",
+      "Bash(wrangler pages deploy:*)",
+      "Bash(cmdkey:*)",
+      "Bash(git credential-manager:*)"
+    ]
+  }
+}

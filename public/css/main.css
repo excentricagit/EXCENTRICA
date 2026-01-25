@@ -1,0 +1,11 @@
+/* EXCENTRICA - Main CSS */
+/* Importa todos los módulos CSS */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import 'variables.css';
+@import 'base.css';
+@import 'components.css';
+@import 'layout.css';
+@import 'social.css';
+@import 'utilities.css';

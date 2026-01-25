@@ -1,0 +1,126 @@
+/* EXCENTRICA - Variables CSS v2.0 - Identidad Visual Oficial */
+
+:root {
+    /* ============================================
+       PALETA BASE - FONDOS
+       ============================================ */
+    --bg-primary: #0B0612;              /* Negro violeta profundo (fondo principal) */
+    --bg-secondary: #12081E;            /* Violeta casi negro (cards/paneles) */
+    --bg-tertiary: #160A24;             /* Violeta oscuro suave (sidebar/contenedores) */
+    --bg-quaternary: #1D0E2E;           /* Violeta degradado (hover/profundidad) */
+    --bg-dark: #0B0612;                 /* Alias para compatibilidad */
+
+    /* ============================================
+       PALETA NEÓN / IDENTIDAD EXCENTRICA
+       ============================================ */
+    --primary: #A020F0;                 /* Violeta neón principal */
+    --primary-dark: #8F1DFF;            /* Violeta eléctrico intenso */
+    --primary-light: #C13CFF;           /* Magenta violeta */
+    --primary-glow: rgba(160, 32, 240, 0.6);  /* Glow violeta */
+
+    --secondary: #6C63FF;               /* Violeta frío (estados) */
+    --secondary-dark: #6A1B9A;          /* Fucsia oscuro elegante */
+
+    /* Acentos dorados (marca Excentrica) */
+    --accent: #FFC107;                  /* Dorado logo principal */
+    --accent-dark: #FFB300;             /* Dorado cálido secundario */
+    --accent-light: #D4A017;            /* Dorado apagado elegante */
+
+    /* ============================================
+       BORDES, OUTLINES Y SOMBRAS
+       ============================================ */
+    --border-color: #7B2CBF;            /* Borde violeta suave */
+    --border-radius: 12px;
+    --border-radius-sm: 6px;
+    --border-radius-lg: 16px;
+    --border-radius-xl: 24px;
+
+    /* Sombras con glow neón */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.65);
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.65);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.65);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.65);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.65);
+
+    /* Glow effects */
+    --glow-primary: 0 0 20px rgba(160, 32, 240, 0.6);
+    --glow-secondary: 0 0 15px rgba(193, 60, 255, 0.35);
+    --glow-accent: 0 0 20px rgba(255, 193, 7, 0.4);
+
+    /* ============================================
+       TEXTOS
+       ============================================ */
+    --text-primary: #F2F2F2;            /* Texto principal blanco suave */
+    --text-secondary: #B8B5C0;          /* Texto secundario gris frío */
+    --text-muted: #8C8896;              /* Texto muted/metadata */
+    --text-light: #FFFFFF;              /* Texto blanco puro */
+    --text-accent: #D08CFF;             /* Texto violeta destacado (títulos) */
+
+    /* ============================================
+       COLORES DE ESTADO
+       ============================================ */
+    --success: #6C63FF;                 /* Publicado/activo (violeta frío) */
+    --warning: #FF8C42;                 /* Advertencia/acción secundaria */
+    --danger: #C9184A;                  /* Eliminar/peligro elegante */
+    --info: #3DDC97;                    /* Información (opcional) */
+
+    /* ============================================
+       TIPOGRAFÍA
+       ============================================ */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    --font-size-4xl: 2.25rem;
+
+    /* ============================================
+       ESPACIADO
+       ============================================ */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* ============================================
+       TRANSICIONES & ANIMACIONES
+       ============================================ */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ============================================
+       Z-INDEX
+       ============================================ */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-tooltip: 600;
+
+    /* ============================================
+       LAYOUT (estructura tipo Facebook)
+       ============================================ */
+    --container-max: 1400px;
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 1024px;
+
+    /* Sidebar izquierdo fijo */
+    --sidebar-width: 260px;
+    --sidebar-collapsed: 80px;
+
+    /* Header superior */
+    --header-height: 64px;
+}
+
+/* ============================================
+   NOTA: Ya no se usa dark mode toggle
+   Excentrica es 100% dark theme por identidad
+   ============================================ */

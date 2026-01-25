@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excentrica - Santiago del Estero</title>
+    <meta name="description" content="Red social y marketplace de Santiago del Estero, Argentina. Noticias, eventos, productos y más.">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" href="/images/favicon.ico">
+</head>
+<body>
+    <!-- Sidebar de Navegación Lateral Fijo (estilo Facebook) -->
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item active">
+            <span class="icon">🏠</span>
+            <span>Inicio</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-title">Explorar</div>
+
+        <a href="/noticias.html" class="sidebar-nav-item">
+            <span class="icon">📰</span>
+            <span>Noticias</span>
+        </a>
+        <a href="/mercaderia.html" class="sidebar-nav-item">
+            <span class="icon">🛒</span>
+            <span>Mercadería</span>
+        </a>
+        <a href="/eventos.html" class="sidebar-nav-item">
+            <span class="icon">📅</span>
+            <span>Eventos</span>
+        </a>
+        <a href="/videos.html" class="sidebar-nav-item">
+            <span class="icon">🎬</span>
+            <span>Videos</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section-title">Servicios</div>
+
+        <a href="/gastronomia.html" class="sidebar-nav-item">
+            <span class="icon">🍽️</span>
+            <span>Gastronomía</span>
+        </a>
+        <a href="/alojamiento.html" class="sidebar-nav-item">
+            <span class="icon">🏨</span>
+            <span>Alojamiento</span>
+        </a>
+        <a href="/transporte.html" class="sidebar-nav-item">
+            <span class="icon">🚌</span>
+            <span>Transporte</span>
+        </a>
+        <a href="/servicios.html" class="sidebar-nav-item">
+            <span class="icon">🔧</span>
+            <span>Servicios</span>
+        </a>
+        <a href="/puntos-interes.html" class="sidebar-nav-item">
+            <span class="icon">📍</span>
+            <span>Turismo</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <a href="/perfil.html" class="sidebar-nav-item">
+            <span class="icon">👤</span>
+            <span>Mi Perfil</span>
+        </a>
+        <a href="/mensajes.html" class="sidebar-nav-item">
+            <span class="icon">💬</span>
+            <span>Mensajes</span>
+        </a>
+        <a href="/configuracion.html" class="sidebar-nav-item">
+            <span class="icon">⚙️</span>
+            <span>Configuración</span>
+        </a>
+    </nav>
+
+    <!-- Header Superior -->
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <span>⚡</span> Excentrica
+            </a>
+
+            <div class="header-search">
+                <input type="search" placeholder="Buscar en Excentrica..." />
+            </div>
+
+            <div class="user-menu"></div>
+
+            <button class="menu-toggle" aria-label="Abrir menú">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="layout-sidebar">
+            <!-- Feed principal -->
+            <div class="content">
+                <!-- Secciones rápidas (stories) -->
+                <div class="stories mb-4">
+                    <a href="/noticias.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">📰</div></div>
+                        <span class="story-name">Noticias</span>
+                    </a>
+                    <a href="/mercaderia.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">🛒</div></div>
+                        <span class="story-name">Mercadería</span>
+                    </a>
+                    <a href="/eventos.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">📅</div></div>
+                        <span class="story-name">Eventos</span>
+                    </a>
+                    <a href="/gastronomia.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">🍽️</div></div>
+                        <span class="story-name">Gastronomía</span>
+                    </a>
+                    <a href="/alojamiento.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">🏨</div></div>
+                        <span class="story-name">Alojamiento</span>
+                    </a>
+                    <a href="/transporte.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">🚌</div></div>
+                        <span class="story-name">Transporte</span>
+                    </a>
+                    <a href="/servicios.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">🔧</div></div>
+                        <span class="story-name">Servicios</span>
+                    </a>
+                    <a href="/puntos-interes.html" class="story">
+                        <div class="story-avatar"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;">📍</div></div>
+                        <span class="story-name">Turismo</span>
+                    </a>
+                </div>
+
+                <!-- Noticias destacadas -->
+                <section class="mb-5">
+                    <div class="d-flex justify-between align-center mb-3">
+                        <h2 class="text-xl font-semibold">📰 Últimas Noticias</h2>
+                        <a href="/noticias.html" class="btn btn-outline btn-sm">Ver todas</a>
+                    </div>
+                    <div id="news-feed" class="feed">
+                        <div class="text-center p-5">
+                            <div class="spinner spinner-lg mx-auto"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Productos destacados -->
+                <section class="mb-5">
+                    <div class="d-flex justify-between align-center mb-3">
+                        <h2 class="text-xl font-semibold">🛒 Productos Destacados</h2>
+                        <a href="/mercaderia.html" class="btn btn-outline btn-sm">Ver todos</a>
+                    </div>
+                    <div id="products-grid" class="grid grid-4">
+                        <div class="text-center p-5">
+                            <div class="spinner spinner-lg mx-auto"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Próximos eventos -->
+                <section class="mb-5">
+                    <div class="d-flex justify-between align-center mb-3">
+                        <h2 class="text-xl font-semibold">📅 Próximos Eventos</h2>
+                        <a href="/eventos.html" class="btn btn-outline btn-sm">Ver todos</a>
+                    </div>
+                    <div id="events-list" class="d-flex flex-column gap-3">
+                        <div class="text-center p-5">
+                            <div class="spinner spinner-lg mx-auto"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Sidebar derecho (widgets) -->
+            <aside class="sidebar">
+                <!-- Publicidad -->
+                <div id="sidebar-ads"></div>
+
+                <!-- Categorías populares -->
+                <div class="widget">
+                    <h3 class="widget-title">Categorías</h3>
+                    <div id="categories-widget" class="widget-list"></div>
+                </div>
+
+                <!-- Zonas -->
+                <div class="widget">
+                    <h3 class="widget-title">Zonas</h3>
+                    <div id="zones-widget" class="widget-list"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4 class="footer-title">Excentrica</h4>
+                    <p class="text-muted">Red social y marketplace de Santiago del Estero, Argentina.</p>
+                    <div class="social-icons mt-3">
+                        <a href="https://facebook.com/excentrica" class="social-icon" target="_blank" rel="noopener">📘</a>
+                        <a href="https://instagram.com/excentricaok" class="social-icon" target="_blank" rel="noopener">📸</a>
+                        <a href="https://twitter.com/excentricaok" class="social-icon" target="_blank" rel="noopener">🐦</a>
+                        <a href="https://youtube.com/revistaexcentrica" class="social-icon" target="_blank" rel="noopener">📺</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Secciones</h4>
+                    <div class="footer-links">
+                        <a href="/noticias.html" class="footer-link">Noticias</a>
+                        <a href="/mercaderia.html" class="footer-link">Mercadería</a>
+                        <a href="/eventos.html" class="footer-link">Eventos</a>
+                        <a href="/videos.html" class="footer-link">Videos</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Servicios</h4>
+                    <div class="footer-links">
+                        <a href="/gastronomia.html" class="footer-link">Gastronomía</a>
+                        <a href="/alojamiento.html" class="footer-link">Alojamiento</a>
+                        <a href="/transporte.html" class="footer-link">Transporte</a>
+                        <a href="/servicios.html" class="footer-link">Servicios</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Contacto</h4>
+                    <div class="footer-links">
+                        <span class="footer-link">📧 contacto@excentrica.com.ar</span>
+                        <span class="footer-link">📍 Santiago del Estero, Argentina</span>
+                        <a href="https://excentrica.com.ar" class="footer-link" target="_blank" rel="noopener">🌐 excentrica.com.ar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Excentrica - Contenidos y Comunicación. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        // Cargar contenido de la página principal
+        async function loadHomePage() {
+            // Cargar noticias
+            try {
+                const newsResponse = await api.getNews({ limit: 5 });
+                const newsFeed = document.getElementById('news-feed');
+                if (newsResponse.success && newsResponse.data.news.length > 0) {
+                    newsFeed.innerHTML = newsResponse.data.news.map(n => Components.newsCard(n)).join('');
+                } else {
+                    Components.showEmpty(newsFeed, 'No hay noticias disponibles', '📰');
+                }
+            } catch (e) {
+                Components.showError(document.getElementById('news-feed'), 'Error cargando noticias');
+            }
+
+            // Cargar productos
+            try {
+                const productsResponse = await api.getProducts({ limit: 8 });
+                const productsGrid = document.getElementById('products-grid');
+                if (productsResponse.success && productsResponse.data.products.length > 0) {
+                    productsGrid.innerHTML = productsResponse.data.products.map(p => Components.productCard(p)).join('');
+                } else {
+                    Components.showEmpty(productsGrid, 'No hay productos disponibles', '🛒');
+                }
+            } catch (e) {
+                Components.showError(document.getElementById('products-grid'), 'Error cargando productos');
+            }
+
+            // Cargar eventos
+            try {
+                const eventsResponse = await api.getEvents({ limit: 4, upcoming: 1 });
+                const eventsList = document.getElementById('events-list');
+                if (eventsResponse.success && eventsResponse.data.events.length > 0) {
+                    eventsList.innerHTML = eventsResponse.data.events.map(e => Components.eventCard(e)).join('');
+                } else {
+                    Components.showEmpty(eventsList, 'No hay eventos próximos', '📅');
+                }
+            } catch (e) {
+                Components.showError(document.getElementById('events-list'), 'Error cargando eventos');
+            }
+
+            // Cargar categorías en widget
+            try {
+                const catResponse = await api.getCategories('noticias');
+                const catWidget = document.getElementById('categories-widget');
+                if (catResponse.success && catResponse.data.length > 0) {
+                    catWidget.innerHTML = catResponse.data.slice(0, 6).map(c => `
+                        <a href="/noticias.html?category=${c.slug}" class="widget-item">
+                            <span>${c.icon || '📁'}</span>
+                            <span>${c.name}</span>
+                        </a>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Error loading categories:', e);
+            }
+
+            // Cargar zonas en widget
+            try {
+                const zonesResponse = await api.getZones();
+                const zonesWidget = document.getElementById('zones-widget');
+                if (zonesResponse.success && zonesResponse.data.length > 0) {
+                    zonesWidget.innerHTML = zonesResponse.data.map(z => `
+                        <a href="/mercaderia.html?zone=${z.slug}" class="widget-item">
+                            <span>📍</span>
+                            <span>${z.name}</span>
+                        </a>
+                    `).join('');
+                }
+            } catch (e) {
+                console.error('Error loading zones:', e);
+            }
+
+            // Cargar anuncios
+            App.loadAds('sidebar-ads', 'sidebar');
+        }
+
+        // Ejecutar al cargar
+        document.addEventListener('DOMContentLoaded', loadHomePage);
+
+        // Toggle menú móvil
+        document.querySelector('.menu-toggle')?.addEventListener('click', () => {
+            document.querySelector('.sidebar-nav').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>

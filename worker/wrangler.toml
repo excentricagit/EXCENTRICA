@@ -1,0 +1,22 @@
+name = "excentrica-api"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Base de datos D1
+[[d1_databases]]
+binding = "DB"
+database_name = "excentrica-db"
+database_id = "7616d9fe-1043-4b69-9751-7026d89b8c81"
+
+# Almacenamiento R2
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "excentrica-media"
+
+# Configuración de desarrollo local
+[dev]
+port = 8787
+local_protocol = "http"
