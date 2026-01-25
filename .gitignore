@@ -32,3 +32,6 @@ build/
 # Temp
 *.tmp
 *.temp
+
+# Scripts with tokens (security)
+push-fix.bat
