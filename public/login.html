@@ -160,7 +160,8 @@
                         // Redirigir al admin si es admin, sino al inicio
                         const redirect = result.user.role === 'admin' ? '/admin/' : '/';
                         console.log('Redirigiendo a:', redirect);
-                        window.location.href = redirect;
+                        // Usar replace para forzar recarga completa y actualizar el user-menu
+                        window.location.replace(redirect);
                     } else {
                         throw new Error('Error al guardar la sesión');
                     }
