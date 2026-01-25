@@ -9,7 +9,11 @@ const ALLOWED_ORIGINS = [
 
 export function corsHeaders(request) {
     const origin = request.headers.get('Origin') || '*';
-    const isAllowed = ALLOWED_ORIGINS.includes(origin) || origin === '*';
+
+    // Permitir cualquier subdominio de pages.dev de Cloudflare
+    const isAllowed = ALLOWED_ORIGINS.includes(origin) ||
+                      origin === '*' ||
+                      (origin && origin.endsWith('.pages.dev'));
 
     return {
         'Access-Control-Allow-Origin': isAllowed ? origin : ALLOWED_ORIGINS[0],
