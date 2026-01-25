@@ -1,7 +1,7 @@
 // Rutas de productos (marketplace)
 
 import { success, error, notFound, forbidden } from '../utils/response.js';
-import { requireAuth, requireAdmin, authMiddleware } from '../middleware/auth.js';
+import { requireAuth, requireAdmin, requireEditor, authMiddleware } from '../middleware/auth.js';
 
 export async function handleGetProducts(request, env) {
     try {
@@ -242,7 +242,7 @@ export async function handleDeleteProduct(request, env, id) {
 // ADMIN
 
 export async function handleAdminGetProducts(request, env) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -306,7 +306,7 @@ export async function handleAdminGetProducts(request, env) {
 }
 
 export async function handleAdminUpdateProductStatus(request, env, id) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -328,7 +328,7 @@ export async function handleAdminUpdateProductStatus(request, env, id) {
 }
 
 export async function handleAdminCreateProduct(request, env) {
-    const { user, error: authError } = await requireAdmin(request, env);
+    const { user, error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -367,7 +367,7 @@ export async function handleAdminCreateProduct(request, env) {
 }
 
 export async function handleAdminUpdateProduct(request, env, id) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {

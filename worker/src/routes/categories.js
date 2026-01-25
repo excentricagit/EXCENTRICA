@@ -1,7 +1,7 @@
 // Rutas de categorías
 
 import { success, error, notFound } from '../utils/response.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requireAdmin, requireEditor } from '../middleware/auth.js';
 
 function generateSlug(name) {
     return name
@@ -56,7 +56,7 @@ export async function handleGetCategoryById(request, env, id) {
 // ADMIN
 
 export async function handleAdminGetCategories(request, env) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -83,7 +83,7 @@ export async function handleAdminGetCategories(request, env) {
 }
 
 export async function handleAdminCreateCategory(request, env) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -117,7 +117,7 @@ export async function handleAdminCreateCategory(request, env) {
 }
 
 export async function handleAdminUpdateCategory(request, env, id) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -156,7 +156,7 @@ export async function handleAdminUpdateCategory(request, env, id) {
 }
 
 export async function handleAdminDeleteCategory(request, env, id) {
-    const { error: authError } = await requireAdmin(request, env);
+    const { error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
