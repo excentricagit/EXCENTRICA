@@ -57,42 +57,66 @@ export async function handleGetStorageStats(request, env) {
     if (authError) return authError;
 
     try {
-        // Estadísticas de media
-        const mediaStats = await env.DB.prepare(`
-            SELECT
-                COUNT(*) as total_files,
-                SUM(size) as total_size,
-                COUNT(DISTINCT content_type) as file_types
-            FROM media
-        `).first();
-
-        // Por tipo de archivo
-        const byType = await env.DB.prepare(`
-            SELECT content_type, COUNT(*) as count, SUM(size) as size
-            FROM media
-            GROUP BY content_type
-            ORDER BY size DESC
-        `).all();
-
-        // Estadísticas de tablas
-        const tables = ['users', 'news', 'products', 'events', 'videos', 'accommodations', 'gastronomy', 'transport', 'services', 'points_of_interest', 'likes', 'ads'];
-        const tableCounts = {};
+        // Estadísticas de tablas de la base de datos
+        const tables = ['users', 'news', 'products', 'events', 'videos', 'categories', 'zones', 'likes', 'ads', 'media'];
+        const tableStats = [];
+        let totalRows = 0;
 
         for (const table of tables) {
-            const result = await env.DB.prepare(`SELECT COUNT(*) as count FROM ${table}`).first();
-            tableCounts[table] = result.count;
+            try {
+                const result = await env.DB.prepare(`SELECT COUNT(*) as count FROM ${table}`).first();
+                const count = result.count || 0;
+                tableStats.push({
+                    name: table,
+                    rows: count
+                });
+                totalRows += count;
+            } catch (e) {
+                // Si la tabla no existe, continuar
+                console.error(`Error getting count for table ${table}:`, e);
+            }
+        }
+
+        // Ordenar tablas por número de filas (descendente)
+        tableStats.sort((a, b) => b.rows - a.rows);
+
+        // Estimación del tamaño de la base de datos (aprox. 1KB por fila promedio)
+        // Esto es una estimación, Cloudflare D1 no expone el tamaño real directamente
+        const estimatedSizeBytes = totalRows * 1024;
+
+        // Estadísticas de R2 (bucket de archivos)
+        let r2Stats = {
+            size_bytes: 0,
+            files: 0,
+            images: 0
+        };
+
+        // Obtener estadísticas de la tabla media para R2
+        try {
+            const mediaStats = await env.DB.prepare(`
+                SELECT
+                    COUNT(*) as total_files,
+                    SUM(size) as total_size,
+                    SUM(CASE WHEN content_type LIKE 'image/%' THEN 1 ELSE 0 END) as image_count
+                FROM media
+            `).first();
+
+            r2Stats = {
+                size_bytes: mediaStats.total_size || 0,
+                files: mediaStats.total_files || 0,
+                images: mediaStats.image_count || 0
+            };
+        } catch (e) {
+            console.error('Error getting media stats:', e);
         }
 
         return success({
-            media: {
-                total_files: mediaStats.total_files || 0,
-                total_size: mediaStats.total_size || 0,
-                total_size_mb: ((mediaStats.total_size || 0) / (1024 * 1024)).toFixed(2),
-                by_type: byType.results
-            },
             database: {
-                tables: tableCounts
-            }
+                size_bytes: estimatedSizeBytes,
+                total_rows: totalRows,
+                tables: tableStats
+            },
+            r2: r2Stats
         });
 
     } catch (e) {

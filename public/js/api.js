@@ -205,6 +205,11 @@ class ApiService {
         return this.get('/api/admin/users', params);
     }
 
+    // Alias for getAdminUsers
+    async getUsers(params = {}) {
+        return this.getAdminUsers(params);
+    }
+
     async createUser(data) {
         return this.post('/api/admin/users', data);
     }

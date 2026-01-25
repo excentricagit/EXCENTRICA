@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticias - Admin Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/admin/usuarios.html" class="admin-nav-item">
+                    <span class="icon">👥</span> Usuarios
+                </a>
+                <a href="/admin/noticias.html" class="admin-nav-item active">
+                    <span class="icon">📰</span> Noticias
+                </a>
+                <a href="/admin/productos.html" class="admin-nav-item">
+                    <span class="icon">🛒</span> Productos
+                </a>
+                <a href="/admin/eventos.html" class="admin-nav-item">
+                    <span class="icon">📅</span> Eventos
+                </a>
+                <a href="/admin/categorias.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Categorías
+                </a>
+                <a href="/admin/zonas.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Zonas
+                </a>
+                <a href="/admin/ads.html" class="admin-nav-item">
+                    <span class="icon">📺</span> Publicidad
+                </a>
+                <a href="/admin/almacenamiento.html" class="admin-nav-item">
+                    <span class="icon">💾</span> Almacenamiento
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>📰 Gestión de Noticias</h1>
+                <div class="admin-user">
+                    <span id="user-name">Administrador</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="grid grid-4 gap-3">
+                            <div class="form-group">
+                                <label for="search">Buscar</label>
+                                <input type="text" id="search" class="form-control" placeholder="Título o contenido...">
+                            </div>
+                            <div class="form-group">
+                                <label for="filter-status">Estado</label>
+                                <select id="filter-status" class="form-control">
+                                    <option value="">Todos</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="aprobada">Aprobada</option>
+                                    <option value="rechazada">Rechazada</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filter-category">Categoría</label>
+                                <select id="filter-category" class="form-control">
+                                    <option value="">Todas</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-outline w-100" onclick="resetFilters()">
+                                    Limpiar filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-4 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">📰</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-news">0</span>
+                            <span class="stat-label">Total noticias</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="pending-news">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="approved-news">0</span>
+                            <span class="stat-label">Aprobadas</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="rejected-news">0</span>
+                            <span class="stat-label">Rechazadas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- News Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="news-table-container">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar admin
+        if (!auth.requireAdmin()) {
+            // Se redirige automáticamente
+        }
+
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+
+        let allNews = [];
+        let filteredNews = [];
+        let categories = [];
+
+        async function loadData() {
+            try {
+                const [newsResponse, categoriesResponse] = await Promise.all([
+                    api.getNoticias(),
+                    api.getCategorias('noticias')
+                ]);
+
+                if (newsResponse.success) {
+                    allNews = newsResponse.data;
+                    applyFilters();
+                    updateStats();
+                }
+
+                if (categoriesResponse.success) {
+                    categories = categoriesResponse.data;
+                    renderCategoryFilter();
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                Components.showToast('Error cargando datos', 'error');
+            }
+        }
+
+        function renderCategoryFilter() {
+            const select = document.getElementById('filter-category');
+            select.innerHTML = '<option value="">Todas</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const status = document.getElementById('filter-status').value;
+            const category = document.getElementById('filter-category').value;
+
+            filteredNews = allNews.filter(news => {
+                const matchSearch = !search ||
+                    news.titulo.toLowerCase().includes(search) ||
+                    news.contenido.toLowerCase().includes(search);
+
+                const matchStatus = !status || news.estado === status;
+                const matchCategory = !category || news.categoria_id == category;
+
+                return matchSearch && matchStatus && matchCategory;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('news-table-container');
+
+            if (filteredNews.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron noticias</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Noticia</th>
+                            <th>Autor</th>
+                            <th>Categoría</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredNews.map(news => `
+                            <tr>
+                                <td>
+                                    <div class="news-info">
+                                        <strong>${news.titulo}</strong>
+                                        <br>
+                                        <small class="text-muted">${truncate(news.contenido, 80)}</small>
+                                    </div>
+                                </td>
+                                <td>${news.autor_nombre || '-'}</td>
+                                <td>
+                                    <span class="badge badge-secondary">
+                                        ${news.categoria_nombre || '-'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-${getStatusBadgeClass(news.estado)}">
+                                        ${getStatusLabel(news.estado)}
+                                    </span>
+                                </td>
+                                <td>${formatDate(news.created_at)}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        ${news.estado === 'pendiente' ? `
+                                            <button class="btn btn-sm btn-success" onclick="approveNews(${news.id})" title="Aprobar">
+                                                ✅
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="rejectNews(${news.id})" title="Rechazar">
+                                                ❌
+                                            </button>
+                                        ` : ''}
+                                        <button class="btn btn-sm btn-outline" onclick="editNews(${news.id})" title="Editar">
+                                            ✏️
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteNews(${news.id})" title="Eliminar">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('total-news').textContent = allNews.length;
+            document.getElementById('pending-news').textContent = allNews.filter(n => n.estado === 'pendiente').length;
+            document.getElementById('approved-news').textContent = allNews.filter(n => n.estado === 'aprobada').length;
+            document.getElementById('rejected-news').textContent = allNews.filter(n => n.estado === 'rechazada').length;
+        }
+
+        function getStatusBadgeClass(status) {
+            const classes = {
+                pendiente: 'warning',
+                aprobada: 'success',
+                rechazada: 'danger'
+            };
+            return classes[status] || 'secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                pendiente: 'Pendiente',
+                aprobada: 'Aprobada',
+                rechazada: 'Rechazada'
+            };
+            return labels[status] || status;
+        }
+
+        function truncate(text, maxLength) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-category').value = '';
+            applyFilters();
+        }
+
+        async function approveNews(newsId) {
+            if (!confirm('¿Aprobar esta noticia?')) return;
+
+            try {
+                const response = await api.updateNoticia(newsId, { estado: 'aprobada' });
+                if (response.success) {
+                    Components.showToast('Noticia aprobada exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error approving news:', e);
+                Components.showToast('Error aprobando noticia', 'error');
+            }
+        }
+
+        async function rejectNews(newsId) {
+            if (!confirm('¿Rechazar esta noticia?')) return;
+
+            try {
+                const response = await api.updateNoticia(newsId, { estado: 'rechazada' });
+                if (response.success) {
+                    Components.showToast('Noticia rechazada', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error rejecting news:', e);
+                Components.showToast('Error rechazando noticia', 'error');
+            }
+        }
+
+        async function deleteNews(newsId) {
+            if (!confirm('¿Eliminar esta noticia? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const response = await api.deleteNoticia(newsId);
+                if (response.success) {
+                    Components.showToast('Noticia eliminada exitosamente', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error deleting news:', e);
+                Components.showToast('Error eliminando noticia', 'error');
+            }
+        }
+
+        function editNews(newsId) {
+            // TODO: Implementar modal de edición
+            Components.showToast('Función de edición en desarrollo', 'info');
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-status').addEventListener('change', applyFilters);
+        document.getElementById('filter-category').addEventListener('change', applyFilters);
+
+        // Load initial data
+        loadData();
+    </script>
+</body>
+</html>

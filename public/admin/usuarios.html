@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios - Admin Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/admin/usuarios.html" class="admin-nav-item active">
+                    <span class="icon">👥</span> Usuarios
+                </a>
+                <a href="/admin/noticias.html" class="admin-nav-item">
+                    <span class="icon">📰</span> Noticias
+                </a>
+                <a href="/admin/productos.html" class="admin-nav-item">
+                    <span class="icon">🛒</span> Productos
+                </a>
+                <a href="/admin/eventos.html" class="admin-nav-item">
+                    <span class="icon">📅</span> Eventos
+                </a>
+                <a href="/admin/categorias.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Categorías
+                </a>
+                <a href="/admin/zonas.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Zonas
+                </a>
+                <a href="/admin/ads.html" class="admin-nav-item">
+                    <span class="icon">📺</span> Publicidad
+                </a>
+                <a href="/admin/almacenamiento.html" class="admin-nav-item">
+                    <span class="icon">💾</span> Almacenamiento
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>👥 Gestión de Usuarios</h1>
+                <div class="admin-user">
+                    <span id="user-name">Administrador</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nuevo Usuario
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="grid grid-4 gap-3">
+                            <div class="form-group">
+                                <label for="search">Buscar</label>
+                                <input type="text" id="search" class="form-control" placeholder="Nombre, email o teléfono...">
+                            </div>
+                            <div class="form-group">
+                                <label for="filter-role">Rol</label>
+                                <select id="filter-role" class="form-control">
+                                    <option value="">Todos los roles</option>
+                                    <option value="admin">Administrador</option>
+                                    <option value="usuario">Usuario</option>
+                                    <option value="comerciante">Comerciante</option>
+                                    <option value="periodista">Periodista</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filter-status">Estado</label>
+                                <select id="filter-status" class="form-control">
+                                    <option value="">Todos</option>
+                                    <option value="active">Activos</option>
+                                    <option value="inactive">Inactivos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-outline w-100" onclick="resetFilters()">
+                                    Limpiar filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-4 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-users">0</span>
+                            <span class="stat-label">Total usuarios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-users">0</span>
+                            <span class="stat-label">Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="comerciante-users">0</span>
+                            <span class="stat-label">Comerciantes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📰</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="periodista-users">0</span>
+                            <span class="stat-label">Periodistas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="users-table-container">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar admin
+        if (!auth.requireAdmin()) {
+            // Se redirige automáticamente
+        }
+
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+
+        let allUsers = [];
+        let filteredUsers = [];
+
+        async function loadUsers() {
+            try {
+                const response = await api.getUsers();
+                if (response.success) {
+                    allUsers = response.data;
+                    applyFilters();
+                    updateStats();
+                }
+            } catch (e) {
+                console.error('Error loading users:', e);
+                Components.showToast('Error cargando usuarios', 'error');
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const role = document.getElementById('filter-role').value;
+            const status = document.getElementById('filter-status').value;
+
+            filteredUsers = allUsers.filter(user => {
+                const matchSearch = !search ||
+                    user.name.toLowerCase().includes(search) ||
+                    user.email.toLowerCase().includes(search) ||
+                    (user.phone && user.phone.includes(search));
+
+                const matchRole = !role || user.role === role;
+                const matchStatus = !status ||
+                    (status === 'active' && user.is_active) ||
+                    (status === 'inactive' && !user.is_active);
+
+                return matchSearch && matchRole && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('users-table-container');
+
+            if (filteredUsers.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron usuarios</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Registro</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredUsers.map(user => `
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <strong>${user.name}</strong>
+                                        ${user.empresa ? `<br><small class="text-muted">${user.empresa}</small>` : ''}
+                                    </div>
+                                </td>
+                                <td>${user.email}</td>
+                                <td>${user.phone || '-'}</td>
+                                <td>
+                                    <span class="badge badge-${getRoleBadgeClass(user.role)}">
+                                        ${getRoleLabel(user.role)}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-${user.is_active ? 'success' : 'secondary'}">
+                                        ${user.is_active ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </td>
+                                <td>${formatDate(user.created_at)}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline" onclick="editUser(${user.id})" title="Editar">
+                                            ✏️
+                                        </button>
+                                        <button class="btn btn-sm btn-outline" onclick="toggleUserStatus(${user.id}, ${user.is_active})" title="${user.is_active ? 'Desactivar' : 'Activar'}">
+                                            ${user.is_active ? '🔒' : '🔓'}
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})" title="Eliminar">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('total-users').textContent = allUsers.length;
+            document.getElementById('active-users').textContent = allUsers.filter(u => u.is_active).length;
+            document.getElementById('comerciante-users').textContent = allUsers.filter(u => u.role === 'comerciante').length;
+            document.getElementById('periodista-users').textContent = allUsers.filter(u => u.role === 'periodista').length;
+        }
+
+        function getRoleBadgeClass(role) {
+            const classes = {
+                admin: 'danger',
+                comerciante: 'primary',
+                periodista: 'info',
+                usuario: 'secondary'
+            };
+            return classes[role] || 'secondary';
+        }
+
+        function getRoleLabel(role) {
+            const labels = {
+                admin: 'Administrador',
+                comerciante: 'Comerciante',
+                periodista: 'Periodista',
+                usuario: 'Usuario'
+            };
+            return labels[role] || role;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('filter-role').value = '';
+            document.getElementById('filter-status').value = '';
+            applyFilters();
+        }
+
+        async function toggleUserStatus(userId, currentStatus) {
+            const action = currentStatus ? 'desactivar' : 'activar';
+            if (!confirm(`¿Está seguro que desea ${action} este usuario?`)) return;
+
+            try {
+                const response = await api.updateUser(userId, { is_active: !currentStatus });
+                if (response.success) {
+                    Components.showToast(`Usuario ${action}do exitosamente`, 'success');
+                    loadUsers();
+                }
+            } catch (e) {
+                console.error('Error updating user:', e);
+                Components.showToast('Error actualizando usuario', 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('¿Está seguro que desea eliminar este usuario? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const response = await api.deleteUser(userId);
+                if (response.success) {
+                    Components.showToast('Usuario eliminado exitosamente', 'success');
+                    loadUsers();
+                }
+            } catch (e) {
+                console.error('Error deleting user:', e);
+                Components.showToast('Error eliminando usuario', 'error');
+            }
+        }
+
+        function editUser(userId) {
+            // TODO: Implementar modal de edición
+            Components.showToast('Función de edición en desarrollo', 'info');
+        }
+
+        function showCreateModal() {
+            // TODO: Implementar modal de creación
+            Components.showToast('Función de creación en desarrollo', 'info');
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-role').addEventListener('change', applyFilters);
+        document.getElementById('filter-status').addEventListener('change', applyFilters);
+
+        // Load initial data
+        loadUsers();
+    </script>
+</body>
+</html>

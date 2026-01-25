@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almacenamiento - Admin Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/admin/usuarios.html" class="admin-nav-item">
+                    <span class="icon">👥</span> Usuarios
+                </a>
+                <a href="/admin/noticias.html" class="admin-nav-item">
+                    <span class="icon">📰</span> Noticias
+                </a>
+                <a href="/admin/productos.html" class="admin-nav-item">
+                    <span class="icon">🛒</span> Productos
+                </a>
+                <a href="/admin/eventos.html" class="admin-nav-item">
+                    <span class="icon">📅</span> Eventos
+                </a>
+                <a href="/admin/categorias.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Categorías
+                </a>
+                <a href="/admin/zonas.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Zonas
+                </a>
+                <a href="/admin/ads.html" class="admin-nav-item">
+                    <span class="icon">📺</span> Publicidad
+                </a>
+                <a href="/admin/almacenamiento.html" class="admin-nav-item active">
+                    <span class="icon">💾</span> Almacenamiento
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>💾 Almacenamiento</h1>
+                <div class="admin-user">
+                    <span id="user-name">Administrador</span>
+                    <button class="btn btn-outline btn-sm" onclick="location.reload()">
+                        <span>🔄</span> Actualizar
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Plan Info -->
+                <div class="alert alert-info mb-4">
+                    <strong>📋 Plan Actual:</strong> Cloudflare Free Plan
+                    <br>
+                    <small>Monitorea el uso de tus recursos para decidir si necesitas un plan de pago</small>
+                </div>
+
+                <!-- Database Stats -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="mb-3">
+                            <span class="icon">🗄️</span> Base de Datos (D1)
+                        </h2>
+
+                        <div class="grid grid-3 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">📦</div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="db-size">-</span>
+                                    <span class="stat-label">Tamaño usado</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📝</div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="db-rows">-</span>
+                                    <span class="stat-label">Total de filas</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="db-tables">-</span>
+                                    <span class="stat-label">Tablas</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-between mb-2">
+                                <span class="text-sm text-muted">Límite del plan gratuito</span>
+                                <span class="text-sm text-muted" id="db-percent">0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" id="db-progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-muted mt-1">
+                                <span id="db-used">0 MB</span> de 5 GB disponibles
+                            </div>
+                        </div>
+
+                        <!-- Tables breakdown -->
+                        <h3 class="mt-4 mb-3">Desglose por tabla</h3>
+                        <div id="tables-breakdown" class="text-center p-3">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- R2 Storage Stats -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h2 class="mb-3">
+                            <span class="icon">🪣</span> Almacenamiento de Archivos (R2)
+                        </h2>
+
+                        <div class="grid grid-3 mb-4">
+                            <div class="stat-card">
+                                <div class="stat-icon">💾</div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="r2-size">-</span>
+                                    <span class="stat-label">Espacio usado</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📁</div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="r2-files">-</span>
+                                    <span class="stat-label">Archivos</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🖼️</div>
+                                <div class="stat-info">
+                                    <span class="stat-value" id="r2-images">-</span>
+                                    <span class="stat-label">Imágenes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress bar -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-between mb-2">
+                                <span class="text-sm text-muted">Límite del plan gratuito</span>
+                                <span class="text-sm text-muted" id="r2-percent">0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" id="r2-progress" style="width: 0%"></div>
+                            </div>
+                            <div class="text-sm text-muted mt-1">
+                                <span id="r2-used">0 MB</span> de 10 GB disponibles
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-3">
+                            <strong>⚠️ Nota:</strong> Los archivos en R2 se cobran por almacenamiento y operaciones. El plan gratuito incluye 10 GB de almacenamiento y 10M de lecturas mensuales.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="card" id="recommendations-card" style="display: none;">
+                    <div class="card-body">
+                        <h2 class="mb-3">
+                            <span class="icon">💡</span> Recomendaciones
+                        </h2>
+                        <div id="recommendations-list"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar admin
+        if (!auth.requireAdmin()) {
+            // Se redirige automáticamente
+        }
+
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        async function loadStorageStats() {
+            try {
+                const response = await api.getStorageStats();
+                if (response.success) {
+                    const data = response.data;
+
+                    // Database stats
+                    const dbSizeBytes = data.database.size_bytes || 0;
+                    const dbSizeMB = dbSizeBytes / (1024 * 1024);
+                    const dbLimitMB = 5 * 1024; // 5 GB in MB
+                    const dbPercent = (dbSizeMB / dbLimitMB) * 100;
+
+                    document.getElementById('db-size').textContent = formatBytes(dbSizeBytes);
+                    document.getElementById('db-rows').textContent = (data.database.total_rows || 0).toLocaleString();
+                    document.getElementById('db-tables').textContent = data.database.tables?.length || 0;
+                    document.getElementById('db-percent').textContent = dbPercent.toFixed(2) + '%';
+                    document.getElementById('db-progress').style.width = Math.min(dbPercent, 100) + '%';
+                    document.getElementById('db-used').textContent = dbSizeMB.toFixed(2) + ' MB';
+
+                    // Update progress bar color based on usage
+                    const dbProgress = document.getElementById('db-progress');
+                    if (dbPercent > 80) {
+                        dbProgress.style.background = 'linear-gradient(90deg, var(--danger), #A01030)';
+                    } else if (dbPercent > 50) {
+                        dbProgress.style.background = 'linear-gradient(90deg, var(--warning), #FF7A42)';
+                    }
+
+                    // Tables breakdown
+                    const tablesBreakdown = document.getElementById('tables-breakdown');
+                    if (data.database.tables && data.database.tables.length > 0) {
+                        tablesBreakdown.innerHTML = `
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tabla</th>
+                                        <th>Filas</th>
+                                        <th>Porcentaje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.database.tables.map(t => `
+                                        <tr>
+                                            <td><strong>${t.name}</strong></td>
+                                            <td>${t.rows.toLocaleString()}</td>
+                                            <td>
+                                                <div class="progress" style="max-width: 200px; display: inline-block;">
+                                                    <div class="progress-bar" style="width: ${(t.rows / data.database.total_rows * 100).toFixed(1)}%"></div>
+                                                </div>
+                                                <span class="ml-2">${(t.rows / data.database.total_rows * 100).toFixed(1)}%</span>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        tablesBreakdown.innerHTML = '<p class="text-muted">No hay datos disponibles</p>';
+                    }
+
+                    // R2 stats
+                    const r2SizeBytes = data.r2?.size_bytes || 0;
+                    const r2SizeMB = r2SizeBytes / (1024 * 1024);
+                    const r2LimitMB = 10 * 1024; // 10 GB in MB
+                    const r2Percent = (r2SizeMB / r2LimitMB) * 100;
+
+                    document.getElementById('r2-size').textContent = formatBytes(r2SizeBytes);
+                    document.getElementById('r2-files').textContent = (data.r2?.files || 0).toLocaleString();
+                    document.getElementById('r2-images').textContent = (data.r2?.images || 0).toLocaleString();
+                    document.getElementById('r2-percent').textContent = r2Percent.toFixed(2) + '%';
+                    document.getElementById('r2-progress').style.width = Math.min(r2Percent, 100) + '%';
+                    document.getElementById('r2-used').textContent = r2SizeMB.toFixed(2) + ' MB';
+
+                    // Update progress bar color based on usage
+                    const r2Progress = document.getElementById('r2-progress');
+                    if (r2Percent > 80) {
+                        r2Progress.style.background = 'linear-gradient(90deg, var(--danger), #A01030)';
+                    } else if (r2Percent > 50) {
+                        r2Progress.style.background = 'linear-gradient(90deg, var(--warning), #FF7A42)';
+                    }
+
+                    // Show recommendations if usage is high
+                    const recommendations = [];
+                    if (dbPercent > 70) {
+                        recommendations.push({
+                            type: 'warning',
+                            message: 'La base de datos está usando más del 70% del límite gratuito. Considera optimizar o migrar a un plan de pago.'
+                        });
+                    }
+                    if (r2Percent > 70) {
+                        recommendations.push({
+                            type: 'warning',
+                            message: 'El almacenamiento R2 está usando más del 70% del límite gratuito. Considera eliminar archivos no utilizados o migrar a un plan de pago.'
+                        });
+                    }
+                    if (dbPercent < 30 && r2Percent < 30) {
+                        recommendations.push({
+                            type: 'success',
+                            message: '✅ El uso de recursos está dentro de límites saludables. El plan gratuito es suficiente por ahora.'
+                        });
+                    }
+
+                    if (recommendations.length > 0) {
+                        document.getElementById('recommendations-card').style.display = 'block';
+                        document.getElementById('recommendations-list').innerHTML = recommendations.map(r => `
+                            <div class="alert alert-${r.type} mb-2">${r.message}</div>
+                        `).join('');
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading storage stats:', e);
+                Components.showToast('Error cargando estadísticas de almacenamiento', 'error');
+            }
+        }
+
+        loadStorageStats();
+    </script>
+</body>
+</html>

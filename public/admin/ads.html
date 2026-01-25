@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicidad - Admin Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/admin/usuarios.html" class="admin-nav-item">
+                    <span class="icon">👥</span> Usuarios
+                </a>
+                <a href="/admin/noticias.html" class="admin-nav-item">
+                    <span class="icon">📰</span> Noticias
+                </a>
+                <a href="/admin/productos.html" class="admin-nav-item">
+                    <span class="icon">🛒</span> Productos
+                </a>
+                <a href="/admin/eventos.html" class="admin-nav-item">
+                    <span class="icon">📅</span> Eventos
+                </a>
+                <a href="/admin/categorias.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Categorías
+                </a>
+                <a href="/admin/zonas.html" class="admin-nav-item">
+                    <span class="icon">📍</span> Zonas
+                </a>
+                <a href="/admin/ads.html" class="admin-nav-item active">
+                    <span class="icon">📺</span> Publicidad
+                </a>
+                <a href="/admin/almacenamiento.html" class="admin-nav-item">
+                    <span class="icon">💾</span> Almacenamiento
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>📺 Gestión de Publicidad</h1>
+                <div class="admin-user">
+                    <span id="user-name">Administrador</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nueva Publicidad
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Filters -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="grid grid-4 gap-3">
+                            <div class="form-group">
+                                <label for="search">Buscar</label>
+                                <input type="text" id="search" class="form-control" placeholder="Título o anunciante...">
+                            </div>
+                            <div class="form-group">
+                                <label for="filter-type">Tipo</label>
+                                <select id="filter-type" class="form-control">
+                                    <option value="">Todos</option>
+                                    <option value="banner">Banner</option>
+                                    <option value="sidebar">Sidebar</option>
+                                    <option value="popup">Popup</option>
+                                    <option value="destacado">Destacado</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="filter-status">Estado</label>
+                                <select id="filter-status" class="form-control">
+                                    <option value="">Todos</option>
+                                    <option value="active">Activas</option>
+                                    <option value="inactive">Inactivas</option>
+                                    <option value="expired">Vencidas</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-outline w-100" onclick="resetFilters()">
+                                    Limpiar filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid grid-4 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">📺</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-ads">0</span>
+                            <span class="stat-label">Total anuncios</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-ads">0</span>
+                            <span class="stat-label">Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-impressions">0</span>
+                            <span class="stat-label">Impresiones</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🖱️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-clicks">0</span>
+                            <span class="stat-label">Clicks</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ads Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="ads-table-container">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar admin
+        if (!auth.requireAdmin()) {
+            // Se redirige automáticamente
+        }
+
+        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Administrador';
+
+        let allAds = [];
+        let filteredAds = [];
+
+        async function loadAds() {
+            try {
+                const response = await api.getAds();
+                if (response.success) {
+                    allAds = response.data;
+                    applyFilters();
+                    updateStats();
+                }
+            } catch (e) {
+                console.error('Error loading ads:', e);
+                Components.showToast('Error cargando publicidad', 'error');
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const type = document.getElementById('filter-type').value;
+            const status = document.getElementById('filter-status').value;
+            const now = new Date();
+
+            filteredAds = allAds.filter(ad => {
+                const matchSearch = !search ||
+                    ad.titulo.toLowerCase().includes(search) ||
+                    (ad.anunciante && ad.anunciante.toLowerCase().includes(search));
+
+                const matchType = !type || ad.tipo === type;
+
+                let matchStatus = true;
+                if (status === 'active') {
+                    matchStatus = ad.is_active && (!ad.fecha_fin || new Date(ad.fecha_fin) >= now);
+                } else if (status === 'inactive') {
+                    matchStatus = !ad.is_active;
+                } else if (status === 'expired') {
+                    matchStatus = ad.fecha_fin && new Date(ad.fecha_fin) < now;
+                }
+
+                return matchSearch && matchType && matchStatus;
+            });
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('ads-table-container');
+
+            if (filteredAds.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontró publicidad</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Anuncio</th>
+                            <th>Tipo</th>
+                            <th>Anunciante</th>
+                            <th>Vigencia</th>
+                            <th>Métricas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredAds.map(ad => `
+                            <tr>
+                                <td>
+                                    <div class="ad-info">
+                                        <strong>${ad.titulo}</strong>
+                                        ${ad.imagen_url ? `<br><small class="text-muted">🖼️ Con imagen</small>` : ''}
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge badge-${getTypeBadgeClass(ad.tipo)}">
+                                        ${getTypeLabel(ad.tipo)}
+                                    </span>
+                                </td>
+                                <td>${ad.anunciante || '-'}</td>
+                                <td>
+                                    ${ad.fecha_inicio ? `<small>Desde: ${formatDate(ad.fecha_inicio)}</small>` : ''}
+                                    ${ad.fecha_fin ? `<br><small>Hasta: ${formatDate(ad.fecha_fin)}</small>` : '<br><small class="text-muted">Sin límite</small>'}
+                                    ${isExpired(ad.fecha_fin) ? '<br><span class="badge badge-danger">Vencida</span>' : ''}
+                                </td>
+                                <td>
+                                    <small>
+                                        👁️ ${(ad.impresiones || 0).toLocaleString()}
+                                        <br>
+                                        🖱️ ${(ad.clicks || 0).toLocaleString()}
+                                        ${ad.impresiones > 0 ? `<br>CTR: ${((ad.clicks || 0) / ad.impresiones * 100).toFixed(2)}%` : ''}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-${ad.is_active ? 'success' : 'secondary'}">
+                                        ${ad.is_active ? 'Activa' : 'Inactiva'}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline" onclick="editAd(${ad.id})" title="Editar">
+                                            ✏️
+                                        </button>
+                                        <button class="btn btn-sm btn-outline" onclick="toggleAdStatus(${ad.id}, ${ad.is_active})" title="${ad.is_active ? 'Desactivar' : 'Activar'}">
+                                            ${ad.is_active ? '🔒' : '🔓'}
+                                        </button>
+                                        <button class="btn btn-sm btn-info" onclick="viewStats(${ad.id})" title="Ver estadísticas">
+                                            📊
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteAd(${ad.id})" title="Eliminar">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('total-ads').textContent = allAds.length;
+            document.getElementById('active-ads').textContent = allAds.filter(a => a.is_active).length;
+            document.getElementById('total-impressions').textContent = allAds.reduce((sum, a) => sum + (a.impresiones || 0), 0).toLocaleString();
+            document.getElementById('total-clicks').textContent = allAds.reduce((sum, a) => sum + (a.clicks || 0), 0).toLocaleString();
+        }
+
+        function getTypeBadgeClass(type) {
+            const classes = {
+                banner: 'primary',
+                sidebar: 'info',
+                popup: 'warning',
+                destacado: 'success'
+            };
+            return classes[type] || 'secondary';
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                banner: 'Banner',
+                sidebar: 'Sidebar',
+                popup: 'Popup',
+                destacado: 'Destacado'
+            };
+            return labels[type] || type;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        function isExpired(dateString) {
+            if (!dateString) return false;
+            return new Date(dateString) < new Date();
+        }
+
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('filter-type').value = '';
+            document.getElementById('filter-status').value = '';
+            applyFilters();
+        }
+
+        async function toggleAdStatus(adId, currentStatus) {
+            const action = currentStatus ? 'desactivar' : 'activar';
+            if (!confirm(`¿Está seguro que desea ${action} este anuncio?`)) return;
+
+            try {
+                const response = await api.updateAd(adId, { is_active: !currentStatus });
+                if (response.success) {
+                    Components.showToast(`Anuncio ${action}do exitosamente`, 'success');
+                    loadAds();
+                }
+            } catch (e) {
+                console.error('Error updating ad:', e);
+                Components.showToast('Error actualizando anuncio', 'error');
+            }
+        }
+
+        async function deleteAd(adId) {
+            if (!confirm('¿Está seguro que desea eliminar este anuncio? Esta acción no se puede deshacer.')) return;
+
+            try {
+                const response = await api.deleteAd(adId);
+                if (response.success) {
+                    Components.showToast('Anuncio eliminado exitosamente', 'success');
+                    loadAds();
+                }
+            } catch (e) {
+                console.error('Error deleting ad:', e);
+                Components.showToast('Error eliminando anuncio', 'error');
+            }
+        }
+
+        function editAd(adId) {
+            // TODO: Implementar modal de edición
+            Components.showToast('Función de edición en desarrollo', 'info');
+        }
+
+        function viewStats(adId) {
+            // TODO: Implementar modal de estadísticas
+            Components.showToast('Función de estadísticas en desarrollo', 'info');
+        }
+
+        function showCreateModal() {
+            // TODO: Implementar modal de creación
+            Components.showToast('Función de creación en desarrollo', 'info');
+        }
+
+        // Event listeners
+        document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-type').addEventListener('change', applyFilters);
+        document.getElementById('filter-status').addEventListener('change', applyFilters);
+
+        // Load initial data
+        loadAds();
+    </script>
+</body>
+</html>
