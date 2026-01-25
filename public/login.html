@@ -124,11 +124,6 @@
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script>
-        // Si ya está autenticado, redirigir
-        if (auth.isAuthenticated()) {
-            window.location.href = '/';
-        }
-
         const form = document.getElementById('login-form');
         const submitBtn = document.getElementById('submit-btn');
         const alertContainer = document.getElementById('alert-container');
@@ -136,23 +131,51 @@
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const email = document.getElementById('email').value;
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
+
+            console.log('Intentando login con:', email);
 
             // Mostrar loading
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner spinner-sm"></span> Ingresando...';
             alertContainer.innerHTML = '';
 
-            const result = await auth.login(email, password);
+            try {
+                const result = await auth.login(email, password);
 
-            if (result.success) {
-                // Redirigir al inicio o a la página anterior
-                const redirect = Utils.getUrlParam('redirect') || '/';
-                window.location.href = redirect;
-            } else {
+                console.log('Resultado del login:', result);
+
+                if (result.success) {
+                    console.log('Login exitoso, usuario:', result.user);
+
+                    // Pequeño delay para asegurar que se guardó en localStorage
+                    await new Promise(resolve => setTimeout(resolve, 100));
+
+                    // Verificar que se guardó correctamente
+                    const isAuth = auth.isAuthenticated();
+                    console.log('¿Está autenticado después del login?', isAuth);
+
+                    if (isAuth) {
+                        // Redirigir al admin si es admin, sino al inicio
+                        const redirect = result.user.role === 'admin' ? '/admin/' : '/';
+                        console.log('Redirigiendo a:', redirect);
+                        window.location.href = redirect;
+                    } else {
+                        throw new Error('Error al guardar la sesión');
+                    }
+                } else {
+                    console.error('Login falló:', result.error);
+                    alertContainer.innerHTML = `
+                        <div class="alert alert-danger">${result.error}</div>
+                    `;
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Ingresar';
+                }
+            } catch (error) {
+                console.error('Error en el proceso de login:', error);
                 alertContainer.innerHTML = `
-                    <div class="alert alert-danger">${result.error}</div>
+                    <div class="alert alert-danger">Error: ${error.message || 'Error al iniciar sesión. Por favor intenta de nuevo.'}</div>
                 `;
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Ingresar';
