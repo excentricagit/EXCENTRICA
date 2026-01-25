@@ -44,15 +44,7 @@ export async function handleGetUsers(request, env) {
             env.DB.prepare(countQuery).bind(...params).first()
         ]);
 
-        return success({
-            users: users.results,
-            pagination: {
-                page,
-                limit,
-                total: countResult.total,
-                pages: Math.ceil(countResult.total / limit)
-            }
-        });
+        return success(users.results);
 
     } catch (e) {
         return error('Error obteniendo usuarios: ' + e.message, 500);
@@ -129,12 +121,18 @@ export async function handleUpdateUser(request, env, id) {
 
     try {
         const data = await request.json();
-        const { name, phone, role, is_active, email, username } = data;
+        const { name, phone, role, is_active, email, username, password } = data;
 
         // Verificar que existe
         const existing = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(id).first();
         if (!existing) {
             return notFound('Usuario no encontrado');
+        }
+
+        // Si se proporciona nueva contraseña, hashearla
+        let passwordHash = null;
+        if (password) {
+            passwordHash = await hashPassword(password);
         }
 
         await env.DB.prepare(`
@@ -145,6 +143,7 @@ export async function handleUpdateUser(request, env, id) {
                 is_active = COALESCE(?, is_active),
                 email = COALESCE(?, email),
                 username = COALESCE(?, username),
+                password_hash = COALESCE(?, password_hash),
                 updated_at = datetime('now')
             WHERE id = ?
         `).bind(
@@ -154,6 +153,7 @@ export async function handleUpdateUser(request, env, id) {
             is_active !== undefined ? (is_active ? 1 : 0) : null,
             email || null,
             username || null,
+            passwordHash,
             id
         ).run();
 

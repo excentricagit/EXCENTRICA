@@ -114,6 +114,71 @@
         </main>
     </div>
 
+    <!-- Modal Crear/Editar Usuario -->
+    <div id="user-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="modal-title">Nuevo Usuario</h2>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="user-form">
+                    <input type="hidden" id="user-id">
+
+                    <div class="form-group">
+                        <label class="form-label">Nombre completo</label>
+                        <input type="text" id="user-name-input" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="user-email" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Usuario</label>
+                        <input type="text" id="user-username" class="form-control" required>
+                    </div>
+
+                    <div class="form-group" id="password-group">
+                        <label class="form-label">Contraseña</label>
+                        <input type="password" id="user-password" class="form-control">
+                        <small class="form-text">Dejar en blanco para no cambiar</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Teléfono</label>
+                        <input type="tel" id="user-phone" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Rol</label>
+                        <select id="user-role" class="form-control" required>
+                            <option value="user">Usuario</option>
+                            <option value="comerciante">Comerciante</option>
+                            <option value="periodista">Periodista</option>
+                            <option value="editor">Editor</option>
+                            <option value="publicista">Publicista</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="user-active" checked>
+                            Usuario activo
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="closeUserModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="save-user-btn">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -143,11 +208,11 @@
                     updateStats();
                 } else {
                     console.error('Error en respuesta:', response.error);
-                    Components.showToast(response.error || 'Error cargando usuarios', 'error');
+                    Components.toast(response.error || 'Error cargando usuarios', 'danger');
                 }
             } catch (e) {
                 console.error('Error loading users:', e);
-                Components.showToast('Error cargando usuarios: ' + e.message, 'error');
+                Components.toast('Error cargando usuarios: ' + e.message, 'danger');
             }
         }
 
@@ -300,12 +365,12 @@
             try {
                 const response = await api.updateUser(userId, { is_active: !currentStatus });
                 if (response.success) {
-                    Components.showToast(`Usuario ${action}do exitosamente`, 'success');
+                    Components.toast(`Usuario ${action}do exitosamente`, 'success');
                     loadUsers();
                 }
             } catch (e) {
                 console.error('Error updating user:', e);
-                Components.showToast('Error actualizando usuario', 'error');
+                Components.toast('Error actualizando usuario', 'danger');
             }
         }
 
@@ -315,24 +380,95 @@
             try {
                 const response = await api.deleteUser(userId);
                 if (response.success) {
-                    Components.showToast('Usuario eliminado exitosamente', 'success');
+                    Components.toast('Usuario eliminado exitosamente', 'success');
                     loadUsers();
                 }
             } catch (e) {
                 console.error('Error deleting user:', e);
-                Components.showToast('Error eliminando usuario', 'error');
+                Components.toast('Error eliminando usuario', 'danger');
             }
         }
 
-        function editUser(userId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nuevo Usuario';
+            document.getElementById('user-form').reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('user-active').checked = true;
+            document.getElementById('password-group').style.display = 'block';
+            document.getElementById('user-password').required = true;
+            document.getElementById('password-group').querySelector('small').style.display = 'none';
+            document.getElementById('user-modal').classList.add('active');
         }
 
-        function showCreateModal() {
-            // TODO: Implementar modal de creación
-            Components.showToast('Función de creación en desarrollo', 'info');
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Usuario';
+            document.getElementById('user-id').value = user.id;
+            document.getElementById('user-name-input').value = user.name;
+            document.getElementById('user-email').value = user.email;
+            document.getElementById('user-username').value = user.username;
+            document.getElementById('user-phone').value = user.phone || '';
+            document.getElementById('user-role').value = user.role;
+            document.getElementById('user-active').checked = user.is_active;
+            document.getElementById('password-group').style.display = 'block';
+            document.getElementById('user-password').required = false;
+            document.getElementById('user-password').value = '';
+            document.getElementById('password-group').querySelector('small').style.display = 'block';
+            document.getElementById('user-modal').classList.add('active');
         }
+
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.remove('active');
+            document.getElementById('user-form').reset();
+        }
+
+        document.getElementById('user-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById('user-id').value;
+            const data = {
+                name: document.getElementById('user-name-input').value,
+                email: document.getElementById('user-email').value,
+                username: document.getElementById('user-username').value,
+                phone: document.getElementById('user-phone').value,
+                role: document.getElementById('user-role').value,
+                is_active: document.getElementById('user-active').checked
+            };
+
+            const password = document.getElementById('user-password').value;
+            if (password) {
+                data.password = password;
+            }
+
+            const saveBtn = document.getElementById('save-user-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Guardando...';
+
+            try {
+                let response;
+                if (userId) {
+                    response = await api.updateUser(userId, data);
+                } else {
+                    response = await api.createUser(data);
+                }
+
+                if (response.success) {
+                    Components.toast(userId ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente', 'success');
+                    closeUserModal();
+                    loadUsers();
+                } else {
+                    Components.toast(response.error || 'Error guardando usuario', 'danger');
+                }
+            } catch (e) {
+                console.error('Error saving user:', e);
+                Components.toast('Error guardando usuario: ' + e.message, 'danger');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Guardar';
+            }
+        });
 
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
