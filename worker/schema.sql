@@ -257,6 +257,8 @@ CREATE TABLE IF NOT EXISTS transport (
     author_id INTEGER NOT NULL,
     zone_id INTEGER,
     address TEXT,
+    latitude REAL,
+    longitude REAL,
     phone TEXT,
     email TEXT,
     website TEXT,
@@ -270,6 +272,24 @@ CREATE TABLE IF NOT EXISTS transport (
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (author_id) REFERENCES users(id),
     FOREIGN KEY (zone_id) REFERENCES zones(id)
+);
+
+-- =============================================
+-- TABLA: transport_drivers
+-- Datos privados de conductores (seguridad interna)
+-- =============================================
+CREATE TABLE IF NOT EXISTS transport_drivers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    transport_id INTEGER NOT NULL,
+    full_name TEXT NOT NULL,
+    dni TEXT,
+    address TEXT,
+    photo1 TEXT,
+    photo2 TEXT,
+    notes TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (transport_id) REFERENCES transport(id) ON DELETE CASCADE
 );
 
 -- =============================================
@@ -306,19 +326,26 @@ CREATE TABLE IF NOT EXISTS transport_private (
 CREATE TABLE IF NOT EXISTS services (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
-    description TEXT NOT NULL,
+    description TEXT,
     image_url TEXT,
     images TEXT,
     category_id INTEGER,
     author_id INTEGER NOT NULL,
     zone_id INTEGER,
     address TEXT,
+    latitude REAL,
+    longitude REAL,
     phone TEXT,
+    whatsapp TEXT,
     email TEXT,
     website TEXT,
     instagram TEXT,
+    facebook TEXT,
     price_from REAL,
     price_to REAL,
+    price_unit TEXT,
+    schedule TEXT,
+    experience_years INTEGER,
     status TEXT DEFAULT 'pending',
     featured INTEGER DEFAULT 0,
     like_count INTEGER DEFAULT 0,
@@ -327,6 +354,25 @@ CREATE TABLE IF NOT EXISTS services (
     FOREIGN KEY (category_id) REFERENCES categories(id),
     FOREIGN KEY (author_id) REFERENCES users(id),
     FOREIGN KEY (zone_id) REFERENCES zones(id)
+);
+
+-- =============================================
+-- TABLA: service_providers
+-- Datos privados del proveedor (seguridad interna)
+-- =============================================
+CREATE TABLE IF NOT EXISTS service_providers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_id INTEGER NOT NULL,
+    full_name TEXT NOT NULL,
+    dni TEXT,
+    address TEXT,
+    phone_personal TEXT,
+    photo1 TEXT,
+    photo2 TEXT,
+    notes TEXT,
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE CASCADE
 );
 
 -- =============================================
@@ -573,12 +619,23 @@ INSERT OR IGNORE INTO categories (name, slug, section, icon) VALUES
 
 -- Categorías de Servicios
 INSERT OR IGNORE INTO categories (name, slug, section, icon) VALUES
+('Plomería', 'plomeria', 'servicios', '🔧'),
+('Electricista', 'electricista', 'servicios', '⚡'),
+('Gasista', 'gasista', 'servicios', '🔥'),
+('Albañilería', 'albanileria', 'servicios', '🧱'),
+('Pintura', 'pintura', 'servicios', '🎨'),
+('Carpintería', 'carpinteria', 'servicios', '🪚'),
+('Cerrajería', 'cerrajeria', 'servicios', '🔑'),
+('Aire Acondicionado', 'aire-acondicionado', 'servicios', '❄️'),
+('Jardinería', 'jardineria', 'servicios', '🌱'),
+('Limpieza', 'limpieza', 'servicios', '🧹'),
+('Mudanzas', 'mudanzas', 'servicios', '📦'),
+('Técnico PC/Celulares', 'tecnico-pc', 'servicios', '💻'),
+('Mecánico', 'mecanico', 'servicios', '🚗'),
 ('Salud', 'salud', 'servicios', '🏥'),
-('Educación', 'educacion', 'servicios', '📚'),
-('Legales', 'legales', 'servicios', '⚖️'),
-('Técnicos', 'tecnicos', 'servicios', '🔧'),
 ('Belleza', 'belleza', 'servicios', '💅'),
-('Profesionales', 'profesionales', 'servicios', '👔');
+('Profesionales', 'profesionales', 'servicios', '👔'),
+('Otros', 'otros-servicios', 'servicios', '🛠️');
 
 -- Categorías de Puntos de Interés
 INSERT OR IGNORE INTO categories (name, slug, section, icon) VALUES

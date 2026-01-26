@@ -524,6 +524,68 @@ class ApiService {
         return this.patch(`/api/admin/transport/${id}/featured`);
     }
 
+    // Transport Drivers (datos privados)
+    async getTransportDriver(transportId) {
+        return this.get(`/api/admin/transport/${transportId}/driver`);
+    }
+
+    async saveTransportDriver(transportId, data) {
+        return this.post(`/api/admin/transport/${transportId}/driver`, data);
+    }
+
+    async deleteTransportDriver(transportId) {
+        return this.delete(`/api/admin/transport/${transportId}/driver`);
+    }
+
+    // ========== SERVICES (Servicios profesionales) ==========
+
+    // Public
+    async getServices(params = {}) {
+        return this.get('/api/services', params);
+    }
+
+    async getServiceById(id) {
+        return this.get(`/api/services/${id}`);
+    }
+
+    // Admin
+    async getAdminServices(params = {}) {
+        return this.get('/api/admin/services', params);
+    }
+
+    async createService(data) {
+        return this.post('/api/admin/services', data);
+    }
+
+    async updateService(id, data) {
+        return this.put(`/api/admin/services/${id}`, data);
+    }
+
+    async deleteService(id) {
+        return this.delete(`/api/admin/services/${id}`);
+    }
+
+    async updateServiceStatus(id, status) {
+        return this.patch(`/api/admin/services/${id}/status`, { status });
+    }
+
+    async toggleServiceFeatured(id) {
+        return this.patch(`/api/admin/services/${id}/featured`);
+    }
+
+    // Service Providers (datos privados)
+    async getServiceProvider(serviceId) {
+        return this.get(`/api/admin/services/${serviceId}/provider`);
+    }
+
+    async saveServiceProvider(serviceId, data) {
+        return this.post(`/api/admin/services/${serviceId}/provider`, data);
+    }
+
+    async deleteServiceProvider(serviceId) {
+        return this.delete(`/api/admin/services/${serviceId}/provider`);
+    }
+
     // ========== BUS LINES (Colectivos) ==========
 
     // Public
@@ -583,6 +645,34 @@ class ApiService {
 
     async reorderBusStops(stopIds) {
         return this.post('/api/admin/bus-stops/reorder', { stops: stopIds });
+    }
+
+    // ========== POI (Puntos de Interés Turístico) ==========
+
+    // Public
+    async getPoi(params = {}) {
+        return this.get('/api/poi', params);
+    }
+
+    async getPoiById(id) {
+        return this.get(`/api/poi/${id}`);
+    }
+
+    // Admin
+    async getAdminPoi(params = {}) {
+        return this.get('/api/admin/poi', params);
+    }
+
+    async createPoi(data) {
+        return this.post('/api/admin/poi', data);
+    }
+
+    async updatePoi(id, data) {
+        return this.put(`/api/admin/poi/${id}`, data);
+    }
+
+    async deletePoi(id) {
+        return this.delete(`/api/admin/poi/${id}`);
     }
 }
 

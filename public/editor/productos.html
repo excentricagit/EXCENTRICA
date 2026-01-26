@@ -666,6 +666,22 @@
             document.getElementById('product-id').value = '';
             document.getElementById('product-condicion').value = 'nuevo';
             document.getElementById('product-estado').value = 'pendiente';
+
+            // En crear, las imágenes son requeridas
+            document.getElementById('product-imagen-frente-file').required = true;
+            document.getElementById('product-imagen-atras-file').required = true;
+
+            // Limpiar previews y mostrar inputs
+            const previewFrente = document.getElementById('product-image-frente-preview');
+            const previewAtras = document.getElementById('product-image-atras-preview');
+            previewFrente.innerHTML = '';
+            previewFrente.style.display = 'none';
+            previewAtras.innerHTML = '';
+            previewAtras.style.display = 'none';
+
+            document.getElementById('product-imagen-frente-file').style.display = 'block';
+            document.getElementById('product-imagen-atras-file').style.display = 'block';
+
             openModal();
         }
 
@@ -689,12 +705,33 @@
             document.getElementById('product-condicion').value = product.condition || 'nuevo';
             document.getElementById('product-estado').value = product.status || 'pendiente';
 
+            // Si ya tiene imágenes, no son requeridas
+            const frenteFileInput = document.getElementById('product-imagen-frente-file');
+            const atrasFileInput = document.getElementById('product-imagen-atras-file');
+            const frenteImage = product.front_image_url || product.image_url;
+            const atrasImage = product.back_image_url;
+
+            frenteFileInput.required = !frenteImage;
+            atrasFileInput.required = !atrasImage;
+
+            // Limpiar previews primero
+            const previewFrente = document.getElementById('product-image-frente-preview');
+            const previewAtras = document.getElementById('product-image-atras-preview');
+            previewFrente.innerHTML = '';
+            previewFrente.style.display = 'none';
+            previewAtras.innerHTML = '';
+            previewAtras.style.display = 'none';
+
+            // Mostrar inputs de archivo
+            frenteFileInput.style.display = 'block';
+            atrasFileInput.style.display = 'block';
+
             // Mostrar preview de imágenes si existen
-            if (product.front_image_url || product.image_url) {
-                showImagePreview('product-image-frente-preview', product.front_image_url || product.image_url);
+            if (frenteImage) {
+                showImagePreview('product-image-frente-preview', frenteImage);
             }
-            if (product.back_image_url) {
-                showImagePreview('product-image-atras-preview', product.back_image_url);
+            if (atrasImage) {
+                showImagePreview('product-image-atras-preview', atrasImage);
             }
 
             openModal();
@@ -704,13 +741,22 @@
             event.preventDefault();
 
             const productId = document.getElementById('product-id').value;
+
+            const frontUrl = document.getElementById('product-imagen-frente').value || null;
+            const backUrl = document.getElementById('product-imagen-atras').value || null;
+
+            console.log('🔍 front_image_url length:', frontUrl?.length);
+            console.log('🔍 back_image_url length:', backUrl?.length);
+            console.log('🔍 front_image_url:', frontUrl?.substring(0, 100));
+            console.log('🔍 back_image_url:', backUrl?.substring(0, 100));
+
             const data = {
                 title: document.getElementById('product-titulo').value,
                 description: document.getElementById('product-descripcion').value,
                 price: parseFloat(document.getElementById('product-precio').value),
                 original_price: document.getElementById('product-precio-original').value ? parseFloat(document.getElementById('product-precio-original').value) : null,
-                front_image_url: document.getElementById('product-imagen-frente').value || null,
-                back_image_url: document.getElementById('product-imagen-atras').value || null,
+                front_image_url: frontUrl,
+                back_image_url: backUrl,
                 category_id: document.getElementById('product-categoria').value || null,
                 zone_id: document.getElementById('product-zona').value || null,
                 address: document.getElementById('product-direccion').value || null,
@@ -739,6 +785,41 @@
             }
         }
 
+        // Comprimir imagen y convertir a base64
+        function compressImage(file, maxWidth = 800, quality = 0.7) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Redimensionar si es muy grande
+                        if (width > maxWidth) {
+                            height = (height * maxWidth) / width;
+                            width = maxWidth;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convertir a base64 con compresión
+                        const base64 = canvas.toDataURL('image/jpeg', quality);
+                        resolve(base64);
+                    };
+                    img.onerror = reject;
+                    img.src = e.target.result;
+                };
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
         // Upload de imagen de producto (frente o atrás)
         async function uploadProductImage(event, tipo) {
             const file = event.target.files[0];
@@ -751,20 +832,17 @@
 
             try {
                 const tipoLabel = tipo === 'frente' ? 'Frente' : 'Atrás';
-                Components.toast(`Subiendo imagen de ${tipoLabel.toLowerCase()}...`, 'info');
-                const response = await api.uploadFile(file);
+                Components.toast(`Procesando imagen de ${tipoLabel.toLowerCase()}...`, 'info');
 
-                if (response.success) {
-                    const imageUrl = response.data.url;
-                    document.getElementById(`product-imagen-${tipo}`).value = imageUrl;
-                    showImagePreview(`product-image-${tipo}-preview`, imageUrl);
-                    Components.toast(`Imagen de ${tipoLabel.toLowerCase()} subida exitosamente`, 'success');
-                } else {
-                    Components.toast('Error subiendo imagen', 'error');
-                }
+                // Comprimir imagen a base64
+                const base64 = await compressImage(file, 800, 0.7);
+
+                document.getElementById(`product-imagen-${tipo}`).value = base64;
+                showImagePreview(`product-image-${tipo}-preview`, base64);
+                Components.toast(`Imagen de ${tipoLabel.toLowerCase()} lista`, 'success');
             } catch (e) {
-                console.error('Error uploading image:', e);
-                Components.toast('Error subiendo imagen', 'error');
+                console.error('Error processing image:', e);
+                Components.toast('Error procesando imagen', 'error');
             }
         }
 
@@ -788,13 +866,6 @@
             container.innerHTML = '';
             container.style.display = 'flex';
 
-            // Esconder el input file cuando se muestra la preview
-            const inputId = containerId.replace('-preview', '-file');
-            const fileInput = document.getElementById(inputId);
-            if (fileInput) {
-                fileInput.style.display = 'none';
-            }
-
             // Crear imagen
             const img = document.createElement('img');
             img.src = url;
@@ -816,21 +887,6 @@
         }
 
         function openModal() {
-            // Limpiar previews
-            const previewFrente = document.getElementById('product-image-frente-preview');
-            const previewAtras = document.getElementById('product-image-atras-preview');
-
-            previewFrente.innerHTML = '';
-            previewFrente.style.display = 'none';
-            previewAtras.innerHTML = '';
-            previewAtras.style.display = 'none';
-
-            // Mostrar inputs de archivo
-            const frenteInput = document.getElementById('product-imagen-frente-file');
-            const atrasInput = document.getElementById('product-imagen-atras-file');
-            if (frenteInput) frenteInput.style.display = 'block';
-            if (atrasInput) atrasInput.style.display = 'block';
-
             document.getElementById('product-modal').classList.add('active');
             document.getElementById('product-modal-backdrop').classList.add('active');
             document.body.style.overflow = 'hidden';

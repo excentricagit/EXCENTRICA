@@ -194,16 +194,19 @@ export async function handleAdminCreateTransport(request, env) {
         const result = await env.DB.prepare(`
             INSERT INTO transport (
                 name, description, image_url,
-                zone_id, address, phone, email, website,
+                zone_id, address, latitude, longitude,
+                phone, email, website,
                 schedule, routes,
                 author_id, status, featured, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
         `).bind(
             data.name.trim(),
             data.description || null,
             data.image_url || null,
             data.zone_id || null,
             data.address || null,
+            data.latitude || null,
+            data.longitude || null,
             data.phone || null,
             data.email || null,
             data.website || null,
@@ -251,6 +254,8 @@ export async function handleAdminUpdateTransport(request, env, id) {
                 image_url = ?,
                 zone_id = ?,
                 address = ?,
+                latitude = ?,
+                longitude = ?,
                 phone = ?,
                 email = ?,
                 website = ?,
@@ -266,6 +271,8 @@ export async function handleAdminUpdateTransport(request, env, id) {
             data.image_url !== undefined ? data.image_url : existing.image_url,
             data.zone_id !== undefined ? data.zone_id : existing.zone_id,
             data.address !== undefined ? data.address : existing.address,
+            data.latitude !== undefined ? data.latitude : existing.latitude,
+            data.longitude !== undefined ? data.longitude : existing.longitude,
             data.phone !== undefined ? data.phone : existing.phone,
             data.email !== undefined ? data.email : existing.email,
             data.website !== undefined ? data.website : existing.website,
@@ -379,5 +386,129 @@ export async function handleAdminToggleTransportFeatured(request, env, id) {
         );
     } catch (e) {
         return error('Error actualizando destacado: ' + e.message, 500);
+    }
+}
+
+// =============================================
+// CONDUCTORES (Datos privados de seguridad)
+// =============================================
+
+/**
+ * GET /api/admin/transport/:id/driver
+ * Obtener datos del conductor de un transporte
+ */
+export async function handleGetDriver(request, env, transportId) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        const driver = await env.DB.prepare(`
+            SELECT * FROM transport_drivers WHERE transport_id = ? ORDER BY created_at DESC LIMIT 1
+        `).bind(transportId).first();
+
+        return success(driver || null);
+    } catch (e) {
+        return error('Error obteniendo conductor: ' + e.message, 500);
+    }
+}
+
+/**
+ * POST /api/admin/transport/:id/driver
+ * Crear o actualizar datos del conductor
+ */
+export async function handleSaveDriver(request, env, transportId) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        // Verificar que el transporte existe
+        const transport = await env.DB.prepare(
+            'SELECT id FROM transport WHERE id = ?'
+        ).bind(transportId).first();
+
+        if (!transport) {
+            return notFound('Transporte no encontrado');
+        }
+
+        const data = await request.json();
+
+        if (!data.full_name || !data.full_name.trim()) {
+            return error('El nombre completo es requerido');
+        }
+
+        // Verificar si ya existe un conductor para este transporte
+        const existing = await env.DB.prepare(
+            'SELECT id FROM transport_drivers WHERE transport_id = ?'
+        ).bind(transportId).first();
+
+        if (existing) {
+            // Actualizar
+            await env.DB.prepare(`
+                UPDATE transport_drivers SET
+                    full_name = ?,
+                    dni = ?,
+                    address = ?,
+                    photo1 = ?,
+                    photo2 = ?,
+                    notes = ?,
+                    updated_at = datetime('now')
+                WHERE transport_id = ?
+            `).bind(
+                data.full_name.trim(),
+                data.dni || null,
+                data.address || null,
+                data.photo1 || null,
+                data.photo2 || null,
+                data.notes || null,
+                transportId
+            ).run();
+
+            const updated = await env.DB.prepare(
+                'SELECT * FROM transport_drivers WHERE transport_id = ?'
+            ).bind(transportId).first();
+
+            return success(updated, 'Datos del conductor actualizados');
+        } else {
+            // Crear nuevo
+            const result = await env.DB.prepare(`
+                INSERT INTO transport_drivers (transport_id, full_name, dni, address, photo1, photo2, notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            `).bind(
+                transportId,
+                data.full_name.trim(),
+                data.dni || null,
+                data.address || null,
+                data.photo1 || null,
+                data.photo2 || null,
+                data.notes || null
+            ).run();
+
+            const newDriver = await env.DB.prepare(
+                'SELECT * FROM transport_drivers WHERE id = ?'
+            ).bind(result.meta.last_row_id).first();
+
+            return success(newDriver, 'Datos del conductor guardados');
+        }
+    } catch (e) {
+        return error('Error guardando conductor: ' + e.message, 500);
+    }
+}
+
+/**
+ * DELETE /api/admin/transport/:id/driver
+ * Eliminar datos del conductor
+ */
+export async function handleDeleteDriver(request, env, transportId) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        await env.DB.prepare(
+            'DELETE FROM transport_drivers WHERE transport_id = ?'
+        ).bind(transportId).run();
+
+        return success(null, 'Datos del conductor eliminados');
+    } catch (e) {
+        return error('Error eliminando conductor: ' + e.message, 500);
     }
 }

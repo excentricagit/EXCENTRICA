@@ -112,9 +112,9 @@
                     <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="approved">Aprobado</option>
+                        <option value="rejected">Rechazado</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
@@ -208,9 +208,9 @@
                 <div class="form-group">
                     <label for="item-estado">Estado</label>
                     <select id="item-estado" class="form-control">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="approved">Aprobado</option>
+                        <option value="rejected">Rechazado</option>
                     </select>
                 </div>
 
@@ -234,7 +234,6 @@
 
         document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        const SECTION = 'puntos-interes';
         let allItems = [];
         let filteredItems = [];
         let categories = [];
@@ -243,24 +242,24 @@
         async function loadData() {
             try {
                 const [itemsResponse, categoriesResponse, zonesResponse] = await Promise.all([
-                    api.getAdminProducts({ section: SECTION }),
-                    api.getAdminCategories('productos'),
-                    api.getAdminZones()
+                    api.getAdminPoi({ limit: 500 }),
+                    api.getCategories('turismo'),
+                    api.getZones()
                 ]);
 
                 if (itemsResponse.success) {
-                    allItems = itemsResponse.data[SECTION] || itemsResponse.data || [];
+                    allItems = itemsResponse.data.items || itemsResponse.data || [];
                     applyFilters();
                     updateStats();
                 }
 
                 if (categoriesResponse.success) {
-                    categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
+                    categories = categoriesResponse.data.items || categoriesResponse.data || [];
                     renderCategoryOptions();
                 }
 
                 if (zonesResponse.success) {
-                    zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
+                    zones = zonesResponse.data.items || zonesResponse.data || [];
                     renderZoneOptions();
                 }
             } catch (e) {
@@ -287,10 +286,10 @@
 
             filteredItems = allItems.filter(item => {
                 const matchSearch = !search ||
-                    item.titulo.toLowerCase().includes(search) ||
-                    (item.descripcion && item.descripcion.toLowerCase().includes(search));
+                    (item.name && item.name.toLowerCase().includes(search)) ||
+                    (item.description && item.description.toLowerCase().includes(search));
 
-                const matchStatus = !status || item.estado === status;
+                const matchStatus = !status || item.status === status;
 
                 return matchSearch && matchStatus;
             });
@@ -322,24 +321,24 @@
                         ${filteredItems.map(item => `
                             <tr>
                                 <td>
-                                    <strong>${item.titulo}</strong>
-                                    ${item.descripcion ? `<br><small class="text-muted">${truncate(item.descripcion, 60)}</small>` : ''}
+                                    <strong>${item.name}</strong>
+                                    ${item.description ? `<br><small class="text-muted">${truncate(item.description, 60)}</small>` : ''}
                                 </td>
-                                <td>${item.zona_nombre || '-'}</td>
+                                <td>${item.zone_name || '-'}</td>
                                 <td>
                                     <span class="badge badge-secondary">
-                                        ${item.categoria_nombre || '-'}
+                                        ${item.category_name || '-'}
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(item.estado)}">
-                                        ${getStatusLabel(item.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(item.status)}">
+                                        ${getStatusLabel(item.status)}
                                     </span>
                                 </td>
                                 <td>${formatDate(item.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${item.estado === 'pendiente' ? `
+                                        ${item.status === 'pending' ? `
                                             <button class="btn btn-sm btn-success" onclick="approveItem(${item.id})" title="Aprobar">
                                                 ✅
                                             </button>
@@ -364,25 +363,25 @@
 
         function updateStats() {
             document.getElementById('total-items').textContent = allItems.length;
-            document.getElementById('active-items').textContent = allItems.filter(i => i.estado === 'aprobado').length;
-            document.getElementById('pending-items').textContent = allItems.filter(i => i.estado === 'pendiente').length;
-            document.getElementById('rejected-items').textContent = allItems.filter(i => i.estado === 'rechazado').length;
+            document.getElementById('active-items').textContent = allItems.filter(i => i.status === 'approved').length;
+            document.getElementById('pending-items').textContent = allItems.filter(i => i.status === 'pending').length;
+            document.getElementById('rejected-items').textContent = allItems.filter(i => i.status === 'rejected').length;
         }
 
         function getStatusBadgeClass(status) {
             const classes = {
-                pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
+                pending: 'warning',
+                approved: 'success',
+                rejected: 'danger'
             };
             return classes[status] || 'secondary';
         }
 
         function getStatusLabel(status) {
             const labels = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                pending: 'Pendiente',
+                approved: 'Aprobado',
+                rejected: 'Rechazado'
             };
             return labels[status] || status;
         }
@@ -411,7 +410,7 @@
             if (!confirm('¿Aprobar este registro?')) return;
 
             try {
-                const response = await api.adminUpdateProduct(itemId, { estado: 'aprobado' });
+                const response = await api.updatePoi(itemId, { status: 'approved' });
                 if (response.success) {
                     Components.toast('Registro aprobado exitosamente', 'success');
                     loadData();
@@ -426,7 +425,7 @@
             if (!confirm('¿Rechazar este registro?')) return;
 
             try {
-                const response = await api.adminUpdateProduct(itemId, { estado: 'rechazado' });
+                const response = await api.updatePoi(itemId, { status: 'rejected' });
                 if (response.success) {
                     Components.toast('Registro rechazado', 'success');
                     loadData();
@@ -441,7 +440,7 @@
             if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteProduct(itemId);
+                const response = await api.deletePoi(itemId);
                 if (response.success) {
                     Components.toast('Registro eliminado exitosamente', 'success');
                     loadData();
@@ -456,7 +455,7 @@
             document.getElementById('modal-title').textContent = 'Nuevo Punto de Interés';
             document.getElementById('item-form').reset();
             document.getElementById('item-id').value = '';
-            document.getElementById('item-estado').value = 'pendiente';
+            document.getElementById('item-estado').value = 'pending';
             openModal();
         }
 
@@ -466,18 +465,17 @@
 
             document.getElementById('modal-title').textContent = 'Editar Punto de Interés';
             document.getElementById('item-id').value = item.id;
-            document.getElementById('item-titulo').value = item.titulo || '';
-            document.getElementById('item-descripcion').value = item.descripcion || '';
-            document.getElementById('item-imagen').value = item.imagen_url || '';
-            document.getElementById('item-categoria').value = item.categoria_id || '';
-            document.getElementById('item-zona').value = item.zona_id || '';
-            document.getElementById('item-direccion').value = item.direccion || '';
-            document.getElementById('item-telefono').value = item.telefono || '';
-            document.getElementById('item-whatsapp').value = item.whatsapp || '';
-            document.getElementById('item-horarios').value = item.horarios || '';
-            document.getElementById('item-precio').value = item.precio || '';
-            document.getElementById('item-web').value = item.sitio_web || '';
-            document.getElementById('item-estado').value = item.estado || 'pendiente';
+            document.getElementById('item-titulo').value = item.name || '';
+            document.getElementById('item-descripcion').value = item.description || '';
+            document.getElementById('item-imagen').value = item.image_url || '';
+            document.getElementById('item-categoria').value = item.category_id || '';
+            document.getElementById('item-zona').value = item.zone_id || '';
+            document.getElementById('item-direccion').value = item.address || '';
+            document.getElementById('item-telefono').value = item.phone || '';
+            document.getElementById('item-horarios').value = item.schedule || '';
+            document.getElementById('item-precio').value = item.entry_fee || '';
+            document.getElementById('item-web').value = item.website || '';
+            document.getElementById('item-estado').value = item.status || 'pending';
             openModal();
         }
 
@@ -486,27 +484,25 @@
 
             const itemId = document.getElementById('item-id').value;
             const data = {
-                titulo: document.getElementById('item-titulo').value,
-                descripcion: document.getElementById('item-descripcion').value,
-                imagen_url: document.getElementById('item-imagen').value || null,
-                categoria_id: document.getElementById('item-categoria').value || null,
-                zona_id: document.getElementById('item-zona').value || null,
-                direccion: document.getElementById('item-direccion').value || null,
-                telefono: document.getElementById('item-telefono').value || null,
-                whatsapp: document.getElementById('item-whatsapp').value || null,
-                horarios: document.getElementById('item-horarios').value || null,
-                precio: document.getElementById('item-precio').value ? parseFloat(document.getElementById('item-precio').value) : null,
-                sitio_web: document.getElementById('item-web').value || null,
-                estado: document.getElementById('item-estado').value,
-                section: SECTION
+                name: document.getElementById('item-titulo').value,
+                description: document.getElementById('item-descripcion').value,
+                image_url: document.getElementById('item-imagen').value || null,
+                category_id: document.getElementById('item-categoria').value || null,
+                zone_id: document.getElementById('item-zona').value || null,
+                address: document.getElementById('item-direccion').value || null,
+                phone: document.getElementById('item-telefono').value || null,
+                schedule: document.getElementById('item-horarios').value || null,
+                entry_fee: document.getElementById('item-precio').value ? parseFloat(document.getElementById('item-precio').value) : 0,
+                website: document.getElementById('item-web').value || null,
+                status: document.getElementById('item-estado').value
             };
 
             try {
                 let response;
                 if (itemId) {
-                    response = await api.adminUpdateProduct(itemId, data);
+                    response = await api.updatePoi(itemId, data);
                 } else {
-                    response = await api.adminCreateProduct(data);
+                    response = await api.createPoi(data);
                 }
 
                 if (response.success) {

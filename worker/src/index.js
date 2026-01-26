@@ -67,8 +67,17 @@ import {
 import {
     handleGetTransport, handleGetTransportById,
     handleAdminGetTransport, handleAdminCreateTransport, handleAdminUpdateTransport,
-    handleAdminDeleteTransport, handleAdminUpdateTransportStatus, handleAdminToggleTransportFeatured
+    handleAdminDeleteTransport, handleAdminUpdateTransportStatus, handleAdminToggleTransportFeatured,
+    handleGetDriver, handleSaveDriver, handleDeleteDriver
 } from './routes/transport.js';
+
+// Services routes (servicios profesionales)
+import {
+    handleGetServices, handleGetServiceById,
+    handleAdminGetServices, handleAdminCreateService, handleAdminUpdateService,
+    handleAdminDeleteService, handleAdminUpdateServiceStatus, handleAdminToggleServiceFeatured,
+    handleGetServiceProvider, handleSaveServiceProvider, handleDeleteServiceProvider
+} from './routes/services.js';
 
 // Bus routes (colectivos y paradas)
 import {
@@ -78,6 +87,12 @@ import {
     handleAdminGetBusStops, handleAdminCreateBusStop, handleAdminUpdateBusStop,
     handleAdminDeleteBusStop, handleAdminReorderBusStops
 } from './routes/bus.js';
+
+// POI routes (puntos de interés turístico)
+import {
+    getPublicPoi, getPublicPoiById,
+    getAdminPoi, createPoi, updatePoi, deletePoi
+} from './routes/poi.js';
 
 // Simple router
 function matchRoute(method, path, routes) {
@@ -304,6 +319,28 @@ const routes = [
     { method: 'DELETE', path: '/api/admin/transport/:id', handler: (req, env, params) => handleAdminDeleteTransport(req, env, params.id) },
     { method: 'PATCH', path: '/api/admin/transport/:id/status', handler: (req, env, params) => handleAdminUpdateTransportStatus(req, env, params.id) },
     { method: 'PATCH', path: '/api/admin/transport/:id/featured', handler: (req, env, params) => handleAdminToggleTransportFeatured(req, env, params.id) },
+    // Transport Drivers (datos privados de conductores)
+    { method: 'GET', path: '/api/admin/transport/:id/driver', handler: (req, env, params) => handleGetDriver(req, env, params.id) },
+    { method: 'POST', path: '/api/admin/transport/:id/driver', handler: (req, env, params) => handleSaveDriver(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/transport/:id/driver', handler: (req, env, params) => handleDeleteDriver(req, env, params.id) },
+
+    // ========== SERVICES (Servicios profesionales) ==========
+
+    // Services (public)
+    { method: 'GET', path: '/api/services', handler: handleGetServices },
+    { method: 'GET', path: '/api/services/:id', handler: (req, env, params) => handleGetServiceById(req, env, params.id) },
+
+    // Admin - Services
+    { method: 'GET', path: '/api/admin/services', handler: handleAdminGetServices },
+    { method: 'POST', path: '/api/admin/services', handler: handleAdminCreateService },
+    { method: 'PUT', path: '/api/admin/services/:id', handler: (req, env, params) => handleAdminUpdateService(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/services/:id', handler: (req, env, params) => handleAdminDeleteService(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/services/:id/status', handler: (req, env, params) => handleAdminUpdateServiceStatus(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/services/:id/featured', handler: (req, env, params) => handleAdminToggleServiceFeatured(req, env, params.id) },
+    // Service Providers (datos privados del proveedor)
+    { method: 'GET', path: '/api/admin/services/:id/provider', handler: (req, env, params) => handleGetServiceProvider(req, env, params.id) },
+    { method: 'POST', path: '/api/admin/services/:id/provider', handler: (req, env, params) => handleSaveServiceProvider(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/services/:id/provider', handler: (req, env, params) => handleDeleteServiceProvider(req, env, params.id) },
 
     // ========== BUS ROUTES (Colectivos) ==========
 
@@ -326,6 +363,18 @@ const routes = [
     { method: 'PUT', path: '/api/admin/bus-stops/:id', handler: (req, env, params) => handleAdminUpdateBusStop(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/bus-stops/:id', handler: (req, env, params) => handleAdminDeleteBusStop(req, env, params.id) },
     { method: 'POST', path: '/api/admin/bus-stops/reorder', handler: handleAdminReorderBusStops },
+
+    // ========== POI ROUTES (Puntos de Interés Turístico) ==========
+
+    // POI (public)
+    { method: 'GET', path: '/api/poi', handler: getPublicPoi },
+    { method: 'GET', path: '/api/poi/:id', handler: (req, env, params) => getPublicPoiById(req, env, params) },
+
+    // Admin - POI
+    { method: 'GET', path: '/api/admin/poi', handler: getAdminPoi },
+    { method: 'POST', path: '/api/admin/poi', handler: createPoi },
+    { method: 'PUT', path: '/api/admin/poi/:id', handler: (req, env, params) => updatePoi(req, env, params) },
+    { method: 'DELETE', path: '/api/admin/poi/:id', handler: (req, env, params) => deletePoi(req, env, params) },
 ];
 
 export default {

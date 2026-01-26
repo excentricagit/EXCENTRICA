@@ -345,28 +345,32 @@ export async function handleAdminCreateProduct(request, env) {
 
     try {
         const data = await request.json();
-        const { title, description, price, original_price, image_url, images, category_id, zone_id, condition, accepts_offers, phone, status, featured } = data;
+        const { title, description, price, original_price, image_url, front_image_url, back_image_url, images, category_id, zone_id, address, condition, accepts_offers, phone, whatsapp, status, featured } = data;
 
         if (!title || !description || !price) {
             return error('Título, descripción y precio son requeridos');
         }
 
         const result = await env.DB.prepare(`
-            INSERT INTO products (title, description, price, original_price, image_url, images, category_id, author_id, zone_id, condition, accepts_offers, phone, status, featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO products (title, description, price, original_price, image_url, front_image_url, back_image_url, images, category_id, author_id, zone_id, address, condition, accepts_offers, phone, whatsapp, status, featured)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             title,
             description,
             price,
             original_price || null,
             image_url || null,
+            front_image_url || null,
+            back_image_url || null,
             images ? JSON.stringify(images) : null,
             category_id || null,
             user.id,
             zone_id || null,
+            address || null,
             condition || 'new',
             accepts_offers ? 1 : 0,
             phone || null,
+            whatsapp || null,
             status || 'approved',
             featured ? 1 : 0
         ).run();
@@ -384,7 +388,7 @@ export async function handleAdminUpdateProduct(request, env, id) {
 
     try {
         const data = await request.json();
-        const { title, description, price, original_price, image_url, images, category_id, zone_id, condition, accepts_offers, phone, status, featured } = data;
+        const { title, description, price, original_price, image_url, front_image_url, back_image_url, images, category_id, zone_id, address, condition, accepts_offers, phone, whatsapp, status, featured } = data;
 
         const product = await env.DB.prepare('SELECT * FROM products WHERE id = ?').bind(id).first();
         if (!product) {
@@ -398,12 +402,16 @@ export async function handleAdminUpdateProduct(request, env, id) {
                 price = COALESCE(?, price),
                 original_price = ?,
                 image_url = COALESCE(?, image_url),
+                front_image_url = COALESCE(?, front_image_url),
+                back_image_url = COALESCE(?, back_image_url),
                 images = COALESCE(?, images),
                 category_id = COALESCE(?, category_id),
                 zone_id = COALESCE(?, zone_id),
+                address = COALESCE(?, address),
                 condition = COALESCE(?, condition),
                 accepts_offers = COALESCE(?, accepts_offers),
                 phone = COALESCE(?, phone),
+                whatsapp = COALESCE(?, whatsapp),
                 status = COALESCE(?, status),
                 featured = COALESCE(?, featured),
                 updated_at = datetime('now')
@@ -414,12 +422,16 @@ export async function handleAdminUpdateProduct(request, env, id) {
             price || null,
             original_price !== undefined ? original_price : product.original_price,
             image_url || null,
+            front_image_url || null,
+            back_image_url || null,
             images ? JSON.stringify(images) : null,
             category_id || null,
             zone_id || null,
+            address || null,
             condition || null,
             accepts_offers !== undefined ? (accepts_offers ? 1 : 0) : null,
             phone || null,
+            whatsapp || null,
             status || null,
             featured !== undefined ? (featured ? 1 : 0) : null,
             id

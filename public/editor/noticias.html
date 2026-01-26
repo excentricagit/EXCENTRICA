@@ -507,6 +507,9 @@
             extra2Preview.innerHTML = '';
             extra2Preview.style.display = 'none';
 
+            // En crear, la imagen es requerida
+            document.getElementById('news-imagen-principal-file').required = true;
+
             // Establecer fecha de publicación a ahora (autocompletada pero editable)
             const now = new Date();
             now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
@@ -530,6 +533,22 @@
             document.getElementById('news-categoria').value = news.category_id || '';
             document.getElementById('news-estado').value = news.status || 'draft';
             document.getElementById('news-destacada').checked = news.featured || false;
+
+            // Si ya tiene imagen, no es requerido subir otra
+            const fileInput = document.getElementById('news-imagen-principal-file');
+            if (news.image_url) {
+                fileInput.required = false;
+            } else {
+                fileInput.required = true;
+            }
+
+            // Limpiar previews primero
+            document.getElementById('main-image-preview').innerHTML = '';
+            document.getElementById('main-image-preview').style.display = 'none';
+            document.getElementById('extra-image-1-preview').innerHTML = '';
+            document.getElementById('extra-image-1-preview').style.display = 'none';
+            document.getElementById('extra-image-2-preview').innerHTML = '';
+            document.getElementById('extra-image-2-preview').style.display = 'none';
 
             // Cargar imágenes extras si existen
             if (news.images) {
@@ -556,8 +575,10 @@
                 document.getElementById('news-fecha-expiracion').value = formatDateTimeLocal(news.expiration_date);
             }
 
-            // Mostrar previsualizaciones
-            if (news.image_url) showImagePreview('main-image-preview', news.image_url);
+            // Mostrar preview de imagen principal si existe
+            if (news.image_url) {
+                showImagePreview('main-image-preview', news.image_url);
+            }
 
             openModal();
         }
