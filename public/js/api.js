@@ -326,6 +326,84 @@ class ApiService {
     async getStorageStats() {
         return this.get('/api/admin/storage');
     }
+
+    // ========== CINEMA ==========
+
+    // Public
+    async getCinemas(params = {}) {
+        return this.get('/api/cinemas', params);
+    }
+
+    async getCinemaById(id) {
+        return this.get(`/api/cinemas/${id}`);
+    }
+
+    async getMovies(params = {}) {
+        return this.get('/api/movies', params);
+    }
+
+    async getMovieById(id) {
+        return this.get(`/api/movies/${id}`);
+    }
+
+    async getShowtimes(params = {}) {
+        return this.get('/api/showtimes', params);
+    }
+
+    // Admin - Cinemas
+    async getAdminCinemas() {
+        return this.get('/api/admin/cinemas');
+    }
+
+    async createCinema(data) {
+        return this.post('/api/admin/cinemas', data);
+    }
+
+    async updateCinema(id, data) {
+        return this.put(`/api/admin/cinemas/${id}`, data);
+    }
+
+    async deleteCinema(id) {
+        return this.delete(`/api/admin/cinemas/${id}`);
+    }
+
+    // Admin - Movies
+    async getAdminMovies(params = {}) {
+        return this.get('/api/admin/movies', params);
+    }
+
+    async createMovie(data) {
+        return this.post('/api/admin/movies', data);
+    }
+
+    async updateMovie(id, data) {
+        return this.put(`/api/admin/movies/${id}`, data);
+    }
+
+    async deleteMovie(id) {
+        return this.delete(`/api/admin/movies/${id}`);
+    }
+
+    // Admin - Showtimes
+    async getAdminShowtimes(params = {}) {
+        return this.get('/api/admin/showtimes', params);
+    }
+
+    async createShowtime(data) {
+        return this.post('/api/admin/showtimes', data);
+    }
+
+    async createShowtimesBulk(showtimes) {
+        return this.post('/api/admin/showtimes/bulk', { showtimes });
+    }
+
+    async updateShowtime(id, data) {
+        return this.put(`/api/admin/showtimes/${id}`, data);
+    }
+
+    async deleteShowtime(id) {
+        return this.delete(`/api/admin/showtimes/${id}`);
+    }
 }
 
 // Crear instancia global

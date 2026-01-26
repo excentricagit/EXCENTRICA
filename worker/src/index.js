@@ -40,6 +40,15 @@ import { handleGetAds, handleGetAdById, handleTrackImpression, handleTrackClick,
 // Admin routes
 import { handleGetStats, handleGetStorageStats } from './routes/admin.js';
 
+// Cinema routes
+import {
+    handleGetCinemas, handleGetCinemaById, handleGetMovies, handleGetMovieById, handleGetShowtimes,
+    handleAdminGetCinemas, handleAdminCreateCinema, handleAdminUpdateCinema, handleAdminDeleteCinema,
+    handleAdminGetMovies, handleAdminCreateMovie, handleAdminUpdateMovie, handleAdminDeleteMovie,
+    handleAdminGetShowtimes, handleAdminCreateShowtime, handleAdminUpdateShowtime, handleAdminDeleteShowtime,
+    handleAdminBulkCreateShowtimes
+} from './routes/cinema.js';
+
 // Simple router
 function matchRoute(method, path, routes) {
     for (const route of routes) {
@@ -188,6 +197,38 @@ const routes = [
     { method: 'POST', path: '/api/admin/ads', handler: handleAdminCreateAd },
     { method: 'PUT', path: '/api/admin/ads/:id', handler: (req, env, params) => handleAdminUpdateAd(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/ads/:id', handler: (req, env, params) => handleAdminDeleteAd(req, env, params.id) },
+
+    // ========== CINEMA ROUTES ==========
+
+    // Cinemas (public)
+    { method: 'GET', path: '/api/cinemas', handler: handleGetCinemas },
+    { method: 'GET', path: '/api/cinemas/:id', handler: (req, env, params) => handleGetCinemaById(req, env, params.id) },
+
+    // Movies (public)
+    { method: 'GET', path: '/api/movies', handler: handleGetMovies },
+    { method: 'GET', path: '/api/movies/:id', handler: (req, env, params) => handleGetMovieById(req, env, params.id) },
+
+    // Showtimes (public)
+    { method: 'GET', path: '/api/showtimes', handler: handleGetShowtimes },
+
+    // Admin - Cinemas
+    { method: 'GET', path: '/api/admin/cinemas', handler: handleAdminGetCinemas },
+    { method: 'POST', path: '/api/admin/cinemas', handler: handleAdminCreateCinema },
+    { method: 'PUT', path: '/api/admin/cinemas/:id', handler: (req, env, params) => handleAdminUpdateCinema(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/cinemas/:id', handler: (req, env, params) => handleAdminDeleteCinema(req, env, params.id) },
+
+    // Admin - Movies
+    { method: 'GET', path: '/api/admin/movies', handler: handleAdminGetMovies },
+    { method: 'POST', path: '/api/admin/movies', handler: handleAdminCreateMovie },
+    { method: 'PUT', path: '/api/admin/movies/:id', handler: (req, env, params) => handleAdminUpdateMovie(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/movies/:id', handler: (req, env, params) => handleAdminDeleteMovie(req, env, params.id) },
+
+    // Admin - Showtimes
+    { method: 'GET', path: '/api/admin/showtimes', handler: handleAdminGetShowtimes },
+    { method: 'POST', path: '/api/admin/showtimes', handler: handleAdminCreateShowtime },
+    { method: 'POST', path: '/api/admin/showtimes/bulk', handler: handleAdminBulkCreateShowtimes },
+    { method: 'PUT', path: '/api/admin/showtimes/:id', handler: (req, env, params) => handleAdminUpdateShowtime(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/showtimes/:id', handler: (req, env, params) => handleAdminDeleteShowtime(req, env, params.id) },
 ];
 
 export default {
