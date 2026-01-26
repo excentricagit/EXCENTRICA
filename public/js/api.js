@@ -162,8 +162,17 @@ class ApiService {
     }
 
     // ========== ZONES ==========
-    async getZones() {
-        return this.get('/api/zones');
+    async getZones(params = {}) {
+        return this.get('/api/zones', params);
+    }
+
+    // ========== PROVINCES ==========
+    async getProvinces() {
+        return this.get('/api/provinces');
+    }
+
+    async getProvinceById(id) {
+        return this.get(`/api/provinces/${id}`);
     }
 
     // ========== LIKES ==========
@@ -291,8 +300,8 @@ class ApiService {
         return this.delete(`/api/admin/categories/${id}`);
     }
 
-    async getAdminZones() {
-        return this.get('/api/admin/zones');
+    async getAdminZones(params = {}) {
+        return this.get('/api/admin/zones', params);
     }
 
     async createZone(data) {
@@ -305,6 +314,23 @@ class ApiService {
 
     async deleteZone(id) {
         return this.delete(`/api/admin/zones/${id}`);
+    }
+
+    async mergeZone(id, targetZoneId) {
+        return this.post(`/api/admin/zones/${id}/merge`, { target_zone_id: targetZoneId });
+    }
+
+    // Admin - Provinces
+    async createProvince(data) {
+        return this.post('/api/admin/provinces', data);
+    }
+
+    async updateProvince(id, data) {
+        return this.put(`/api/admin/provinces/${id}`, data);
+    }
+
+    async deleteProvince(id) {
+        return this.delete(`/api/admin/provinces/${id}`);
     }
 
     async getAdminAds() {

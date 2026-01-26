@@ -78,6 +78,13 @@
                 <!-- Stats -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card">
+                        <div class="stat-icon">🗺️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-provinces">0</span>
+                            <span class="stat-label">Provincias</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-icon">📍</div>
                         <div class="stat-info">
                             <span class="stat-value" id="total-zones">0</span>
@@ -102,7 +109,10 @@
 
                 <!-- Compact filters -->
                 <div class="d-flex gap-3 mb-4 flex-wrap">
-                    <input type="text" id="search" class="form-control" placeholder="Buscar zona..." style="max-width: 250px;">
+                    <input type="text" id="search" class="form-control" placeholder="Buscar zona..." style="max-width: 200px;">
+                    <select id="filter-province" class="form-control" style="max-width: 200px;">
+                        <option value="">Todas las provincias</option>
+                    </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
@@ -122,6 +132,33 @@
         </main>
     </div>
 
+    <!-- Modal para fusionar zona -->
+    <div class="modal-backdrop" id="merge-modal-backdrop" onclick="closeMergeModal()"></div>
+    <div class="modal" id="merge-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">🔀 Fusionar Zona</h3>
+            <span class="modal-close" onclick="closeMergeModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p class="text-muted mb-3">
+                Transferir todos los datos de <strong id="merge-source-name"></strong> a otra zona y eliminarla.
+            </p>
+            <input type="hidden" id="merge-source-id">
+
+            <div class="form-group">
+                <label for="merge-target">Zona destino *</label>
+                <select id="merge-target" class="form-control" required>
+                    <option value="">Seleccionar zona destino</option>
+                </select>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeMergeModal()">Cancelar</button>
+                <button type="button" class="btn btn-warning" onclick="executeMerge()">Fusionar y eliminar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para crear/editar zona -->
     <div class="modal-backdrop" id="zone-modal-backdrop" onclick="closeModal()"></div>
     <div class="modal" id="zone-modal">
@@ -134,8 +171,15 @@
                 <input type="hidden" id="zone-id">
 
                 <div class="form-group">
+                    <label for="zone-provincia">Provincia *</label>
+                    <select id="zone-provincia" class="form-control" required>
+                        <option value="">Seleccionar provincia</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="zone-nombre">Nombre *</label>
-                    <input type="text" id="zone-nombre" class="form-control" required>
+                    <input type="text" id="zone-nombre" class="form-control" required placeholder="Ej: Capital, La Banda, Termas...">
                 </div>
 
                 <div class="form-group">
@@ -172,30 +216,56 @@
 
         let allZones = [];
         let filteredZones = [];
+        let provinces = [];
 
-        async function loadZones() {
+        async function loadData() {
             try {
-                const response = await api.getAdminZones();
-                if (response.success) {
-                    allZones = response.data;
+                const [zonesRes, provincesRes] = await Promise.all([
+                    api.getAdminZones(),
+                    api.getProvinces()
+                ]);
+
+                if (zonesRes.success) {
+                    allZones = zonesRes.data;
                     applyFilters();
                     updateStats();
                 }
+
+                if (provincesRes.success) {
+                    provinces = provincesRes.data || [];
+                    renderProvinceOptions();
+                }
             } catch (e) {
-                console.error('Error loading zones:', e);
-                Components.toast('Error cargando zonas', 'error');
+                console.error('Error loading data:', e);
+                Components.toast('Error cargando datos', 'error');
             }
+        }
+
+        function renderProvinceOptions() {
+            // Filter dropdown
+            const filterSelect = document.getElementById('filter-province');
+            filterSelect.innerHTML = '<option value="">Todas las provincias</option>' +
+                provinces.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+
+            // Modal dropdown
+            const modalSelect = document.getElementById('zone-provincia');
+            modalSelect.innerHTML = '<option value="">Seleccionar provincia</option>' +
+                provinces.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
         }
 
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
+            const provinceId = document.getElementById('filter-province').value;
 
             filteredZones = allZones.filter(zone => {
                 const matchSearch = !search ||
                     zone.name.toLowerCase().includes(search) ||
-                    (zone.description && zone.description.toLowerCase().includes(search));
+                    (zone.description && zone.description.toLowerCase().includes(search)) ||
+                    (zone.province_name && zone.province_name.toLowerCase().includes(search));
 
-                return matchSearch;
+                const matchProvince = !provinceId || zone.province_id == provinceId;
+
+                return matchSearch && matchProvince;
             });
 
             renderTable();
@@ -214,9 +284,9 @@
                     <thead>
                         <tr>
                             <th>Zona</th>
+                            <th>Provincia</th>
                             <th>Descripción</th>
                             <th>Estado</th>
-                            <th>Creada</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -224,13 +294,13 @@
                         ${filteredZones.map(zone => `
                             <tr>
                                 <td><strong>${zone.name}</strong></td>
+                                <td><span class="badge badge-info">${zone.province_name || '-'}</span></td>
                                 <td><small class="text-muted">${zone.description || '-'}</small></td>
                                 <td>
                                     <span class="badge badge-${zone.is_active ? 'success' : 'secondary'}">
                                         ${zone.is_active ? 'Activa' : 'Inactiva'}
                                     </span>
                                 </td>
-                                <td>${formatDate(zone.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
                                         <button class="btn btn-sm btn-outline" onclick="editZone(${zone.id})" title="Editar">
@@ -238,6 +308,9 @@
                                         </button>
                                         <button class="btn btn-sm btn-outline" onclick="toggleZoneStatus(${zone.id}, ${zone.is_active})" title="${zone.is_active ? 'Desactivar' : 'Activar'}">
                                             ${zone.is_active ? '🔒' : '🔓'}
+                                        </button>
+                                        <button class="btn btn-sm btn-outline" onclick="showMergeModal(${zone.id})" title="Fusionar con otra zona">
+                                            🔀
                                         </button>
                                         <button class="btn btn-sm btn-danger" onclick="deleteZone(${zone.id})" title="Eliminar">
                                             🗑️
@@ -252,6 +325,7 @@
         }
 
         function updateStats() {
+            document.getElementById('total-provinces').textContent = provinces.length;
             document.getElementById('total-zones').textContent = allZones.length;
             document.getElementById('active-zones').textContent = allZones.filter(z => z.is_active).length;
             document.getElementById('inactive-zones').textContent = allZones.filter(z => !z.is_active).length;
@@ -268,18 +342,19 @@
 
         function resetFilters() {
             document.getElementById('search').value = '';
+            document.getElementById('filter-province').value = '';
             applyFilters();
         }
 
         async function toggleZoneStatus(zoneId, currentStatus) {
             const action = currentStatus ? 'desactivar' : 'activar';
-            if (!confirm(`¿Está seguro que desea ${action} esta zona?`)) return;
+            if (!confirm(`¿${action.charAt(0).toUpperCase() + action.slice(1)} esta zona?`)) return;
 
             try {
                 const response = await api.updateZone(zoneId, { is_active: !currentStatus });
                 if (response.success) {
-                    Components.toast(`Zona ${action}da exitosamente`, 'success');
-                    loadZones();
+                    Components.toast(`Zona ${action}da`, 'success');
+                    loadData();
                 }
             } catch (e) {
                 console.error('Error updating zone:', e);
@@ -288,17 +363,90 @@
         }
 
         async function deleteZone(zoneId) {
-            if (!confirm('¿Está seguro que desea eliminar esta zona? Esta acción no se puede deshacer.')) return;
+            if (!confirm('¿Eliminar esta zona? Esta acción no se puede deshacer.')) return;
 
             try {
                 const response = await api.deleteZone(zoneId);
                 if (response.success) {
-                    Components.toast('Zona eliminada exitosamente', 'success');
-                    loadZones();
+                    Components.toast('Zona eliminada', 'success');
+                    loadData();
+                } else {
+                    // If has associated data, suggest merge
+                    if (response.message && response.message.includes('Fusionar')) {
+                        Components.toast(response.message, 'warning');
+                    } else {
+                        Components.toast(response.message || 'Error eliminando zona', 'error');
+                    }
                 }
             } catch (e) {
                 console.error('Error deleting zone:', e);
-                Components.toast('Error eliminando zona', 'error');
+                const msg = e.message || 'Error eliminando zona';
+                if (msg.includes('Fusionar')) {
+                    Components.toast(msg, 'warning');
+                } else {
+                    Components.toast(msg, 'error');
+                }
+            }
+        }
+
+        // Merge zone functions
+        function showMergeModal(zoneId) {
+            const zone = allZones.find(z => z.id === zoneId);
+            if (!zone) return;
+
+            document.getElementById('merge-source-id').value = zoneId;
+            document.getElementById('merge-source-name').textContent = zone.name;
+
+            // Populate target dropdown with all zones except the source
+            const targetSelect = document.getElementById('merge-target');
+            targetSelect.innerHTML = '<option value="">Seleccionar zona destino</option>' +
+                allZones.filter(z => z.id !== zoneId)
+                    .map(z => `<option value="${z.id}">${z.name} (${z.province_name || 'Sin provincia'})</option>`)
+                    .join('');
+
+            openMergeModal();
+        }
+
+        function openMergeModal() {
+            document.getElementById('merge-modal').classList.add('active');
+            document.getElementById('merge-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMergeModal() {
+            document.getElementById('merge-modal').classList.remove('active');
+            document.getElementById('merge-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        async function executeMerge() {
+            const sourceId = document.getElementById('merge-source-id').value;
+            const targetId = document.getElementById('merge-target').value;
+
+            if (!targetId) {
+                Components.toast('Selecciona una zona destino', 'error');
+                return;
+            }
+
+            const sourceName = document.getElementById('merge-source-name').textContent;
+            const targetZone = allZones.find(z => z.id == targetId);
+
+            if (!confirm(`¿Transferir todos los datos de "${sourceName}" a "${targetZone?.name}" y eliminar "${sourceName}"?`)) {
+                return;
+            }
+
+            try {
+                const response = await api.mergeZone(sourceId, targetId);
+                if (response.success) {
+                    Components.toast(response.message || 'Zona fusionada correctamente', 'success');
+                    closeMergeModal();
+                    loadData();
+                } else {
+                    Components.toast(response.message || 'Error fusionando zona', 'error');
+                }
+            } catch (e) {
+                console.error('Error merging zone:', e);
+                Components.toast(e.message || 'Error fusionando zona', 'error');
             }
         }
 
@@ -306,6 +454,7 @@
             document.getElementById('modal-title').textContent = 'Nueva Zona';
             document.getElementById('zone-form').reset();
             document.getElementById('zone-id').value = '';
+            document.getElementById('zone-provincia').value = '';
             document.getElementById('zone-activa').checked = true;
             openModal();
         }
@@ -316,6 +465,7 @@
 
             document.getElementById('modal-title').textContent = 'Editar Zona';
             document.getElementById('zone-id').value = zone.id;
+            document.getElementById('zone-provincia').value = zone.province_id || '';
             document.getElementById('zone-nombre').value = zone.name || '';
             document.getElementById('zone-descripcion').value = zone.description || '';
             document.getElementById('zone-activa').checked = zone.is_active !== false;
@@ -326,9 +476,17 @@
             event.preventDefault();
 
             const zoneId = document.getElementById('zone-id').value;
+            const provinceId = document.getElementById('zone-provincia').value;
+
+            if (!provinceId) {
+                Components.toast('Selecciona una provincia', 'error');
+                return;
+            }
+
             const data = {
                 name: document.getElementById('zone-nombre').value,
                 description: document.getElementById('zone-descripcion').value || null,
+                province_id: parseInt(provinceId),
                 is_active: document.getElementById('zone-activa').checked
             };
 
@@ -341,9 +499,9 @@
                 }
 
                 if (response.success) {
-                    Components.toast(zoneId ? 'Zona actualizada exitosamente' : 'Zona creada exitosamente', 'success');
+                    Components.toast(zoneId ? 'Zona actualizada' : 'Zona creada', 'success');
                     closeModal();
-                    loadZones();
+                    loadData();
                 } else {
                     Components.toast(response.message || 'Error guardando zona', 'error');
                 }
@@ -367,9 +525,10 @@
 
         // Event listeners
         document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-province').addEventListener('change', applyFilters);
 
         // Load initial data
-        loadZones();
+        loadData();
     </script>
 </body>
 </html>

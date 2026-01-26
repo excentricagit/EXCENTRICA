@@ -114,6 +114,7 @@
                         <option value="productos">Productos</option>
                         <option value="eventos">Eventos</option>
                         <option value="servicios">Servicios</option>
+                        <option value="turismo">Turismo</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="switchSection(document.getElementById('filter-section').value)">
                         Cambiar sección
@@ -161,6 +162,7 @@
                                 <option value="productos">🛒 Productos</option>
                                 <option value="eventos">📅 Eventos</option>
                                 <option value="servicios">🔧 Servicios</option>
+                                <option value="turismo">📍 Turismo</option>
                             </select>
                         </div>
 
@@ -395,7 +397,8 @@
                 noticias: 'info',
                 productos: 'primary',
                 eventos: 'warning',
-                servicios: 'success'
+                servicios: 'success',
+                turismo: 'purple'
             };
             return classes[section] || 'secondary';
         }
@@ -405,7 +408,8 @@
                 noticias: 'Noticias',
                 productos: 'Productos',
                 eventos: 'Eventos',
-                servicios: 'Servicios'
+                servicios: 'Servicios',
+                turismo: 'Turismo'
             };
             return labels[section] || section;
         }
@@ -535,6 +539,11 @@
         initEmojiPicker();
     </script>
     <style>
+        .badge-purple {
+            background-color: #a855f7;
+            color: white;
+        }
+
         .tabs {
             display: flex;
             gap: 1rem;

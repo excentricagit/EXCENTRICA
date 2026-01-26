@@ -20,7 +20,7 @@ import { handleGetProducts, handleGetProductById, handleCreateProduct, handleUpd
 import { handleGetCategories, handleGetCategoryById, handleAdminGetCategories, handleAdminCreateCategory, handleAdminUpdateCategory, handleAdminDeleteCategory } from './routes/categories.js';
 
 // Zones routes
-import { handleGetZones, handleGetZoneById, handleAdminGetZones, handleAdminCreateZone, handleAdminUpdateZone, handleAdminDeleteZone } from './routes/zones.js';
+import { handleGetZones, handleGetZoneById, handleAdminGetZones, handleAdminCreateZone, handleAdminUpdateZone, handleAdminDeleteZone, handleAdminMergeZone } from './routes/zones.js';
 
 // Events routes
 import { handleGetEvents, handleGetEventById, handleAdminGetEvents, handleAdminCreateEvent, handleAdminUpdateEvent, handleAdminDeleteEvent } from './routes/events.js';
@@ -93,6 +93,12 @@ import {
     getPublicPoi, getPublicPoiById,
     getAdminPoi, createPoi, updatePoi, deletePoi
 } from './routes/poi.js';
+
+// Provinces routes (provincias)
+import {
+    getProvinces, getProvinceById,
+    createProvince, updateProvince, deleteProvince
+} from './routes/provinces.js';
 
 // Simple router
 function matchRoute(method, path, routes) {
@@ -211,6 +217,7 @@ const routes = [
     { method: 'POST', path: '/api/admin/zones', handler: handleAdminCreateZone },
     { method: 'PUT', path: '/api/admin/zones/:id', handler: (req, env, params) => handleAdminUpdateZone(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/zones/:id', handler: (req, env, params) => handleAdminDeleteZone(req, env, params.id) },
+    { method: 'POST', path: '/api/admin/zones/:id/merge', handler: (req, env, params) => handleAdminMergeZone(req, env, params.id) },
 
     // Admin - News
     { method: 'GET', path: '/api/admin/news', handler: handleAdminGetNews },
@@ -375,6 +382,17 @@ const routes = [
     { method: 'POST', path: '/api/admin/poi', handler: createPoi },
     { method: 'PUT', path: '/api/admin/poi/:id', handler: (req, env, params) => updatePoi(req, env, params) },
     { method: 'DELETE', path: '/api/admin/poi/:id', handler: (req, env, params) => deletePoi(req, env, params) },
+
+    // ========== PROVINCES ROUTES (Provincias) ==========
+
+    // Provinces (public)
+    { method: 'GET', path: '/api/provinces', handler: getProvinces },
+    { method: 'GET', path: '/api/provinces/:id', handler: (req, env, params) => getProvinceById(req, env, params) },
+
+    // Admin - Provinces
+    { method: 'POST', path: '/api/admin/provinces', handler: createProvince },
+    { method: 'PUT', path: '/api/admin/provinces/:id', handler: (req, env, params) => updateProvince(req, env, params) },
+    { method: 'DELETE', path: '/api/admin/provinces/:id', handler: (req, env, params) => deleteProvince(req, env, params) },
 ];
 
 export default {
