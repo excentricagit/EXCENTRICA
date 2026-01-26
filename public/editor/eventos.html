@@ -367,6 +367,9 @@
                     api.getAdminZones()
                 ]);
 
+                console.log('Categories response:', categoriesResponse);
+                console.log('Zones response:', zonesResponse);
+
                 if (eventsResponse.success) {
                     allEvents = eventsResponse.data.events || eventsResponse.data || [];
                     applyFilters();
@@ -375,11 +378,17 @@
 
                 if (categoriesResponse.success) {
                     categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
+                    // Filter only active categories
+                    categories = categories.filter(cat => cat.is_active !== 0);
+                    console.log('Categories loaded:', categories.length);
                     renderCategoryOptions();
                 }
 
                 if (zonesResponse.success) {
                     zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
+                    // Filter only active zones
+                    zones = zones.filter(zone => zone.is_active !== 0);
+                    console.log('Zones loaded:', zones.length);
                     renderZoneOptions();
                 }
             } catch (e) {
