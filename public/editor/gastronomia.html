@@ -7,26 +7,26 @@
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/editor/editor.css">
     <style>
-        /* Modal Grande 3 columnas */
+        /* Modal Grande 4 columnas */
         #restaurant-modal {
-            max-width: 1100px;
+            max-width: 1300px;
             width: 95%;
         }
 
-        .modal-3col {
+        .modal-4col {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1.5rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
         }
 
-        @media (max-width: 900px) {
-            .modal-3col {
-                grid-template-columns: 1fr 1fr;
+        @media (max-width: 1100px) {
+            .modal-4col {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 600px) {
-            .modal-3col {
+            .modal-4col {
                 grid-template-columns: 1fr;
             }
         }
@@ -34,25 +34,43 @@
         .modal-col {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.6rem;
         }
 
         .modal-col h4 {
             color: #a855f7;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin: 0;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.4rem;
             border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .modal-col .form-group {
+            margin-bottom: 0;
+        }
+
+        .modal-col .form-group label {
+            font-size: 0.75rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .modal-col .form-control {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .modal-col textarea.form-control {
+            min-height: 50px;
         }
 
         /* Image preview */
         .image-preview-container {
             width: 100%;
-            aspect-ratio: 16/9;
+            aspect-ratio: 4/3;
             border: 2px dashed rgba(168, 85, 247, 0.3);
-            border-radius: 8px;
+            border-radius: 6px;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -76,31 +94,32 @@
         .image-preview-container .placeholder {
             color: rgba(255, 255, 255, 0.5);
             text-align: center;
-            padding: 1rem;
+            padding: 0.5rem;
+            font-size: 0.8rem;
         }
 
         .image-preview-container .placeholder span {
-            font-size: 2rem;
+            font-size: 1.5rem;
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         /* Services checkboxes */
         .services-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
+            display: flex;
+            gap: 0.35rem;
         }
 
         .service-checkbox {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem;
+            gap: 0.35rem;
+            padding: 0.35rem 0.5rem;
             background: rgba(0, 0, 0, 0.2);
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             transition: all 0.2s ease;
+            flex: 1;
         }
 
         .service-checkbox:hover {
@@ -109,26 +128,28 @@
 
         .service-checkbox input {
             accent-color: #a855f7;
+            width: 14px;
+            height: 14px;
         }
 
         .service-checkbox label {
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
         }
 
         /* Price range selector */
         .price-range-selector {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.35rem;
         }
 
         .price-option {
             flex: 1;
-            padding: 0.75rem;
+            padding: 0.5rem;
             text-align: center;
             background: rgba(0, 0, 0, 0.2);
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -143,15 +164,18 @@
         }
 
         .price-option .price-symbol {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: bold;
             color: #a855f7;
         }
 
-        .price-option .price-label {
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.6);
-            margin-top: 0.25rem;
+        /* Featured checkbox */
+        .featured-check {
+            background: rgba(251, 191, 36, 0.1) !important;
+            border: 1px solid rgba(251, 191, 36, 0.3) !important;
+        }
+        .featured-check label {
+            color: #fbbf24 !important;
         }
 
         /* Status badge colors */
@@ -302,47 +326,47 @@
             </div>
             <nav class="admin-nav">
                 <a href="/editor/" class="admin-nav-item">
-                    <span class="icon">D</span> Dashboard
+                    <span class="icon">📊</span> Dashboard
                 </a>
                 <a href="/editor/noticias.html" class="admin-nav-item">
-                    <span class="icon">N</span> Noticias
+                    <span class="icon">📰</span> Noticias
                 </a>
                 <a href="/editor/productos.html" class="admin-nav-item">
-                    <span class="icon">P</span> Productos
+                    <span class="icon">🛒</span> Productos
                 </a>
                 <a href="/editor/eventos.html" class="admin-nav-item">
-                    <span class="icon">E</span> Eventos
+                    <span class="icon">📅</span> Eventos
                 </a>
                 <a href="/editor/categorias.html" class="admin-nav-item">
-                    <span class="icon">C</span> Categorias
+                    <span class="icon">📁</span> Categorías
                 </a>
                 <a href="/editor/zonas.html" class="admin-nav-item">
-                    <span class="icon">Z</span> Zonas
+                    <span class="icon">📍</span> Zonas
                 </a>
                 <a href="/editor/cine.html" class="admin-nav-item">
-                    <span class="icon">CI</span> Cine
+                    <span class="icon">🎬</span> Cine
                 </a>
                 <a href="/editor/gastronomia.html" class="admin-nav-item active">
-                    <span class="icon">G</span> Gastronomia
+                    <span class="icon">🍽️</span> Gastronomía
                 </a>
                 <a href="/editor/alojamiento.html" class="admin-nav-item">
-                    <span class="icon">A</span> Alojamiento
+                    <span class="icon">🏨</span> Alojamiento
                 </a>
                 <a href="/editor/transporte.html" class="admin-nav-item">
-                    <span class="icon">T</span> Transporte
+                    <span class="icon">🚌</span> Transporte
                 </a>
                 <a href="/editor/servicios.html" class="admin-nav-item">
-                    <span class="icon">S</span> Servicios
+                    <span class="icon">🔧</span> Servicios
                 </a>
                 <a href="/editor/puntos-interes.html" class="admin-nav-item">
-                    <span class="icon">PI</span> Turismo
+                    <span class="icon">📍</span> Turismo
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
-                    <span class="icon">H</span> Volver al sitio
+                    <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">X</span> Cerrar sesion
+                    <span class="icon">🚪</span> Cerrar sesión
                 </a>
             </nav>
         </aside>
@@ -439,45 +463,56 @@
             <form id="restaurant-form" onsubmit="saveRestaurant(event)">
                 <input type="hidden" id="restaurant-id">
 
-                <div class="modal-3col">
-                    <!-- Columna 1: Informacion Basica -->
+                <div class="modal-4col">
+                    <!-- Col 1: Info Basica -->
                     <div class="modal-col">
-                        <h4>Informacion Basica</h4>
-
+                        <h4>Info Basica</h4>
                         <div class="form-group">
                             <label for="restaurant-name">Nombre *</label>
-                            <input type="text" id="restaurant-name" class="form-control" required placeholder="Nombre del restaurante">
+                            <input type="text" id="restaurant-name" class="form-control" required placeholder="Nombre">
                         </div>
-
                         <div class="form-group">
                             <label for="restaurant-description">Descripcion</label>
-                            <textarea id="restaurant-description" class="form-control" rows="3" placeholder="Breve descripcion del local..."></textarea>
+                            <textarea id="restaurant-description" class="form-control" rows="2" placeholder="Breve descripcion..."></textarea>
                         </div>
-
                         <div class="form-group">
-                            <label for="restaurant-specialties">Especialidades / Tipo de cocina</label>
-                            <textarea id="restaurant-specialties" class="form-control" rows="2" placeholder="Ej: Parrilla, Pastas, Empanadas..."></textarea>
+                            <label for="restaurant-specialties">Especialidades</label>
+                            <textarea id="restaurant-specialties" class="form-control" rows="2" placeholder="Parrilla, Pastas..."></textarea>
                         </div>
-
                         <div class="form-group">
-                            <label>Rango de precios</label>
+                            <label>Precio</label>
                             <div class="price-range-selector">
                                 <div class="price-option" data-value="$" onclick="selectPriceRange('$')">
                                     <div class="price-symbol">$</div>
-                                    <div class="price-label">Economico</div>
                                 </div>
                                 <div class="price-option" data-value="$$" onclick="selectPriceRange('$$')">
                                     <div class="price-symbol">$$</div>
-                                    <div class="price-label">Moderado</div>
                                 </div>
                                 <div class="price-option" data-value="$$$" onclick="selectPriceRange('$$$')">
                                     <div class="price-symbol">$$$</div>
-                                    <div class="price-label">Premium</div>
                                 </div>
                             </div>
                             <input type="hidden" id="restaurant-price-range" value="">
                         </div>
+                    </div>
 
+                    <!-- Col 2: Ubicacion -->
+                    <div class="modal-col">
+                        <h4>Ubicacion</h4>
+                        <div class="form-group">
+                            <label for="restaurant-zone">Zona</label>
+                            <select id="restaurant-zone" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurant-address">Direccion</label>
+                            <input type="text" id="restaurant-address" class="form-control" placeholder="Calle y numero">
+                        </div>
+                        <div class="form-group">
+                            <label for="restaurant-schedule">Horarios</label>
+                            <textarea id="restaurant-schedule" class="form-control" rows="2" placeholder="Lun-Vie 12-15, 20-00"></textarea>
+                        </div>
                         <div class="form-group">
                             <label>Servicios</label>
                             <div class="services-grid">
@@ -493,88 +528,60 @@
                         </div>
                     </div>
 
-                    <!-- Columna 2: Ubicacion y Contacto -->
+                    <!-- Col 3: Contacto -->
                     <div class="modal-col">
-                        <h4>Ubicacion y Contacto</h4>
-
-                        <div class="form-group">
-                            <label for="restaurant-zone">Zona</label>
-                            <select id="restaurant-zone" class="form-control">
-                                <option value="">Seleccionar zona...</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="restaurant-address">Direccion</label>
-                            <input type="text" id="restaurant-address" class="form-control" placeholder="Calle y numero">
-                        </div>
-
+                        <h4>Contacto</h4>
                         <div class="form-group">
                             <label for="restaurant-phone">Telefono</label>
-                            <input type="tel" id="restaurant-phone" class="form-control" placeholder="Ej: 0385-4123456">
+                            <input type="tel" id="restaurant-phone" class="form-control" placeholder="0385-4123456">
                         </div>
-
                         <div class="form-group">
                             <label for="restaurant-email">Email</label>
-                            <input type="email" id="restaurant-email" class="form-control" placeholder="contacto@ejemplo.com">
+                            <input type="email" id="restaurant-email" class="form-control" placeholder="contacto@mail.com">
                         </div>
-
                         <div class="form-group">
                             <label for="restaurant-instagram">Instagram</label>
                             <input type="text" id="restaurant-instagram" class="form-control" placeholder="@usuario">
                         </div>
-
                         <div class="form-group">
-                            <label for="restaurant-website">Sitio Web / Menu</label>
+                            <label for="restaurant-website">Web / Menu</label>
                             <input type="url" id="restaurant-website" class="form-control" placeholder="https://...">
-                            <small style="color: rgba(255,255,255,0.5);">Link externo al menu o pagina del local</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="restaurant-schedule">Horarios</label>
-                            <textarea id="restaurant-schedule" class="form-control" rows="2" placeholder="Ej: Lun-Vie 12:00-15:00, 20:00-00:00"></textarea>
                         </div>
                     </div>
 
-                    <!-- Columna 3: Imagen y Estado -->
+                    <!-- Col 4: Imagen y Estado -->
                     <div class="modal-col">
                         <h4>Imagen</h4>
-
                         <div class="form-group">
-                            <label>Foto del local</label>
                             <div class="image-preview-container" onclick="document.getElementById('restaurant-image-file').click()">
                                 <div id="image-preview" class="placeholder">
                                     <span>+</span>
-                                    Click para subir imagen
+                                    Subir imagen
                                 </div>
                             </div>
                             <input type="file" id="restaurant-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
                             <input type="hidden" id="restaurant-image-url">
                         </div>
-
-                        <h4 style="margin-top: 1rem;">Estado</h4>
-
                         <div class="form-group">
-                            <label for="restaurant-status">Estado de publicacion</label>
+                            <label for="restaurant-status">Estado</label>
                             <select id="restaurant-status" class="form-control">
                                 <option value="pending">Pendiente</option>
                                 <option value="approved">Aprobado</option>
                                 <option value="rejected">Rechazado</option>
                             </select>
                         </div>
-
                         <div class="form-group">
-                            <div class="service-checkbox" style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3);">
+                            <div class="service-checkbox featured-check">
                                 <input type="checkbox" id="restaurant-featured">
-                                <label for="restaurant-featured" style="color: #fbbf24;">* Destacar restaurante</label>
+                                <label for="restaurant-featured">Destacar</label>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-footer" style="margin-top: 1.5rem;">
-                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                <div class="modal-footer" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Guardar</button>
                 </div>
             </form>
         </div>

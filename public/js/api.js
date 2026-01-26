@@ -448,6 +448,142 @@ class ApiService {
     async toggleGastronomyFeatured(id) {
         return this.patch(`/api/admin/gastronomy/${id}/featured`);
     }
+
+    // ========== ACCOMMODATION ==========
+
+    // Public
+    async getAccommodations(params = {}) {
+        return this.get('/api/accommodations', params);
+    }
+
+    async getAccommodationById(id) {
+        return this.get(`/api/accommodations/${id}`);
+    }
+
+    async getAccommodationBySlug(slug) {
+        return this.get(`/api/accommodations/slug/${slug}`);
+    }
+
+    // Admin
+    async getAdminAccommodations(params = {}) {
+        return this.get('/api/admin/accommodations', params);
+    }
+
+    async createAccommodation(data) {
+        return this.post('/api/admin/accommodations', data);
+    }
+
+    async updateAccommodation(id, data) {
+        return this.put(`/api/admin/accommodations/${id}`, data);
+    }
+
+    async deleteAccommodation(id) {
+        return this.delete(`/api/admin/accommodations/${id}`);
+    }
+
+    async updateAccommodationStatus(id, status) {
+        return this.patch(`/api/admin/accommodations/${id}/status`, { status });
+    }
+
+    async toggleAccommodationFeatured(id) {
+        return this.patch(`/api/admin/accommodations/${id}/featured`);
+    }
+
+    // ========== TRANSPORT ==========
+
+    async getTransport(params = {}) {
+        return this.get('/api/transport', params);
+    }
+
+    async getTransportById(id) {
+        return this.get(`/api/transport/${id}`);
+    }
+
+    // Admin Transport
+    async getAdminTransport(params = {}) {
+        return this.get('/api/admin/transport', params);
+    }
+
+    async createTransport(data) {
+        return this.post('/api/admin/transport', data);
+    }
+
+    async updateTransport(id, data) {
+        return this.put(`/api/admin/transport/${id}`, data);
+    }
+
+    async deleteTransport(id) {
+        return this.delete(`/api/admin/transport/${id}`);
+    }
+
+    async updateTransportStatus(id, status) {
+        return this.patch(`/api/admin/transport/${id}/status`, { status });
+    }
+
+    async toggleTransportFeatured(id) {
+        return this.patch(`/api/admin/transport/${id}/featured`);
+    }
+
+    // ========== BUS LINES (Colectivos) ==========
+
+    // Public
+    async getBusLines(params = {}) {
+        return this.get('/api/bus-lines', params);
+    }
+
+    async getBusLineById(id) {
+        return this.get(`/api/bus-lines/${id}`);
+    }
+
+    async getBusStops(params = {}) {
+        return this.get('/api/bus-stops', params);
+    }
+
+    // Admin - Bus Lines
+    async getAdminBusLines(params = {}) {
+        return this.get('/api/admin/bus-lines', params);
+    }
+
+    async createBusLine(data) {
+        return this.post('/api/admin/bus-lines', data);
+    }
+
+    async updateBusLine(id, data) {
+        return this.put(`/api/admin/bus-lines/${id}`, data);
+    }
+
+    async deleteBusLine(id) {
+        return this.delete(`/api/admin/bus-lines/${id}`);
+    }
+
+    async updateBusLineStatus(id, status) {
+        return this.patch(`/api/admin/bus-lines/${id}/status`, { status });
+    }
+
+    async toggleBusLineFeatured(id) {
+        return this.patch(`/api/admin/bus-lines/${id}/featured`);
+    }
+
+    // Admin - Bus Stops
+    async getAdminBusStops(params = {}) {
+        return this.get('/api/admin/bus-stops', params);
+    }
+
+    async createBusStop(data) {
+        return this.post('/api/admin/bus-stops', data);
+    }
+
+    async updateBusStop(id, data) {
+        return this.put(`/api/admin/bus-stops/${id}`, data);
+    }
+
+    async deleteBusStop(id) {
+        return this.delete(`/api/admin/bus-stops/${id}`);
+    }
+
+    async reorderBusStops(stopIds) {
+        return this.post('/api/admin/bus-stops/reorder', { stops: stopIds });
+    }
 }
 
 // Crear instancia global

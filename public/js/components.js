@@ -95,6 +95,61 @@ const Components = {
         `;
     },
 
+    // Crear card de alojamiento
+    accommodationCard(accommodation) {
+        const imageUrl = accommodation.image_url || CONFIG.PLACEHOLDER_IMAGE;
+        const typeLabels = {
+            'hotel': 'Hotel',
+            'hostel': 'Hostel',
+            'apart': 'Apart Hotel',
+            'cabin': 'Cabaña',
+            'camping': 'Camping'
+        };
+        const typeLabel = typeLabels[accommodation.accommodation_type] || 'Alojamiento';
+
+        // Generar estrellas
+        let stars = '';
+        if (accommodation.star_rating > 0) {
+            for (let i = 0; i < accommodation.star_rating; i++) {
+                stars += '⭐';
+            }
+        }
+
+        // Servicios icons
+        const services = [];
+        if (accommodation.has_wifi) services.push('📶');
+        if (accommodation.has_pool) services.push('🏊');
+        if (accommodation.has_parking) services.push('🅿️');
+        if (accommodation.has_breakfast) services.push('🍳');
+        if (accommodation.has_ac) services.push('❄️');
+        if (accommodation.has_pet_friendly) services.push('🐾');
+
+        return `
+            <article class="accommodation-card">
+                <div class="accommodation-image">
+                    <a href="/alojamiento-detalle.html?id=${accommodation.id}">
+                        <img src="${imageUrl}" alt="${Utils.escapeHtml(accommodation.name)}"
+                             onerror="Utils.handleImageError(this)">
+                    </a>
+                    <span class="accommodation-badge badge badge-primary">${typeLabel}</span>
+                    ${accommodation.featured ? '<span class="accommodation-featured">⭐ Destacado</span>' : ''}
+                </div>
+                <div class="accommodation-info">
+                    <h3 class="accommodation-title">
+                        <a href="/alojamiento-detalle.html?id=${accommodation.id}">${Utils.escapeHtml(accommodation.name)}</a>
+                    </h3>
+                    ${stars ? `<div class="accommodation-stars">${stars}</div>` : ''}
+                    <div class="accommodation-meta">
+                        ${accommodation.zone_name ? `<span>📍 ${Utils.escapeHtml(accommodation.zone_name)}</span>` : ''}
+                        ${accommodation.price_range ? `<span class="accommodation-price">${accommodation.price_range}</span>` : ''}
+                    </div>
+                    ${services.length > 0 ? `<div class="accommodation-services">${services.join(' ')}</div>` : ''}
+                    ${accommodation.price_from ? `<div class="accommodation-price-from">Desde ${Utils.formatPrice(accommodation.price_from)}</div>` : ''}
+                </div>
+            </article>
+        `;
+    },
+
     // Crear paginación
     pagination(current, total, onPageChange) {
         if (total <= 1) return '';

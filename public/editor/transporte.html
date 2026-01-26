@@ -6,13 +6,745 @@
     <title>Transporte - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/editor/editor.css">
+    <style>
+        .transport-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .transport-tab {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .transport-tab:hover { color: rgba(255, 255, 255, 0.9); }
+
+        .transport-tab.active {
+            color: #a855f7;
+            border-bottom-color: #a855f7;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .modal-wide { max-width: 950px; width: 95%; }
+        .modal-medium { max-width: 700px; width: 95%; }
+
+        .modal-3col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .modal-2col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        @media (max-width: 900px) { .modal-3col { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 700px) { .modal-2col { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { .modal-3col { grid-template-columns: 1fr; } }
+
+        .modal-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .modal-col h4 {
+            color: #a855f7;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin: 0;
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(90deg, rgba(168, 85, 247, 0.15) 0%, transparent 100%);
+            border-left: 3px solid #a855f7;
+            border-radius: 0 6px 6px 0;
+            font-weight: 600;
+        }
+
+        .modal-col .form-group { margin-bottom: 0; }
+        .modal-col .form-group label { font-size: 0.75rem; margin-bottom: 0.2rem; }
+        .modal-col .form-control { padding: 0.4rem 0.6rem; font-size: 0.85rem; }
+        .modal-col textarea.form-control { min-height: 50px; }
+
+        .image-preview-container {
+            width: 100%;
+            aspect-ratio: 4/3;
+            border: 2px dashed rgba(168, 85, 247, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-preview-container:hover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .image-preview-container img { width: 100%; height: 100%; object-fit: cover; }
+        .image-preview-container .placeholder { color: rgba(255, 255, 255, 0.5); text-align: center; padding: 0.5rem; font-size: 0.8rem; }
+        .image-preview-container .placeholder span { font-size: 1.5rem; display: block; margin-bottom: 0.25rem; }
+
+        /* Legacy featured check for private transport */
+        .featured-check {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(30, 30, 30, 0.9) 100%) !important;
+            border: 1px solid rgba(251, 191, 36, 0.3) !important;
+            border-radius: 8px;
+        }
+        .featured-check label { color: #fbbf24 !important; }
+
+        .badge-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        .badge-approved { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .featured-star { color: #fbbf24; }
+
+        /* Bus Line Cards */
+        .bus-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .bus-card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .bus-card:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .bus-card-header {
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bus-line-badge {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .bus-card-info { flex: 1; }
+        .bus-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+        }
+        .bus-card-company {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+        }
+
+        .bus-card-body { padding: 1rem; }
+
+        .bus-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .bus-card-route {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0.5rem 0;
+            line-height: 1.4;
+        }
+
+        .bus-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bus-card-actions .btn { flex: 1; }
+
+        /* Private Transport Cards */
+        .transporte-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .transporte-card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .transporte-card:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .transporte-card-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .transporte-card-body { padding: 1rem; }
+
+        .transporte-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .transporte-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+        }
+
+        .transporte-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .transporte-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .transporte-card-actions .btn { flex: 1; }
+
+        /* Stops list */
+        .stops-list {
+            max-height: 350px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .stop-item {
+            display: grid;
+            grid-template-columns: 30px 1fr auto auto;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .stop-item:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(30, 30, 30, 0.95) 100%);
+        }
+
+        .stop-order {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(168, 85, 247, 0.3);
+            flex-shrink: 0;
+        }
+
+        .stop-order.inicio {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            box-shadow: 0 2px 5px rgba(34, 197, 94, 0.3);
+        }
+
+        .stop-order.fin {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            box-shadow: 0 2px 5px rgba(239, 68, 68, 0.3);
+        }
+
+        .stop-item.inicio {
+            border-color: rgba(34, 197, 94, 0.3);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(30, 30, 30, 0.9) 100%);
+        }
+
+        .stop-item.fin {
+            border-color: rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(30, 30, 30, 0.9) 100%);
+        }
+
+        .stop-type-badge {
+            display: inline-block;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .stop-type-badge.inicio {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .stop-type-badge.fin {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .stop-info { flex: 1; min-width: 0; }
+        .stop-name { color: #fff; font-weight: 500; }
+        .stop-address { font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); margin-top: 2px; }
+
+        .stop-times {
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .times-badge {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .no-times {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.7rem;
+            font-style: italic;
+        }
+
+        .stop-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .stop-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        /* Map - Leaflet */
+        #stops-map {
+            width: 100%;
+            height: 350px;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        /* Fix Leaflet controls in dark theme */
+        .leaflet-control-zoom a {
+            background: rgba(30, 30, 30, 0.9) !important;
+            color: #fff !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .leaflet-control-zoom a:hover {
+            background: rgba(50, 50, 50, 0.9) !important;
+        }
+
+        .leaflet-control-attribution {
+            background: rgba(30, 30, 30, 0.7) !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-size: 9px !important;
+        }
+
+        .leaflet-control-attribution a {
+            color: rgba(168, 85, 247, 0.7) !important;
+        }
+
+        /* Custom marker number icon */
+        .stop-number-icon {
+            background: transparent !important;
+            border: none !important;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .color-picker-wrapper input[type="color"] {
+            width: 45px;
+            height: 45px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            background: transparent;
+            padding: 2px;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        .color-picker-wrapper input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 5px;
+        }
+
+        .color-preview {
+            flex: 1;
+            height: 45px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Schedule Editor - Premium Design */
+        .schedule-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .schedule-row:hover {
+            border-color: rgba(168, 85, 247, 0.3);
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.12) 0%, rgba(30, 30, 30, 0.95) 100%);
+        }
+
+        .schedule-row.disabled {
+            opacity: 0.5;
+            background: rgba(20, 20, 20, 0.5);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .schedule-day {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+            user-select: none;
+        }
+
+        /* Custom Checkbox Design */
+        .schedule-day input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(168, 85, 247, 0.4);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .schedule-day input[type="checkbox"]:hover {
+            border-color: rgba(168, 85, 247, 0.7);
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .schedule-day input[type="checkbox"]:checked {
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+            border-color: #a855f7;
+        }
+
+        .schedule-day input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .schedule-row input[type="time"] {
+            width: 80px;
+            padding: 0.35rem 0.5rem;
+            font-size: 0.75rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 6px;
+            color: #fff;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .schedule-row input[type="time"]:hover:not(:disabled) {
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+
+        .schedule-row input[type="time"]:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+        }
+
+        .schedule-row input[type="time"]:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .schedule-separator {
+            color: rgba(168, 85, 247, 0.6);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Custom Featured Checkbox */
+        .featured-check-custom {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(30, 30, 30, 0.9) 100%) !important;
+            border: 1px solid rgba(251, 191, 36, 0.3) !important;
+            border-radius: 8px;
+            padding: 0.75rem !important;
+            transition: all 0.2s ease;
+        }
+
+        .featured-check-custom:hover {
+            border-color: rgba(251, 191, 36, 0.5) !important;
+        }
+
+        .featured-check-custom label {
+            color: #fbbf24 !important;
+            font-weight: 500;
+        }
+
+        .featured-check-custom input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(251, 191, 36, 0.4);
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .featured-check-custom input[type="checkbox"]:checked {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-color: #fbbf24;
+        }
+
+        .featured-check-custom input[type="checkbox"]:checked::after {
+            content: '⭐';
+            position: absolute;
+            font-size: 12px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Price Input Style */
+        .price-input-wrapper {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            padding: 0.75rem;
+        }
+
+        .price-input-wrapper label {
+            color: #22c55e !important;
+            font-weight: 500;
+        }
+
+        .price-input-wrapper .form-control {
+            background: rgba(0, 0, 0, 0.4) !important;
+            border-color: rgba(34, 197, 94, 0.3) !important;
+        }
+
+        .price-input-wrapper .form-control:focus {
+            border-color: #22c55e !important;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2) !important;
+        }
+
+        /* Arrival Times Editor */
+        .arrival-times-editor {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(30, 30, 30, 0.9) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem;
+        }
+
+        .arrival-times-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            min-height: 32px;
+        }
+
+        .arrival-times-list:empty::before {
+            content: 'Sin horarios agregados';
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+
+        .arrival-time-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+            color: #fff;
+            padding: 0.35rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: 0 2px 6px rgba(168, 85, 247, 0.3);
+            animation: chipIn 0.2s ease;
+        }
+
+        @keyframes chipIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .arrival-time-chip .time-icon {
+            font-size: 0.75rem;
+        }
+
+        .arrival-time-chip .remove-time {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 12px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .arrival-time-chip .remove-time:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .arrival-times-add {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(168, 85, 247, 0.15);
+        }
+
+        .arrival-times-add input[type="time"] {
+            flex: 1;
+            max-width: 120px;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .arrival-times-add input[type="time"]:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+
+        .arrival-times-add input[type="time"]:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+        }
+
+        .arrival-times-add .btn {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
-        <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="admin-logo">
-                <a href="/"><span>⚡</span> Excentrica</a>
+                <a href="/"><span>EX</span> Excentrica</a>
                 <span class="admin-badge">EDITOR</span>
             </div>
             <nav class="admin-nav">
@@ -29,7 +761,7 @@
                     <span class="icon">📅</span> Eventos
                 </a>
                 <a href="/editor/categorias.html" class="admin-nav-item">
-                    <span class="icon">📁</span> Categorías
+                    <span class="icon">📁</span> Categorias
                 </a>
                 <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
@@ -38,7 +770,7 @@
                     <span class="icon">🎬</span> Cine
                 </a>
                 <a href="/editor/gastronomia.html" class="admin-nav-item">
-                    <span class="icon">🍽️</span> Gastronomía
+                    <span class="icon">🍽️</span> Gastronomia
                 </a>
                 <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
@@ -57,164 +789,446 @@
                     <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">🚪</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
 
-        <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🚌 Gestión de Transporte</h1>
+                <h1>Gestion de Transporte</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
-                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
-                        <span>➕</span> Nuevo Transporte
-                    </button>
                 </div>
             </header>
 
             <div class="admin-content">
-                <!-- Stats -->
-                <div class="stats-grid mb-4">
-                    <div class="stat-card">
-                        <div class="stat-icon">🚌</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="total-items">0</span>
-                            <span class="stat-label">Total transportes</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="active-items">0</span>
-                            <span class="stat-label">Activos</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">⏳</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="pending-items">0</span>
-                            <span class="stat-label">Pendientes</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">❌</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="rejected-items">0</span>
-                            <span class="stat-label">Rechazados</span>
-                        </div>
-                    </div>
+                <!-- Tabs -->
+                <div class="transport-tabs">
+                    <button class="transport-tab active" onclick="switchTab('colectivos')">🚌 Colectivos</button>
+                    <button class="transport-tab" onclick="switchTab('privados')">🚗 Privados</button>
                 </div>
 
-                <!-- Compact filters -->
-                <div class="d-flex gap-3 mb-4 flex-wrap">
-                    <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
-                    <select id="filter-status" class="form-control" style="max-width: 150px;">
-                        <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
-                    </select>
-                    <button class="btn btn-outline btn-sm" onclick="resetFilters()">
-                        Limpiar
-                    </button>
-                </div>
-
-                <!-- Table -->
-                <div class="card">
-                    <div class="card-body">
-                        <div id="items-table-container">
-                            <div class="text-center p-4">
-                                <div class="spinner"></div>
+                <!-- Colectivos Tab -->
+                <div id="tab-colectivos" class="tab-content active">
+                    <div class="stats-grid mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">🚌</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-bus-total">0</span>
+                                <span class="stat-label">Lineas</span>
                             </div>
                         </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-bus-approved">0</span>
+                                <span class="stat-label">Activas</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🚏</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-bus-stops">0</span>
+                                <span class="stat-label">Paradas</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-bus-featured">0</span>
+                                <span class="stat-label">Destacadas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-4 flex-wrap" style="justify-content: space-between;">
+                        <div class="d-flex gap-3">
+                            <input type="text" id="bus-search" class="form-control" placeholder="Buscar linea..." style="max-width: 200px;">
+                            <select id="bus-filter-status" class="form-control" style="max-width: 150px;">
+                                <option value="">Todos</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="approved">Aprobados</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="showCreateBusModal()">+ Nueva Linea</button>
+                    </div>
+
+                    <div id="bus-container" class="bus-grid">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Privados Tab -->
+                <div id="tab-privados" class="tab-content">
+                    <div class="stats-grid mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">🚗</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-total">0</span>
+                                <span class="stat-label">Total</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-approved">0</span>
+                                <span class="stat-label">Aprobados</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-pending">0</span>
+                                <span class="stat-label">Pendientes</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-featured">0</span>
+                                <span class="stat-label">Destacados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 mb-4 flex-wrap" style="justify-content: space-between;">
+                        <div class="d-flex gap-3">
+                            <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
+                            <select id="filter-status" class="form-control" style="max-width: 150px;">
+                                <option value="">Todos</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="approved">Aprobados</option>
+                                <option value="rejected">Rechazados</option>
+                            </select>
+                            <select id="filter-zone" class="form-control" style="max-width: 150px;">
+                                <option value="">Todas las zonas</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary btn-sm" onclick="showCreateModal()">+ Nuevo Transporte</button>
+                    </div>
+
+                    <div id="items-container" class="transporte-grid">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modal para crear/editar -->
-    <div class="modal-backdrop" id="item-modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal" id="item-modal">
+    <div class="modal-backdrop" id="modal-backdrop" onclick="closeAllModals()"></div>
+
+    <!-- Modal Bus Line -->
+    <div class="modal modal-wide" id="bus-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="bus-modal-title">Nueva Linea de Colectivo</h3>
+            <span class="modal-close" onclick="closeBusModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="bus-form" onsubmit="saveBusLine(event)">
+                <input type="hidden" id="bus-id">
+
+                <div class="modal-3col">
+                    <!-- Columna 1: Informacion de la Linea -->
+                    <div class="modal-col">
+                        <h4>Informacion de la Linea</h4>
+                        <div class="form-group">
+                            <label for="bus-line-number">Numero de Linea *</label>
+                            <input type="text" id="bus-line-number" class="form-control" required placeholder="Ej: 10, A, 15B">
+                        </div>
+                        <div class="form-group">
+                            <label for="bus-name">Nombre / Destino *</label>
+                            <input type="text" id="bus-name" class="form-control" required placeholder="Ej: Terminal - Barrio Norte">
+                        </div>
+                        <div class="form-group">
+                            <label for="bus-company">Empresa</label>
+                            <input type="text" id="bus-company" class="form-control" placeholder="Ej: Empresa XX">
+                        </div>
+                        <div class="form-group">
+                            <label for="bus-description">Descripcion</label>
+                            <textarea id="bus-description" class="form-control" rows="2" placeholder="Descripcion de la linea..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="bus-route-desc">Recorrido</label>
+                            <textarea id="bus-route-desc" class="form-control" rows="3" placeholder="Terminal - Av. Belgrano - Plaza - Centro..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Estado y Configuracion -->
+                    <div class="modal-col">
+                        <h4>Apariencia</h4>
+                        <div class="form-group">
+                            <label for="bus-color">Color de la Linea</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="bus-color" value="#a855f7" onchange="updateColorPreview()">
+                                <div class="color-preview" id="color-preview" style="background: #a855f7;">10</div>
+                            </div>
+                        </div>
+
+                        <h4 style="margin-top: 1rem;">Estado</h4>
+                        <div class="form-group">
+                            <label for="bus-status">Estado</label>
+                            <select id="bus-status" class="form-control">
+                                <option value="pending">Pendiente</option>
+                                <option value="approved">Aprobado</option>
+                                <option value="rejected">Rechazado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group featured-check-custom">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="bus-featured">
+                                <span>Linea Destacada</span>
+                            </label>
+                        </div>
+
+                        <div class="form-group price-input-wrapper">
+                            <label for="bus-price">Precio del Boleto</label>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="color: #22c55e; font-weight: 600;">$</span>
+                                <input type="number" id="bus-price" class="form-control" placeholder="0.00" step="0.01" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: Horarios -->
+                    <div class="modal-col">
+                        <h4>Horarios de Servicio</h4>
+                        <div class="schedule-editor" id="schedule-editor">
+                            <div class="schedule-row" data-day="lun">
+                                <label class="schedule-day">
+                                    <input type="checkbox" checked> Lunes
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="06:00">
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="22:00">
+                            </div>
+                            <div class="schedule-row" data-day="mar">
+                                <label class="schedule-day">
+                                    <input type="checkbox" checked> Martes
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="06:00">
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="22:00">
+                            </div>
+                            <div class="schedule-row" data-day="mie">
+                                <label class="schedule-day">
+                                    <input type="checkbox" checked> Miercoles
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="06:00">
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="22:00">
+                            </div>
+                            <div class="schedule-row" data-day="jue">
+                                <label class="schedule-day">
+                                    <input type="checkbox" checked> Jueves
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="06:00">
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="22:00">
+                            </div>
+                            <div class="schedule-row" data-day="vie">
+                                <label class="schedule-day">
+                                    <input type="checkbox" checked> Viernes
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="06:00">
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="22:00">
+                            </div>
+                            <div class="schedule-row" data-day="sab">
+                                <label class="schedule-day">
+                                    <input type="checkbox" checked> Sabado
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="07:00">
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="20:00">
+                            </div>
+                            <div class="schedule-row" data-day="dom">
+                                <label class="schedule-day">
+                                    <input type="checkbox"> Domingo
+                                </label>
+                                <input type="time" class="form-control schedule-from" value="08:00" disabled>
+                                <span class="schedule-separator">a</span>
+                                <input type="time" class="form-control schedule-to" value="18:00" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="margin-top: 1rem;">
+                    <button type="button" class="btn btn-outline" onclick="closeBusModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Linea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Bus Stops -->
+    <div class="modal modal-wide" id="stops-modal" style="max-width: 1200px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="stops-modal-title">Paradas de la Linea</h3>
+            <span class="modal-close" onclick="closeStopsModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="modal-3col">
+                <!-- Columna 1: Formulario -->
+                <div class="modal-col">
+                    <h4>📍 Nueva Parada</h4>
+                    <p style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-bottom: 0.75rem;">Click en el mapa para autocompletar ubicación</p>
+
+                    <div id="add-stop-form">
+                        <input type="hidden" id="stop-id">
+                        <div class="form-group">
+                            <label for="stop-name">Nombre de la Parada *</label>
+                            <input type="text" id="stop-name" class="form-control" placeholder="Ej: Terminal de Omnibus">
+                        </div>
+                        <div class="form-group">
+                            <label for="stop-type">Tipo de Parada</label>
+                            <select id="stop-type" class="form-control">
+                                <option value="normal">🚏 Normal</option>
+                                <option value="inicio">🚀 Inicio de Recorrido</option>
+                                <option value="fin">🏁 Fin de Recorrido</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="stop-address">Direccion <span id="address-loading" style="display:none; color: #a855f7;">⏳ Buscando...</span></label>
+                            <input type="text" id="stop-address" class="form-control" placeholder="Se autocompleta al hacer click en el mapa">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <div class="form-group" style="flex: 1;">
+                                <label for="stop-lat">Latitud</label>
+                                <input type="number" id="stop-lat" class="form-control" step="any" placeholder="-27.7833" readonly style="background: rgba(0,0,0,0.3);">
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label for="stop-lng">Longitud</label>
+                                <input type="number" id="stop-lng" class="form-control" step="any" placeholder="-64.2667" readonly style="background: rgba(0,0,0,0.3);">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Horarios de Llegada</label>
+                            <div class="arrival-times-editor" id="arrival-times-editor">
+                                <div class="arrival-times-list" id="arrival-times-list"></div>
+                                <div class="arrival-times-add">
+                                    <input type="time" id="new-arrival-time" class="form-control" value="06:00">
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="addArrivalTime()">+ Agregar</button>
+                                </div>
+                            </div>
+                            <input type="hidden" id="stop-times">
+                        </div>
+                        <div class="d-flex gap-2" style="margin-top: 1rem;">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="clearStopForm()">Limpiar</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="saveStop()">💾 Guardar Parada</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Lista de Paradas -->
+                <div class="modal-col">
+                    <h4>🚏 Paradas (<span id="stops-count">0</span>)</h4>
+                    <div id="stops-list" class="stops-list" style="max-height: 450px; overflow-y: auto;">
+                        <p class="text-muted text-center">No hay paradas registradas</p>
+                    </div>
+                </div>
+
+                <!-- Columna 3: Mapa -->
+                <div class="modal-col">
+                    <h4>🗺️ Mapa</h4>
+                    <div id="stops-map" style="height: 450px;"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer" style="margin-top: 1rem;">
+                <button type="button" class="btn btn-outline" onclick="closeStopsModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Private Transport -->
+    <div class="modal modal-wide" id="transporte-modal">
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Nuevo Transporte</h3>
             <span class="modal-close" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
-            <form id="item-form" onsubmit="saveItem(event)">
+            <form id="transporte-form" onsubmit="saveItem(event)">
                 <input type="hidden" id="item-id">
 
-                <div class="form-group">
-                    <label for="item-titulo">Nombre *</label>
-                    <input type="text" id="item-titulo" class="form-control" required>
+                <div class="modal-3col">
+                    <div class="modal-col">
+                        <h4>Informacion Basica</h4>
+                        <div class="form-group">
+                            <label for="item-name">Nombre *</label>
+                            <input type="text" id="item-name" class="form-control" required placeholder="Ej: Remis Don Pedro">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-description">Descripcion</label>
+                            <textarea id="item-description" class="form-control" rows="2" placeholder="Descripcion..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-routes">Zonas de Cobertura</label>
+                            <textarea id="item-routes" class="form-control" rows="2" placeholder="Centro, Barrio Norte, Terminal..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-schedule">Horarios</label>
+                            <textarea id="item-schedule" class="form-control" rows="2" placeholder="24 horas / Lun-Vie 06:00-22:00"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-col">
+                        <h4>Ubicacion y Contacto</h4>
+                        <div class="form-group">
+                            <label for="item-zone">Zona</label>
+                            <select id="item-zone" class="form-control">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="item-address">Direccion / Base</label>
+                            <input type="text" id="item-address" class="form-control" placeholder="Av. Belgrano 123">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-phone">Telefono</label>
+                            <input type="tel" id="item-phone" class="form-control" placeholder="0385-4123456">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-email">Email</label>
+                            <input type="email" id="item-email" class="form-control" placeholder="contacto@empresa.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-website">Sitio Web</label>
+                            <input type="url" id="item-website" class="form-control" placeholder="https://...">
+                        </div>
+                    </div>
+
+                    <div class="modal-col">
+                        <h4>Imagen</h4>
+                        <input type="file" id="item-image-file" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+                        <input type="hidden" id="item-image-url">
+                        <div class="image-preview-container" onclick="document.getElementById('item-image-file').click()">
+                            <div class="placeholder" id="image-preview">
+                                <span>+</span>Click para subir
+                            </div>
+                        </div>
+
+                        <h4 style="margin-top: 0.5rem;">Estado</h4>
+                        <div class="form-group">
+                            <label for="item-status">Estado</label>
+                            <select id="item-status" class="form-control">
+                                <option value="pending">Pendiente</option>
+                                <option value="approved">Aprobado</option>
+                                <option value="rejected">Rechazado</option>
+                            </select>
+                        </div>
+                        <div class="form-group featured-check" style="padding: 0.5rem; border-radius: 6px;">
+                            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                                <input type="checkbox" id="item-featured">
+                                <span>Destacado</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="item-descripcion">Descripción *</label>
-                    <textarea id="item-descripcion" class="form-control" rows="4" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-imagen">URL de Imagen</label>
-                    <input type="url" id="item-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-categoria">Categoría</label>
-                    <select id="item-categoria" class="form-control">
-                        <option value="">Sin categoría</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-zona">Zona</label>
-                    <select id="item-zona" class="form-control">
-                        <option value="">Sin zona específica</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-direccion">Dirección</label>
-                    <input type="text" id="item-direccion" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-telefono">Teléfono</label>
-                    <input type="tel" id="item-telefono" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-whatsapp">WhatsApp</label>
-                    <input type="tel" id="item-whatsapp" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-horarios">Horarios</label>
-                    <textarea id="item-horarios" class="form-control" rows="2" placeholder="Ej: Lun-Vie 12:00-23:00"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-precio">Precio Promedio</label>
-                    <input type="number" id="item-precio" class="form-control" step="0.01" min="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-web">Sitio Web</label>
-                    <input type="url" id="item-web" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-estado">Estado</label>
-                    <select id="item-estado" class="form-control">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
-                    </select>
-                </div>
-
-                <div class="modal-footer">
+                <div class="modal-footer" style="margin-top: 1rem;">
                     <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
@@ -222,6 +1236,9 @@
         </div>
     </div>
 
+    <!-- Leaflet CSS & JS - Free map library -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
@@ -229,38 +1246,175 @@
     <script src="/js/components.js"></script>
     <script>
         if (!auth.getUser()) {
-            // Se redirige automáticamente
+            window.location.href = '/editor/login.html';
         }
-
         document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        const SECTION = 'transporte';
+        // Data
         let allItems = [];
         let filteredItems = [];
-        let categories = [];
+        let allBusLines = [];
+        let filteredBusLines = [];
+        let allBusStops = [];
         let zones = [];
+        let currentBusLineId = null;
+        let currentBusLineStops = [];
 
+        // Leaflet Map
+        let map = null;
+        let markers = [];
+        let markersLayer = null;
+
+        function initMap() {
+            const container = document.getElementById('stops-map');
+            if (!container || map) return;
+
+            // Santiago del Estero coordinates
+            const center = [-27.7833, -64.2667];
+
+            // Create map with dark theme tiles
+            map = L.map('stops-map').setView(center, 13);
+
+            // Dark theme tiles (CartoDB Dark Matter)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Layer group for markers
+            markersLayer = L.layerGroup().addTo(map);
+
+            // Click to add coordinates
+            map.on('click', function(e) {
+                document.getElementById('stop-lat').value = e.latlng.lat.toFixed(6);
+                document.getElementById('stop-lng').value = e.latlng.lng.toFixed(6);
+                showAddStopForm();
+            });
+        }
+
+        function clearMarkers() {
+            if (markersLayer) {
+                markersLayer.clearLayers();
+            }
+            markers = [];
+        }
+
+        function addStopMarkers(stops, lineColor = '#a855f7') {
+            clearMarkers();
+            if (!map) return;
+
+            const validStops = stops.filter(s => s.latitude && s.longitude);
+
+            if (validStops.length === 0) return;
+
+            // Determine marker color based on stop type
+            const getMarkerColor = (stopType) => {
+                if (stopType === 'inicio') return '#22c55e';  // Green for start
+                if (stopType === 'fin') return '#ef4444';     // Red for end
+                return lineColor;                              // Line color for normal
+            };
+
+            const getMarkerIcon = (stopType) => {
+                if (stopType === 'inicio') return '🚀';
+                if (stopType === 'fin') return '🏁';
+                return null;
+            };
+
+            validStops.forEach((stop, index) => {
+                const lat = parseFloat(stop.latitude);
+                const lng = parseFloat(stop.longitude);
+                const markerColor = getMarkerColor(stop.stop_type);
+                const markerIcon = getMarkerIcon(stop.stop_type);
+
+                // Add number label with type-based color
+                const numberIcon = L.divIcon({
+                    className: 'stop-number-icon',
+                    html: `<div style="
+                        background: ${markerColor};
+                        color: #fff;
+                        width: ${markerIcon ? '32px' : '26px'};
+                        height: ${markerIcon ? '32px' : '26px'};
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-weight: bold;
+                        font-size: ${markerIcon ? '14px' : '12px'};
+                        border: 2px solid #fff;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+                    ">${markerIcon || (index + 1)}</div>`,
+                    iconSize: [markerIcon ? 32 : 26, markerIcon ? 32 : 26],
+                    iconAnchor: [markerIcon ? 16 : 13, markerIcon ? 16 : 13]
+                });
+
+                const numberMarker = L.marker([lat, lng], { icon: numberIcon });
+
+                // Popup with type info
+                const typeLabel = stop.stop_type === 'inicio' ? '<span style="color:#22c55e">🚀 INICIO</span>' :
+                                  stop.stop_type === 'fin' ? '<span style="color:#ef4444">🏁 FIN</span>' : '';
+
+                numberMarker.bindPopup(`
+                    <div style="color:#000; min-width: 150px;">
+                        <strong>${stop.name}</strong> ${typeLabel}
+                        ${stop.address ? `<br><small>${stop.address}</small>` : ''}
+                        ${stop.arrival_times ? `<br><small style="color:#666">🕐 ${stop.arrival_times}</small>` : ''}
+                    </div>
+                `);
+
+                markersLayer.addLayer(numberMarker);
+                markers.push(numberMarker);
+            });
+
+            // Fit bounds to markers
+            if (validStops.length > 0) {
+                const bounds = L.latLngBounds(validStops.map(s => [parseFloat(s.latitude), parseFloat(s.longitude)]));
+                map.fitBounds(bounds, { padding: [30, 30] });
+
+                if (validStops.length === 1) {
+                    map.setZoom(15);
+                }
+            }
+        }
+
+        // Tab switching
+        function switchTab(tab) {
+            document.querySelectorAll('.transport-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+        }
+
+        // Data loading
         async function loadData() {
             try {
-                const [itemsResponse, categoriesResponse, zonesResponse] = await Promise.all([
-                    api.getAdminProducts({ section: SECTION }),
-                    api.getAdminCategories('productos'),
+                const [itemsRes, busLinesRes, stopsRes, zonesRes] = await Promise.all([
+                    api.getAdminTransport(),
+                    api.getAdminBusLines(),
+                    api.getAdminBusStops(),
                     api.getAdminZones()
                 ]);
 
-                if (itemsResponse.success) {
-                    allItems = itemsResponse.data[SECTION] || itemsResponse.data || [];
-                    applyFilters();
-                    updateStats();
+                if (itemsRes.success) {
+                    allItems = itemsRes.data.items || [];
+                    updatePrivateStats();
+                    applyPrivateFilters();
                 }
 
-                if (categoriesResponse.success) {
-                    categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
-                    renderCategoryOptions();
+                if (busLinesRes.success) {
+                    allBusLines = busLinesRes.data.items || [];
+                    updateBusStats();
+                    applyBusFilters();
                 }
 
-                if (zonesResponse.success) {
-                    zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
+                if (stopsRes.success) {
+                    allBusStops = stopsRes.data.items || [];
+                    document.getElementById('stat-bus-stops').textContent = allBusStops.length;
+                }
+
+                if (zonesRes.success) {
+                    zones = zonesRes.data || [];
                     renderZoneOptions();
                 }
             } catch (e) {
@@ -269,274 +1423,783 @@
             }
         }
 
-        function renderCategoryOptions() {
-            const select = document.getElementById('item-categoria');
-            select.innerHTML = '<option value="">Sin categoría</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
-        }
-
         function renderZoneOptions() {
-            const select = document.getElementById('item-zona');
-            select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
+            const opts = zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+            document.getElementById('item-zone').innerHTML = '<option value="">Seleccionar...</option>' + opts;
+            document.getElementById('filter-zone').innerHTML = '<option value="">Todas las zonas</option>' + opts;
         }
 
-        function applyFilters() {
-            const search = document.getElementById('search').value.toLowerCase();
-            const status = document.getElementById('filter-status').value;
+        // Bus Lines
+        function updateBusStats() {
+            document.getElementById('stat-bus-total').textContent = allBusLines.length;
+            document.getElementById('stat-bus-approved').textContent = allBusLines.filter(i => i.status === 'approved').length;
+            document.getElementById('stat-bus-featured').textContent = allBusLines.filter(i => i.featured === 1).length;
+        }
 
-            filteredItems = allItems.filter(item => {
+        function applyBusFilters() {
+            const search = document.getElementById('bus-search').value.toLowerCase();
+            const status = document.getElementById('bus-filter-status').value;
+
+            filteredBusLines = allBusLines.filter(i => {
                 const matchSearch = !search ||
-                    item.titulo.toLowerCase().includes(search) ||
-                    (item.descripcion && item.descripcion.toLowerCase().includes(search));
-
-                const matchStatus = !status || item.estado === status;
-
+                    i.name?.toLowerCase().includes(search) ||
+                    i.line_number?.toLowerCase().includes(search) ||
+                    i.company?.toLowerCase().includes(search);
+                const matchStatus = !status || i.status === status;
                 return matchSearch && matchStatus;
             });
 
-            renderTable();
+            renderBusLines();
         }
 
-        function renderTable() {
-            const container = document.getElementById('items-table-container');
-
-            if (filteredItems.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron registros</p>';
+        function renderBusLines() {
+            const container = document.getElementById('bus-container');
+            if (filteredBusLines.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No hay lineas de colectivos registradas</p>';
                 return;
             }
 
-            container.innerHTML = `
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Zona</th>
-                            <th>Categoría</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredItems.map(item => `
-                            <tr>
-                                <td>
-                                    <strong>${item.titulo}</strong>
-                                    ${item.descripcion ? `<br><small class="text-muted">${truncate(item.descripcion, 60)}</small>` : ''}
-                                </td>
-                                <td>${item.zona_nombre || '-'}</td>
-                                <td>
-                                    <span class="badge badge-secondary">
-                                        ${item.categoria_nombre || '-'}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-${getStatusBadgeClass(item.estado)}">
-                                        ${getStatusLabel(item.estado)}
-                                    </span>
-                                </td>
-                                <td>${formatDate(item.created_at)}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        ${item.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveItem(${item.id})" title="Aprobar">
-                                                ✅
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectItem(${item.id})" title="Rechazar">
-                                                ❌
-                                            </button>
-                                        ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editItem(${item.id})" title="Editar">
-                                            ✏️
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})" title="Eliminar">
-                                            🗑️
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+            container.innerHTML = filteredBusLines.map(bus => {
+                const stopsCount = allBusStops.filter(s => s.bus_line_id === bus.id).length;
+                return `
+                <div class="bus-card">
+                    <div class="bus-card-header">
+                        <div class="bus-line-badge" style="background: ${bus.color || '#a855f7'}">
+                            ${bus.line_number}
+                        </div>
+                        <div class="bus-card-info">
+                            <h4 class="bus-card-title">
+                                ${bus.featured ? '<span class="featured-star">⭐</span> ' : ''}${bus.name}
+                            </h4>
+                            <p class="bus-card-company">${bus.company || 'Sin empresa'}</p>
+                        </div>
+                        <span class="badge badge-${bus.status}">${getStatusLabel(bus.status)}</span>
+                    </div>
+                    <div class="bus-card-body">
+                        <div class="bus-card-meta">
+                            <span>🚏 ${stopsCount} paradas</span>
+                            ${bus.price ? `<span>💵 $${bus.price}</span>` : ''}
+                        </div>
+                        ${bus.route_description ? `<p class="bus-card-route">${bus.route_description.substring(0, 100)}${bus.route_description.length > 100 ? '...' : ''}</p>` : ''}
+                        <div class="bus-card-actions">
+                            <button class="btn btn-sm btn-outline" onclick="openStopsModal(${bus.id})">🚏 Paradas</button>
+                            <button class="btn btn-sm btn-outline" onclick="editBusLine(${bus.id})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteBusLine(${bus.id})">Borrar</button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
         }
 
-        function updateStats() {
-            document.getElementById('total-items').textContent = allItems.length;
-            document.getElementById('active-items').textContent = allItems.filter(i => i.estado === 'aprobado').length;
-            document.getElementById('pending-items').textContent = allItems.filter(i => i.estado === 'pendiente').length;
-            document.getElementById('rejected-items').textContent = allItems.filter(i => i.estado === 'rechazado').length;
+        function showCreateBusModal() {
+            document.getElementById('bus-modal-title').textContent = 'Nueva Linea de Colectivo';
+            document.getElementById('bus-form').reset();
+            document.getElementById('bus-id').value = '';
+            document.getElementById('bus-status').value = 'pending';
+            document.getElementById('bus-color').value = '#a855f7';
+            resetScheduleEditor();
+            updateColorPreview();
+            openBusModal();
         }
 
-        function getStatusBadgeClass(status) {
-            const classes = {
-                pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
+        function editBusLine(id) {
+            const bus = allBusLines.find(x => x.id === id);
+            if (!bus) return;
+
+            document.getElementById('bus-modal-title').textContent = 'Editar Linea de Colectivo';
+            document.getElementById('bus-id').value = bus.id;
+            document.getElementById('bus-line-number').value = bus.line_number || '';
+            document.getElementById('bus-name').value = bus.name || '';
+            document.getElementById('bus-company').value = bus.company || '';
+            document.getElementById('bus-description').value = bus.description || '';
+            document.getElementById('bus-route-desc').value = bus.route_description || '';
+            document.getElementById('bus-price').value = bus.price || '';
+            document.getElementById('bus-color').value = bus.color || '#a855f7';
+            document.getElementById('bus-status').value = bus.status || 'pending';
+            document.getElementById('bus-featured').checked = bus.featured === 1;
+            setScheduleFromString(bus.schedule || '');
+            updateColorPreview();
+            openBusModal();
+        }
+
+        // Schedule Editor Functions
+        function resetScheduleEditor() {
+            const defaults = {
+                lun: { active: true, from: '06:00', to: '22:00' },
+                mar: { active: true, from: '06:00', to: '22:00' },
+                mie: { active: true, from: '06:00', to: '22:00' },
+                jue: { active: true, from: '06:00', to: '22:00' },
+                vie: { active: true, from: '06:00', to: '22:00' },
+                sab: { active: true, from: '07:00', to: '20:00' },
+                dom: { active: false, from: '08:00', to: '18:00' }
             };
-            return classes[status] || 'secondary';
-        }
 
-        function getStatusLabel(status) {
-            const labels = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
-            };
-            return labels[status] || status;
-        }
+            document.querySelectorAll('.schedule-row').forEach(row => {
+                const day = row.dataset.day;
+                const def = defaults[day] || { active: true, from: '06:00', to: '22:00' };
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const fromInput = row.querySelector('.schedule-from');
+                const toInput = row.querySelector('.schedule-to');
 
-        function truncate(text, maxLength) {
-            if (!text) return '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
+                checkbox.checked = def.active;
+                fromInput.value = def.from;
+                toInput.value = def.to;
+                fromInput.disabled = !def.active;
+                toInput.disabled = !def.active;
+                row.classList.toggle('disabled', !def.active);
             });
         }
 
-        function resetFilters() {
-            document.getElementById('search').value = '';
-            document.getElementById('filter-status').value = '';
-            applyFilters();
+        function getScheduleString() {
+            const days = { lun: 'Lun', mar: 'Mar', mie: 'Mie', jue: 'Jue', vie: 'Vie', sab: 'Sab', dom: 'Dom' };
+            const schedule = [];
+
+            document.querySelectorAll('.schedule-row').forEach(row => {
+                const day = row.dataset.day;
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const fromInput = row.querySelector('.schedule-from');
+                const toInput = row.querySelector('.schedule-to');
+
+                if (checkbox.checked) {
+                    schedule.push(`${days[day]}: ${fromInput.value} - ${toInput.value}`);
+                }
+            });
+
+            return schedule.join('\n');
         }
 
-        async function approveItem(itemId) {
-            if (!confirm('¿Aprobar este registro?')) return;
+        function setScheduleFromString(scheduleStr) {
+            // Reset first
+            document.querySelectorAll('.schedule-row').forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const fromInput = row.querySelector('.schedule-from');
+                const toInput = row.querySelector('.schedule-to');
+                checkbox.checked = false;
+                fromInput.disabled = true;
+                toInput.disabled = true;
+                row.classList.add('disabled');
+            });
+
+            if (!scheduleStr) {
+                resetScheduleEditor();
+                return;
+            }
+
+            const dayMap = {
+                'lun': 'lun', 'mar': 'mar', 'mie': 'mie', 'miercoles': 'mie',
+                'jue': 'jue', 'vie': 'vie', 'sab': 'sab', 'dom': 'dom',
+                'lunes': 'lun', 'martes': 'mar', 'jueves': 'jue',
+                'viernes': 'vie', 'sabado': 'sab', 'domingo': 'dom'
+            };
+
+            const lines = scheduleStr.split('\n');
+            lines.forEach(line => {
+                const match = line.match(/^(\w+):\s*(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/i);
+                if (match) {
+                    const dayKey = dayMap[match[1].toLowerCase()];
+                    if (dayKey) {
+                        const row = document.querySelector(`.schedule-row[data-day="${dayKey}"]`);
+                        if (row) {
+                            const checkbox = row.querySelector('input[type="checkbox"]');
+                            const fromInput = row.querySelector('.schedule-from');
+                            const toInput = row.querySelector('.schedule-to');
+                            checkbox.checked = true;
+                            fromInput.value = match[2].padStart(5, '0');
+                            toInput.value = match[3].padStart(5, '0');
+                            fromInput.disabled = false;
+                            toInput.disabled = false;
+                            row.classList.remove('disabled');
+                        }
+                    }
+                }
+            });
+        }
+
+        function initScheduleEditor() {
+            document.querySelectorAll('.schedule-row').forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                const fromInput = row.querySelector('.schedule-from');
+                const toInput = row.querySelector('.schedule-to');
+
+                checkbox.addEventListener('change', function() {
+                    fromInput.disabled = !this.checked;
+                    toInput.disabled = !this.checked;
+                    row.classList.toggle('disabled', !this.checked);
+                });
+            });
+        }
+
+        function updateColorPreview() {
+            const color = document.getElementById('bus-color').value;
+            const lineNum = document.getElementById('bus-line-number').value || '10';
+            const preview = document.getElementById('color-preview');
+            preview.style.background = color;
+            preview.textContent = lineNum;
+        }
+
+        async function saveBusLine(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('bus-id').value;
+            const data = {
+                line_number: document.getElementById('bus-line-number').value.trim(),
+                name: document.getElementById('bus-name').value.trim(),
+                company: document.getElementById('bus-company').value.trim() || null,
+                description: document.getElementById('bus-description').value.trim() || null,
+                route_description: document.getElementById('bus-route-desc').value.trim() || null,
+                schedule: getScheduleString() || null,
+                price: parseFloat(document.getElementById('bus-price').value) || null,
+                color: document.getElementById('bus-color').value,
+                status: document.getElementById('bus-status').value,
+                featured: document.getElementById('bus-featured').checked
+            };
+
+            if (!data.line_number || !data.name) {
+                Components.toast('Numero de linea y nombre son requeridos', 'error');
+                return;
+            }
 
             try {
-                const response = await api.adminUpdateProduct(itemId, { estado: 'aprobado' });
-                if (response.success) {
-                    Components.toast('Registro aprobado exitosamente', 'success');
+                let res;
+                if (id) {
+                    res = await api.updateBusLine(id, data);
+                } else {
+                    res = await api.createBusLine(data);
+                }
+
+                if (res.success) {
+                    Components.toast(id ? 'Linea actualizada' : 'Linea creada', 'success');
+                    closeBusModal();
                     loadData();
+                } else {
+                    Components.toast(res.message || 'Error guardando', 'error');
                 }
             } catch (e) {
-                console.error('Error approving item:', e);
-                Components.toast('Error aprobando registro', 'error');
+                console.error('Error saving bus line:', e);
+                Components.toast('Error guardando: ' + e.message, 'error');
             }
         }
 
-        async function rejectItem(itemId) {
-            if (!confirm('¿Rechazar este registro?')) return;
-
+        async function deleteBusLine(id) {
+            if (!confirm('Eliminar esta linea? Se eliminaran tambien todas sus paradas.')) return;
             try {
-                const response = await api.adminUpdateProduct(itemId, { estado: 'rechazado' });
-                if (response.success) {
-                    Components.toast('Registro rechazado', 'success');
+                const res = await api.deleteBusLine(id);
+                if (res.success) {
+                    Components.toast('Linea eliminada', 'success');
                     loadData();
                 }
             } catch (e) {
-                console.error('Error rejecting item:', e);
-                Components.toast('Error rechazando registro', 'error');
+                Components.toast('Error eliminando', 'error');
             }
         }
 
-        async function deleteItem(itemId) {
-            if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+        // Bus Stops
+        function openStopsModal(busLineId) {
+            currentBusLineId = busLineId;
+            const bus = allBusLines.find(b => b.id === busLineId);
+            if (!bus) return;
+
+            document.getElementById('stops-modal-title').textContent = `Paradas - Linea ${bus.line_number}: ${bus.name}`;
+            currentBusLineStops = allBusStops.filter(s => s.bus_line_id === busLineId).sort((a, b) => a.stop_order - b.stop_order);
+
+            renderStops();
+            hideAddStopForm();
+
+            document.getElementById('stops-modal').classList.add('active');
+            document.getElementById('modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            setTimeout(() => {
+                initMap();
+                if (map) {
+                    addStopMarkers(currentBusLineStops, bus.color || '#a855f7');
+                }
+            }, 100);
+        }
+
+        function renderStops() {
+            const container = document.getElementById('stops-list');
+            document.getElementById('stops-count').textContent = currentBusLineStops.length;
+
+            if (currentBusLineStops.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No hay paradas registradas</p>';
+                return;
+            }
+
+            const getStopTypeBadge = (type) => {
+                if (type === 'inicio') return '<span class="stop-type-badge inicio">🚀 INICIO</span>';
+                if (type === 'fin') return '<span class="stop-type-badge fin">🏁 FIN</span>';
+                return '';
+            };
+
+            const getStopOrderClass = (type) => {
+                if (type === 'inicio') return 'stop-order inicio';
+                if (type === 'fin') return 'stop-order fin';
+                return 'stop-order';
+            };
+
+            container.innerHTML = currentBusLineStops.map((stop, index) => `
+                <div class="stop-item ${stop.stop_type || ''}">
+                    <div class="${getStopOrderClass(stop.stop_type)}">${index + 1}</div>
+                    <div class="stop-info">
+                        <div class="stop-name">
+                            ${stop.name}
+                            ${getStopTypeBadge(stop.stop_type)}
+                        </div>
+                        ${stop.address ? `<div class="stop-address">${stop.address}</div>` : ''}
+                    </div>
+                    <div class="stop-times">
+                        ${stop.arrival_times ? `<span class="times-badge">🕐 ${stop.arrival_times}</span>` : '<span class="no-times">Sin horarios</span>'}
+                    </div>
+                    <div class="stop-actions">
+                        <button class="btn btn-outline" onclick="editStop(${stop.id})">Editar</button>
+                        <button class="btn btn-danger" onclick="deleteStop(${stop.id})">X</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddStopForm() {
+            document.getElementById('add-stop-form').style.display = 'block';
+        }
+
+        function hideAddStopForm() {
+            document.getElementById('add-stop-form').style.display = 'none';
+            document.getElementById('stop-id').value = '';
+            document.getElementById('stop-name').value = '';
+            document.getElementById('stop-type').value = 'normal';
+            document.getElementById('stop-address').value = '';
+            document.getElementById('stop-lat').value = '';
+            document.getElementById('stop-lng').value = '';
+            document.getElementById('stop-times').value = '';
+            document.getElementById('arrival-times-list').innerHTML = '';
+            document.getElementById('new-arrival-time').value = '06:00';
+        }
+
+        // Arrival Times Functions
+        function addArrivalTime() {
+            const timeInput = document.getElementById('new-arrival-time');
+            const time = timeInput.value;
+            if (!time) return;
+
+            const list = document.getElementById('arrival-times-list');
+
+            // Check if already exists
+            const existingTimes = Array.from(list.querySelectorAll('.arrival-time-chip'))
+                .map(chip => chip.dataset.time);
+            if (existingTimes.includes(time)) {
+                Components.toast('Este horario ya fue agregado', 'error');
+                return;
+            }
+
+            // Create chip
+            const chip = document.createElement('span');
+            chip.className = 'arrival-time-chip';
+            chip.dataset.time = time;
+            chip.innerHTML = `
+                <span class="time-icon">🕐</span>
+                <span>${time}</span>
+                <button type="button" class="remove-time" onclick="removeArrivalTime(this)">×</button>
+            `;
+            list.appendChild(chip);
+
+            // Update hidden field
+            updateArrivalTimesField();
+
+            // Reset input to next time (30 min later)
+            const [h, m] = time.split(':').map(Number);
+            const newMin = (m + 30) % 60;
+            const newHour = (h + Math.floor((m + 30) / 60)) % 24;
+            timeInput.value = `${String(newHour).padStart(2, '0')}:${String(newMin).padStart(2, '0')}`;
+        }
+
+        function removeArrivalTime(btn) {
+            btn.closest('.arrival-time-chip').remove();
+            updateArrivalTimesField();
+        }
+
+        function updateArrivalTimesField() {
+            const list = document.getElementById('arrival-times-list');
+            const times = Array.from(list.querySelectorAll('.arrival-time-chip'))
+                .map(chip => chip.dataset.time)
+                .sort();
+            document.getElementById('stop-times').value = times.join(', ');
+        }
+
+        function loadArrivalTimes(timesStr) {
+            const list = document.getElementById('arrival-times-list');
+            list.innerHTML = '';
+
+            if (!timesStr) return;
+
+            const times = timesStr.split(',').map(t => t.trim()).filter(t => t);
+            times.forEach(time => {
+                const chip = document.createElement('span');
+                chip.className = 'arrival-time-chip';
+                chip.dataset.time = time;
+                chip.innerHTML = `
+                    <span class="time-icon">🕐</span>
+                    <span>${time}</span>
+                    <button type="button" class="remove-time" onclick="removeArrivalTime(this)">×</button>
+                `;
+                list.appendChild(chip);
+            });
+
+            updateArrivalTimesField();
+        }
+
+        function editStop(id) {
+            const stop = currentBusLineStops.find(s => s.id === id);
+            if (!stop) return;
+
+            document.getElementById('stop-id').value = stop.id;
+            document.getElementById('stop-name').value = stop.name || '';
+            document.getElementById('stop-type').value = stop.stop_type || 'normal';
+            document.getElementById('stop-address').value = stop.address || '';
+            document.getElementById('stop-lat').value = stop.latitude || '';
+            document.getElementById('stop-lng').value = stop.longitude || '';
+            loadArrivalTimes(stop.arrival_times || '');
+            showAddStopForm();
+        }
+
+        async function saveStop() {
+            const id = document.getElementById('stop-id').value;
+            const data = {
+                bus_line_id: currentBusLineId,
+                name: document.getElementById('stop-name').value.trim(),
+                stop_type: document.getElementById('stop-type').value,
+                address: document.getElementById('stop-address').value.trim() || null,
+                latitude: parseFloat(document.getElementById('stop-lat').value) || null,
+                longitude: parseFloat(document.getElementById('stop-lng').value) || null,
+                arrival_times: document.getElementById('stop-times').value.trim() || null
+            };
+
+            if (!data.name) {
+                Components.toast('El nombre de la parada es requerido', 'error');
+                return;
+            }
 
             try {
-                const response = await api.deleteProduct(itemId);
-                if (response.success) {
-                    Components.toast('Registro eliminado exitosamente', 'success');
-                    loadData();
+                let res;
+                if (id) {
+                    res = await api.updateBusStop(id, data);
+                } else {
+                    res = await api.createBusStop(data);
+                }
+
+                if (res.success) {
+                    Components.toast(id ? 'Parada actualizada' : 'Parada agregada', 'success');
+                    hideAddStopForm();
+                    // Reload stops
+                    const stopsRes = await api.getAdminBusStops({ bus_line_id: currentBusLineId });
+                    if (stopsRes.success) {
+                        allBusStops = allBusStops.filter(s => s.bus_line_id !== currentBusLineId);
+                        allBusStops.push(...(stopsRes.data.items || []));
+                        currentBusLineStops = (stopsRes.data.items || []).sort((a, b) => a.stop_order - b.stop_order);
+                        renderStops();
+                        const bus = allBusLines.find(b => b.id === currentBusLineId);
+                        addStopMarkers(currentBusLineStops, bus?.color || '#a855f7');
+                        document.getElementById('stat-bus-stops').textContent = allBusStops.length;
+                    }
+                    renderBusLines();
+                } else {
+                    Components.toast(res.message || 'Error guardando', 'error');
                 }
             } catch (e) {
-                console.error('Error deleting item:', e);
-                Components.toast('Error eliminando registro', 'error');
+                console.error('Error saving stop:', e);
+                Components.toast('Error guardando: ' + e.message, 'error');
             }
+        }
+
+        async function deleteStop(id) {
+            if (!confirm('Eliminar esta parada?')) return;
+            try {
+                const res = await api.deleteBusStop(id);
+                if (res.success) {
+                    Components.toast('Parada eliminada', 'success');
+                    currentBusLineStops = currentBusLineStops.filter(s => s.id !== id);
+                    allBusStops = allBusStops.filter(s => s.id !== id);
+                    renderStops();
+                    const bus = allBusLines.find(b => b.id === currentBusLineId);
+                    addStopMarkers(currentBusLineStops, bus?.color || '#a855f7');
+                    document.getElementById('stat-bus-stops').textContent = allBusStops.length;
+                    renderBusLines();
+                }
+            } catch (e) {
+                Components.toast('Error eliminando', 'error');
+            }
+        }
+
+        // Private Transport
+        function updatePrivateStats() {
+            document.getElementById('stat-total').textContent = allItems.length;
+            document.getElementById('stat-approved').textContent = allItems.filter(i => i.status === 'approved').length;
+            document.getElementById('stat-pending').textContent = allItems.filter(i => i.status === 'pending').length;
+            document.getElementById('stat-featured').textContent = allItems.filter(i => i.featured === 1).length;
+        }
+
+        function applyPrivateFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const status = document.getElementById('filter-status').value;
+            const zoneId = document.getElementById('filter-zone').value;
+
+            filteredItems = allItems.filter(i => {
+                const matchSearch = !search ||
+                    i.name?.toLowerCase().includes(search) ||
+                    i.description?.toLowerCase().includes(search) ||
+                    i.routes?.toLowerCase().includes(search);
+                const matchStatus = !status || i.status === status;
+                const matchZone = !zoneId || i.zone_id == zoneId;
+                return matchSearch && matchStatus && matchZone;
+            });
+
+            renderItems();
+        }
+
+        function getStatusLabel(status) {
+            const labels = { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' };
+            return labels[status] || status;
+        }
+
+        function renderItems() {
+            const container = document.getElementById('items-container');
+            if (filteredItems.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No hay transportes privados registrados</p>';
+                return;
+            }
+
+            container.innerHTML = filteredItems.map(i => `
+                <div class="transporte-card">
+                    ${i.image_url ? `<img src="${i.image_url}" class="transporte-card-image" alt="${i.name}">` :
+                        `<div class="transporte-card-image" style="display:flex;align-items:center;justify-content:center;font-size:3rem;">🚗</div>`}
+                    <div class="transporte-card-body">
+                        <div class="transporte-card-header">
+                            <h4 class="transporte-card-title">
+                                ${i.featured ? '<span class="featured-star">⭐</span> ' : ''}${i.name}
+                            </h4>
+                            <span class="badge badge-${i.status}">${getStatusLabel(i.status)}</span>
+                        </div>
+                        <div class="transporte-card-meta">
+                            ${i.zone_name ? `<span>📍 ${i.zone_name}</span>` : ''}
+                            ${i.phone ? `<span>📞 ${i.phone}</span>` : ''}
+                        </div>
+                        ${i.routes ? `<p style="font-size:0.8rem;color:rgba(255,255,255,0.5);margin:0.5rem 0;">${i.routes.substring(0, 80)}${i.routes.length > 80 ? '...' : ''}</p>` : ''}
+                        <div class="transporte-card-actions">
+                            ${i.status === 'pending' ? `
+                                <button class="btn btn-sm btn-success" onclick="approveItem(${i.id})">Aprobar</button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectItem(${i.id})">Rechazar</button>
+                            ` : ''}
+                            <button class="btn btn-sm btn-outline" onclick="editItem(${i.id})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteItem(${i.id})">Borrar</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Modal functions
+        function openBusModal() {
+            document.getElementById('bus-modal').classList.add('active');
+            document.getElementById('modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBusModal() {
+            document.getElementById('bus-modal').classList.remove('active');
+            document.getElementById('modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeStopsModal() {
+            document.getElementById('stops-modal').classList.remove('active');
+            document.getElementById('modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+            currentBusLineId = null;
+            currentBusLineStops = [];
+            clearMarkers();
+            // Destroy Leaflet map to prevent issues on reopen
+            if (map) {
+                map.remove();
+                map = null;
+                markersLayer = null;
+            }
+        }
+
+        function openModal() {
+            document.getElementById('transporte-modal').classList.add('active');
+            document.getElementById('modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('transporte-modal').classList.remove('active');
+            document.getElementById('modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function closeAllModals() {
+            closeBusModal();
+            closeStopsModal();
+            closeModal();
         }
 
         function showCreateModal() {
-            document.getElementById('modal-title').textContent = 'Nuevo Transporte';
-            document.getElementById('item-form').reset();
+            document.getElementById('modal-title').textContent = 'Nuevo Transporte Privado';
+            document.getElementById('transporte-form').reset();
             document.getElementById('item-id').value = '';
-            document.getElementById('item-estado').value = 'pendiente';
+            document.getElementById('item-status').value = 'pending';
+            document.getElementById('item-image-url').value = '';
+            document.getElementById('image-preview').innerHTML = '<span>+</span>Click para subir imagen';
+            document.getElementById('image-preview').className = 'placeholder';
             openModal();
         }
 
-        function editItem(itemId) {
-            const item = allItems.find(i => i.id === itemId);
-            if (!item) return;
+        function editItem(id) {
+            const i = allItems.find(x => x.id === id);
+            if (!i) return;
 
             document.getElementById('modal-title').textContent = 'Editar Transporte';
-            document.getElementById('item-id').value = item.id;
-            document.getElementById('item-titulo').value = item.titulo || '';
-            document.getElementById('item-descripcion').value = item.descripcion || '';
-            document.getElementById('item-imagen').value = item.imagen_url || '';
-            document.getElementById('item-categoria').value = item.categoria_id || '';
-            document.getElementById('item-zona').value = item.zona_id || '';
-            document.getElementById('item-direccion').value = item.direccion || '';
-            document.getElementById('item-telefono').value = item.telefono || '';
-            document.getElementById('item-whatsapp').value = item.whatsapp || '';
-            document.getElementById('item-horarios').value = item.horarios || '';
-            document.getElementById('item-precio').value = item.precio || '';
-            document.getElementById('item-web').value = item.sitio_web || '';
-            document.getElementById('item-estado').value = item.estado || 'pendiente';
+            document.getElementById('item-id').value = i.id;
+            document.getElementById('item-name').value = i.name || '';
+            document.getElementById('item-description').value = i.description || '';
+            document.getElementById('item-routes').value = i.routes || '';
+            document.getElementById('item-schedule').value = i.schedule || '';
+            document.getElementById('item-zone').value = i.zone_id || '';
+            document.getElementById('item-address').value = i.address || '';
+            document.getElementById('item-phone').value = i.phone || '';
+            document.getElementById('item-email').value = i.email || '';
+            document.getElementById('item-website').value = i.website || '';
+            document.getElementById('item-status').value = i.status || 'pending';
+            document.getElementById('item-featured').checked = i.featured === 1;
+            document.getElementById('item-image-url').value = i.image_url || '';
+
+            const preview = document.getElementById('image-preview');
+            if (i.image_url) {
+                preview.innerHTML = `<img src="${i.image_url}" alt="Preview">`;
+                preview.className = '';
+            } else {
+                preview.innerHTML = '<span>+</span>Click para subir imagen';
+                preview.className = 'placeholder';
+            }
+
             openModal();
+        }
+
+        async function handleImageUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            if (file.size > 10 * 1024 * 1024) {
+                Components.toast('Imagen muy grande (max 10MB)', 'error');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                document.getElementById('item-image-url').value = base64;
+                const preview = document.getElementById('image-preview');
+                preview.innerHTML = `<img src="${base64}" alt="Preview">`;
+                preview.className = '';
+            };
+            reader.readAsDataURL(file);
         }
 
         async function saveItem(event) {
             event.preventDefault();
 
-            const itemId = document.getElementById('item-id').value;
+            const id = document.getElementById('item-id').value;
             const data = {
-                titulo: document.getElementById('item-titulo').value,
-                descripcion: document.getElementById('item-descripcion').value,
-                imagen_url: document.getElementById('item-imagen').value || null,
-                categoria_id: document.getElementById('item-categoria').value || null,
-                zona_id: document.getElementById('item-zona').value || null,
-                direccion: document.getElementById('item-direccion').value || null,
-                telefono: document.getElementById('item-telefono').value || null,
-                whatsapp: document.getElementById('item-whatsapp').value || null,
-                horarios: document.getElementById('item-horarios').value || null,
-                precio: document.getElementById('item-precio').value ? parseFloat(document.getElementById('item-precio').value) : null,
-                sitio_web: document.getElementById('item-web').value || null,
-                estado: document.getElementById('item-estado').value,
-                section: SECTION
+                name: document.getElementById('item-name').value.trim(),
+                description: document.getElementById('item-description').value.trim() || null,
+                routes: document.getElementById('item-routes').value.trim() || null,
+                schedule: document.getElementById('item-schedule').value.trim() || null,
+                zone_id: document.getElementById('item-zone').value || null,
+                address: document.getElementById('item-address').value.trim() || null,
+                phone: document.getElementById('item-phone').value.trim() || null,
+                email: document.getElementById('item-email').value.trim() || null,
+                website: document.getElementById('item-website').value.trim() || null,
+                status: document.getElementById('item-status').value,
+                featured: document.getElementById('item-featured').checked,
+                image_url: document.getElementById('item-image-url').value || null
             };
 
+            if (!data.name) {
+                Components.toast('El nombre es requerido', 'error');
+                return;
+            }
+
             try {
-                let response;
-                if (itemId) {
-                    response = await api.adminUpdateProduct(itemId, data);
+                let res;
+                if (id) {
+                    res = await api.updateTransport(id, data);
                 } else {
-                    response = await api.adminCreateProduct(data);
+                    res = await api.createTransport(data);
                 }
 
-                if (response.success) {
-                    Components.toast(itemId ? 'Registro actualizado exitosamente' : 'Registro creado exitosamente', 'success');
+                if (res.success) {
+                    Components.toast(id ? 'Transporte actualizado' : 'Transporte creado', 'success');
                     closeModal();
                     loadData();
+                } else {
+                    Components.toast(res.message || 'Error guardando', 'error');
                 }
             } catch (e) {
-                console.error('Error saving item:', e);
-                Components.toast(e.message || 'Error guardando registro', 'error');
+                console.error('Error saving:', e);
+                Components.toast('Error guardando: ' + e.message, 'error');
             }
         }
 
-        function openModal() {
-            document.getElementById('item-modal').classList.add('active');
-            document.getElementById('item-modal-backdrop').classList.add('active');
-            document.body.style.overflow = 'hidden';
+        async function approveItem(id) {
+            if (!confirm('Aprobar este transporte?')) return;
+            try {
+                const res = await api.updateTransportStatus(id, 'approved');
+                if (res.success) {
+                    Components.toast('Transporte aprobado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                Components.toast('Error aprobando', 'error');
+            }
         }
 
-        function closeModal() {
-            document.getElementById('item-modal').classList.remove('active');
-            document.getElementById('item-modal-backdrop').classList.remove('active');
-            document.body.style.overflow = '';
+        async function rejectItem(id) {
+            if (!confirm('Rechazar este transporte?')) return;
+            try {
+                const res = await api.updateTransportStatus(id, 'rejected');
+                if (res.success) {
+                    Components.toast('Transporte rechazado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                Components.toast('Error rechazando', 'error');
+            }
+        }
+
+        async function deleteItem(id) {
+            if (!confirm('Eliminar este transporte? Esta accion no se puede deshacer.')) return;
+            try {
+                const res = await api.deleteTransport(id);
+                if (res.success) {
+                    Components.toast('Transporte eliminado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                Components.toast('Error eliminando', 'error');
+            }
         }
 
         // Event listeners
-        document.getElementById('search').addEventListener('input', applyFilters);
-        document.getElementById('filter-status').addEventListener('change', applyFilters);
+        document.getElementById('bus-search').addEventListener('input', applyBusFilters);
+        document.getElementById('bus-filter-status').addEventListener('change', applyBusFilters);
+        document.getElementById('bus-line-number').addEventListener('input', updateColorPreview);
 
-        // Load initial data
+        document.getElementById('search').addEventListener('input', applyPrivateFilters);
+        document.getElementById('filter-status').addEventListener('change', applyPrivateFilters);
+        document.getElementById('filter-zone').addEventListener('change', applyPrivateFilters);
+
+        // Initialize schedule editor
+        initScheduleEditor();
+
         loadData();
     </script>
 </body>

@@ -56,6 +56,29 @@ import {
     handleAdminDeleteGastronomy, handleAdminUpdateGastronomyStatus, handleAdminToggleGastronomyFeatured
 } from './routes/gastronomy.js';
 
+// Accommodation routes
+import {
+    handleGetAccommodations, handleGetAccommodationById, handleGetAccommodationBySlug,
+    handleAdminGetAccommodations, handleAdminCreateAccommodation, handleAdminUpdateAccommodation,
+    handleAdminDeleteAccommodation, handleAdminUpdateAccommodationStatus, handleAdminToggleAccommodationFeatured
+} from './routes/accommodation.js';
+
+// Transport routes
+import {
+    handleGetTransport, handleGetTransportById,
+    handleAdminGetTransport, handleAdminCreateTransport, handleAdminUpdateTransport,
+    handleAdminDeleteTransport, handleAdminUpdateTransportStatus, handleAdminToggleTransportFeatured
+} from './routes/transport.js';
+
+// Bus routes (colectivos y paradas)
+import {
+    handleGetBusLines, handleGetBusLineById, handleGetBusStops,
+    handleAdminGetBusLines, handleAdminCreateBusLine, handleAdminUpdateBusLine,
+    handleAdminDeleteBusLine, handleAdminUpdateBusLineStatus, handleAdminToggleBusLineFeatured,
+    handleAdminGetBusStops, handleAdminCreateBusStop, handleAdminUpdateBusStop,
+    handleAdminDeleteBusStop, handleAdminReorderBusStops
+} from './routes/bus.js';
+
 // Simple router
 function matchRoute(method, path, routes) {
     for (const route of routes) {
@@ -252,6 +275,57 @@ const routes = [
     { method: 'DELETE', path: '/api/admin/gastronomy/:id', handler: (req, env, params) => handleAdminDeleteGastronomy(req, env, params.id) },
     { method: 'PATCH', path: '/api/admin/gastronomy/:id/status', handler: (req, env, params) => handleAdminUpdateGastronomyStatus(req, env, params.id) },
     { method: 'PATCH', path: '/api/admin/gastronomy/:id/featured', handler: (req, env, params) => handleAdminToggleGastronomyFeatured(req, env, params.id) },
+
+    // ========== ACCOMMODATION ROUTES ==========
+
+    // Accommodation (public)
+    { method: 'GET', path: '/api/accommodations', handler: handleGetAccommodations },
+    { method: 'GET', path: '/api/accommodations/:id', handler: (req, env, params) => handleGetAccommodationById(req, env, params.id) },
+    { method: 'GET', path: '/api/accommodations/slug/:slug', handler: (req, env, params) => handleGetAccommodationBySlug(req, env, params.slug) },
+
+    // Admin - Accommodation
+    { method: 'GET', path: '/api/admin/accommodations', handler: handleAdminGetAccommodations },
+    { method: 'POST', path: '/api/admin/accommodations', handler: handleAdminCreateAccommodation },
+    { method: 'PUT', path: '/api/admin/accommodations/:id', handler: (req, env, params) => handleAdminUpdateAccommodation(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/accommodations/:id', handler: (req, env, params) => handleAdminDeleteAccommodation(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/accommodations/:id/status', handler: (req, env, params) => handleAdminUpdateAccommodationStatus(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/accommodations/:id/featured', handler: (req, env, params) => handleAdminToggleAccommodationFeatured(req, env, params.id) },
+
+    // ========== TRANSPORT ROUTES ==========
+
+    // Transport (public)
+    { method: 'GET', path: '/api/transport', handler: handleGetTransport },
+    { method: 'GET', path: '/api/transport/:id', handler: (req, env, params) => handleGetTransportById(req, env, params.id) },
+
+    // Admin - Transport
+    { method: 'GET', path: '/api/admin/transport', handler: handleAdminGetTransport },
+    { method: 'POST', path: '/api/admin/transport', handler: handleAdminCreateTransport },
+    { method: 'PUT', path: '/api/admin/transport/:id', handler: (req, env, params) => handleAdminUpdateTransport(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/transport/:id', handler: (req, env, params) => handleAdminDeleteTransport(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/transport/:id/status', handler: (req, env, params) => handleAdminUpdateTransportStatus(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/transport/:id/featured', handler: (req, env, params) => handleAdminToggleTransportFeatured(req, env, params.id) },
+
+    // ========== BUS ROUTES (Colectivos) ==========
+
+    // Bus Lines (public)
+    { method: 'GET', path: '/api/bus-lines', handler: handleGetBusLines },
+    { method: 'GET', path: '/api/bus-lines/:id', handler: (req, env, params) => handleGetBusLineById(req, env, params.id) },
+    { method: 'GET', path: '/api/bus-stops', handler: handleGetBusStops },
+
+    // Admin - Bus Lines
+    { method: 'GET', path: '/api/admin/bus-lines', handler: handleAdminGetBusLines },
+    { method: 'POST', path: '/api/admin/bus-lines', handler: handleAdminCreateBusLine },
+    { method: 'PUT', path: '/api/admin/bus-lines/:id', handler: (req, env, params) => handleAdminUpdateBusLine(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/bus-lines/:id', handler: (req, env, params) => handleAdminDeleteBusLine(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/bus-lines/:id/status', handler: (req, env, params) => handleAdminUpdateBusLineStatus(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/bus-lines/:id/featured', handler: (req, env, params) => handleAdminToggleBusLineFeatured(req, env, params.id) },
+
+    // Admin - Bus Stops
+    { method: 'GET', path: '/api/admin/bus-stops', handler: handleAdminGetBusStops },
+    { method: 'POST', path: '/api/admin/bus-stops', handler: handleAdminCreateBusStop },
+    { method: 'PUT', path: '/api/admin/bus-stops/:id', handler: (req, env, params) => handleAdminUpdateBusStop(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/bus-stops/:id', handler: (req, env, params) => handleAdminDeleteBusStop(req, env, params.id) },
+    { method: 'POST', path: '/api/admin/bus-stops/reorder', handler: handleAdminReorderBusStops },
 ];
 
 export default {
