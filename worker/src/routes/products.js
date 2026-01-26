@@ -129,28 +129,32 @@ export async function handleCreateProduct(request, env) {
 
     try {
         const data = await request.json();
-        const { title, description, price, original_price, image_url, images, category_id, zone_id, condition, accepts_offers, phone } = data;
+        const { title, description, price, original_price, image_url, front_image_url, back_image_url, images, category_id, zone_id, address, phone, whatsapp, condition, accepts_offers } = data;
 
         if (!title || !description || !price) {
             return error('Título, descripción y precio son requeridos');
         }
 
         const result = await env.DB.prepare(`
-            INSERT INTO products (title, description, price, original_price, image_url, images, category_id, author_id, zone_id, condition, accepts_offers, phone, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
+            INSERT INTO products (title, description, price, original_price, image_url, front_image_url, back_image_url, images, category_id, author_id, zone_id, address, phone, whatsapp, condition, accepts_offers, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')
         `).bind(
             title,
             description,
             price,
             original_price || null,
             image_url || null,
+            front_image_url || null,
+            back_image_url || null,
             images ? JSON.stringify(images) : null,
             category_id || null,
             user.id,
             zone_id || null,
+            address || null,
+            phone || null,
+            whatsapp || null,
             condition || 'new',
-            accepts_offers ? 1 : 0,
-            phone || null
+            accepts_offers ? 1 : 0
         ).run();
 
         return success({ id: result.meta.last_row_id }, 'Producto creado. Pendiente de aprobación.');
@@ -176,7 +180,7 @@ export async function handleUpdateProduct(request, env, id) {
         }
 
         const data = await request.json();
-        const { title, description, price, original_price, image_url, images, category_id, zone_id, condition, accepts_offers, phone } = data;
+        const { title, description, price, original_price, image_url, front_image_url, back_image_url, images, category_id, zone_id, address, phone, whatsapp, condition, accepts_offers } = data;
 
         await env.DB.prepare(`
             UPDATE products SET
@@ -185,12 +189,16 @@ export async function handleUpdateProduct(request, env, id) {
                 price = COALESCE(?, price),
                 original_price = ?,
                 image_url = COALESCE(?, image_url),
+                front_image_url = COALESCE(?, front_image_url),
+                back_image_url = COALESCE(?, back_image_url),
                 images = COALESCE(?, images),
                 category_id = COALESCE(?, category_id),
                 zone_id = COALESCE(?, zone_id),
+                address = COALESCE(?, address),
+                phone = COALESCE(?, phone),
+                whatsapp = COALESCE(?, whatsapp),
                 condition = COALESCE(?, condition),
                 accepts_offers = COALESCE(?, accepts_offers),
-                phone = COALESCE(?, phone),
                 updated_at = datetime('now')
             WHERE id = ?
         `).bind(
@@ -199,12 +207,16 @@ export async function handleUpdateProduct(request, env, id) {
             price || null,
             original_price !== undefined ? original_price : product.original_price,
             image_url || null,
+            front_image_url || null,
+            back_image_url || null,
             images ? JSON.stringify(images) : null,
             category_id || null,
             zone_id || null,
+            address || null,
+            phone || null,
+            whatsapp || null,
             condition || null,
             accepts_offers !== undefined ? (accepts_offers ? 1 : 0) : null,
-            phone || null,
             id
         ).run();
 

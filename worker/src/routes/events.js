@@ -153,15 +153,15 @@ export async function handleAdminCreateEvent(request, env) {
 
     try {
         const data = await request.json();
-        const { title, description, image_url, images, category_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, status, featured } = data;
+        const { title, description, image_url, images, category_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, featured } = data;
 
         if (!title || !description || !event_date) {
             return error('Título, descripción y fecha son requeridos');
         }
 
         const result = await env.DB.prepare(`
-            INSERT INTO events (title, description, image_url, images, category_id, author_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, status, featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO events (title, description, image_url, images, category_id, author_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, featured)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             title,
             description,
@@ -180,6 +180,9 @@ export async function handleAdminCreateEvent(request, env) {
             end_time || null,
             price || 0,
             ticket_url || null,
+            phone || null,
+            whatsapp || null,
+            website || null,
             status || 'pending',
             featured ? 1 : 0
         ).run();
@@ -203,7 +206,7 @@ export async function handleAdminUpdateEvent(request, env, id) {
             return notFound('Evento no encontrado');
         }
 
-        const fields = ['title', 'description', 'image_url', 'category_id', 'zone_id', 'location', 'address', 'latitude', 'longitude', 'event_date', 'event_time', 'end_date', 'end_time', 'price', 'ticket_url', 'status', 'featured'];
+        const fields = ['title', 'description', 'image_url', 'category_id', 'zone_id', 'location', 'address', 'latitude', 'longitude', 'event_date', 'event_time', 'end_date', 'end_time', 'price', 'ticket_url', 'phone', 'whatsapp', 'website', 'status', 'featured'];
 
         let setClause = fields.map(f => `${f} = COALESCE(?, ${f})`).join(', ');
         setClause += ", updated_at = datetime('now')";

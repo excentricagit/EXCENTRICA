@@ -6,6 +6,168 @@
     <title>Productos - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/editor/editor.css">
+    <style>
+        /* Override modal width */
+        #product-modal {
+            max-width: 1100px !important;
+            width: 95% !important;
+        }
+
+        .modal-body {
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1rem !important;
+        }
+
+        /* Modal compacto de 2 columnas */
+        .modal-grid-2-compact {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 900px) {
+            .modal-grid-2-compact {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form groups mejorados */
+        .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.75rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* Estilo para input file */
+        .form-control-file {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control-file:hover {
+            border-color: var(--primary);
+            background: #f0f0f0;
+        }
+
+        /* Header con botones */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        /* Preview de imagen grande */
+        .image-preview-large {
+            margin-top: 0.4rem;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            background: #ffffff;
+            min-height: 160px;
+            max-height: 200px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview-large img {
+            display: block;
+            max-width: 100%;
+            max-height: 180px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        /* Alert info */
+        .alert-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.8;
+        }
+
+        .alert-info strong {
+            color: #1976d2;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Text muted */
+        .text-muted {
+            color: #6c757d;
+            font-size: 0.875rem;
+            display: block;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -143,87 +305,110 @@
     <div class="modal" id="product-modal">
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Nuevo Producto</h3>
-            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                <button type="submit" form="product-form" class="btn btn-primary btn-sm">Guardar Producto</button>
+            </div>
         </div>
         <div class="modal-body">
             <form id="product-form" onsubmit="saveProduct(event)">
                 <input type="hidden" id="product-id">
 
-                <div class="form-group">
-                    <label for="product-titulo">Título *</label>
-                    <input type="text" id="product-titulo" class="form-control" required>
-                </div>
+                <div class="modal-grid-2-compact">
+                    <!-- COLUMNA 1: Información del Producto -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="product-titulo">Título *</label>
+                            <input type="text" id="product-titulo" class="form-control" placeholder="Nombre del producto" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-descripcion">Descripción *</label>
-                    <textarea id="product-descripcion" class="form-control" rows="4" required></textarea>
-                </div>
+                        <div class="form-group">
+                            <label for="product-descripcion">Descripción *</label>
+                            <textarea id="product-descripcion" class="form-control" rows="3" placeholder="Descripción del producto" required></textarea>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-precio">Precio *</label>
-                    <input type="number" id="product-precio" class="form-control" step="0.01" min="0" required>
-                </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="product-precio">Precio *</label>
+                                <input type="number" id="product-precio" class="form-control" step="0.01" min="0" placeholder="0.00" required>
+                            </div>
 
-                <div class="form-group">
-                    <label for="product-precio-original">Precio Original (opcional)</label>
-                    <input type="number" id="product-precio-original" class="form-control" step="0.01" min="0">
-                </div>
+                            <div class="form-group">
+                                <label for="product-precio-original">Precio Original</label>
+                                <input type="number" id="product-precio-original" class="form-control" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-imagen">URL de Imagen</label>
-                    <input type="url" id="product-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
-                </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="product-condicion">Condición *</label>
+                                <select id="product-condicion" class="form-control">
+                                    <option value="nuevo">Nuevo</option>
+                                    <option value="usado">Usado</option>
+                                    <option value="reacondicionado">Reacondicionado</option>
+                                </select>
+                            </div>
 
-                <div class="form-group">
-                    <label for="product-categoria">Categoría</label>
-                    <select id="product-categoria" class="form-control">
-                        <option value="">Sin categoría</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="product-estado">Estado *</label>
+                                <select id="product-estado" class="form-control">
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="aprobado">Aprobado</option>
+                                    <option value="rechazado">Rechazado</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-zona">Zona</label>
-                    <select id="product-zona" class="form-control">
-                        <option value="">Sin zona específica</option>
-                    </select>
-                </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="product-categoria">Categoría</label>
+                                <select id="product-categoria" class="form-control">
+                                    <option value="">Sin categoría</option>
+                                </select>
+                            </div>
 
-                <div class="form-group">
-                    <label for="product-direccion">Dirección</label>
-                    <input type="text" id="product-direccion" class="form-control">
-                </div>
+                            <div class="form-group">
+                                <label for="product-zona">Zona</label>
+                                <select id="product-zona" class="form-control">
+                                    <option value="">Sin zona</option>
+                                </select>
+                            </div>
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-telefono">Teléfono</label>
-                    <input type="tel" id="product-telefono" class="form-control">
-                </div>
+                        <div class="form-group">
+                            <label for="product-direccion">Dirección</label>
+                            <input type="text" id="product-direccion" class="form-control" placeholder="Calle, número, barrio">
+                        </div>
 
-                <div class="form-group">
-                    <label for="product-whatsapp">WhatsApp</label>
-                    <input type="tel" id="product-whatsapp" class="form-control">
-                </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="product-telefono">Teléfono</label>
+                                <input type="tel" id="product-telefono" class="form-control" placeholder="+54 9 385...">
+                            </div>
 
-                <div class="form-group">
-                    <label for="product-condicion">Condición</label>
-                    <select id="product-condicion" class="form-control">
-                        <option value="nuevo">Nuevo</option>
-                        <option value="usado">Usado</option>
-                        <option value="reacondicionado">Reacondicionado</option>
-                    </select>
-                </div>
+                            <div class="form-group">
+                                <label for="product-whatsapp">WhatsApp</label>
+                                <input type="tel" id="product-whatsapp" class="form-control" placeholder="+54 9 385...">
+                            </div>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="product-estado">Estado</label>
-                    <select id="product-estado" class="form-control">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
-                    </select>
-                </div>
+                    <!-- COLUMNA 2: Previews de Imágenes -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="product-imagen-frente-file">📸 Foto de Frente *</label>
+                            <input type="hidden" id="product-imagen-frente">
+                            <input type="file" id="product-imagen-frente-file" class="form-control-file" accept="image/*" onchange="uploadProductImage(event, 'frente')" required>
+                            <div id="product-image-frente-preview" class="image-preview-large"></div>
+                        </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                        <div class="form-group">
+                            <label for="product-imagen-atras-file">📸 Foto de Atrás *</label>
+                            <input type="hidden" id="product-imagen-atras">
+                            <input type="file" id="product-imagen-atras-file" class="form-control-file" accept="image/*" onchange="uploadProductImage(event, 'atras')" required>
+                            <div id="product-image-atras-preview" class="image-preview-large"></div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -280,19 +465,19 @@
         function renderCategoryOptions() {
             const select = document.getElementById('product-categoria');
             select.innerHTML = '<option value="">Sin categoría</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
         function renderZoneOptions() {
             const select = document.getElementById('product-zona');
             select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.nombre}</option>`).join('');
+                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
         }
 
         function renderCategoryFilter() {
             const select = document.getElementById('filter-category');
             select.innerHTML = '<option value="">Todas</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.nombre}</option>`).join('');
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
         }
 
         function applyFilters() {
@@ -494,7 +679,8 @@
             document.getElementById('product-descripcion').value = product.description || '';
             document.getElementById('product-precio').value = product.price || '';
             document.getElementById('product-precio-original').value = product.price_original || '';
-            document.getElementById('product-imagen').value = product.image_url || '';
+            document.getElementById('product-imagen-frente').value = product.front_image_url || product.image_url || '';
+            document.getElementById('product-imagen-atras').value = product.back_image_url || '';
             document.getElementById('product-categoria').value = product.category_id || '';
             document.getElementById('product-zona').value = product.zone_id || '';
             document.getElementById('product-direccion').value = product.address || '';
@@ -502,6 +688,15 @@
             document.getElementById('product-whatsapp').value = product.whatsapp || '';
             document.getElementById('product-condicion').value = product.condition || 'nuevo';
             document.getElementById('product-estado').value = product.status || 'pendiente';
+
+            // Mostrar preview de imágenes si existen
+            if (product.front_image_url || product.image_url) {
+                showImagePreview('product-image-frente-preview', product.front_image_url || product.image_url);
+            }
+            if (product.back_image_url) {
+                showImagePreview('product-image-atras-preview', product.back_image_url);
+            }
+
             openModal();
         }
 
@@ -514,7 +709,8 @@
                 description: document.getElementById('product-descripcion').value,
                 price: parseFloat(document.getElementById('product-precio').value),
                 original_price: document.getElementById('product-precio-original').value ? parseFloat(document.getElementById('product-precio-original').value) : null,
-                image_url: document.getElementById('product-imagen').value || null,
+                front_image_url: document.getElementById('product-imagen-frente').value || null,
+                back_image_url: document.getElementById('product-imagen-atras').value || null,
                 category_id: document.getElementById('product-categoria').value || null,
                 zone_id: document.getElementById('product-zona').value || null,
                 address: document.getElementById('product-direccion').value || null,
@@ -543,7 +739,98 @@
             }
         }
 
+        // Upload de imagen de producto (frente o atrás)
+        async function uploadProductImage(event, tipo) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                Components.toast('Por favor selecciona un archivo de imagen', 'error');
+                return;
+            }
+
+            try {
+                const tipoLabel = tipo === 'frente' ? 'Frente' : 'Atrás';
+                Components.toast(`Subiendo imagen de ${tipoLabel.toLowerCase()}...`, 'info');
+                const response = await api.uploadFile(file);
+
+                if (response.success) {
+                    const imageUrl = response.data.url;
+                    document.getElementById(`product-imagen-${tipo}`).value = imageUrl;
+                    showImagePreview(`product-image-${tipo}-preview`, imageUrl);
+                    Components.toast(`Imagen de ${tipoLabel.toLowerCase()} subida exitosamente`, 'success');
+                } else {
+                    Components.toast('Error subiendo imagen', 'error');
+                }
+            } catch (e) {
+                console.error('Error uploading image:', e);
+                Components.toast('Error subiendo imagen', 'error');
+            }
+        }
+
+        // Mostrar preview de imagen
+        function showImagePreview(containerId, url) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error('Container not found:', containerId);
+                return;
+            }
+
+            // Validar URL
+            if (!url || url === 'undefined' || url === 'null') {
+                console.error('Invalid URL');
+                container.innerHTML = '<p style="color: #f44336; text-align: center;">URL inválida</p>';
+                container.style.display = 'flex';
+                return;
+            }
+
+            // Limpiar contenedor
+            container.innerHTML = '';
+            container.style.display = 'flex';
+
+            // Esconder el input file cuando se muestra la preview
+            const inputId = containerId.replace('-preview', '-file');
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+                fileInput.style.display = 'none';
+            }
+
+            // Crear imagen
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Preview';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '220px';
+            img.style.objectFit = 'contain';
+
+            img.onload = function() {
+                console.log('✅ Image loaded:', containerId);
+            };
+
+            img.onerror = function() {
+                console.error('❌ Error loading image');
+                container.innerHTML = '<p style="color: #f44336; text-align: center;">Error cargando imagen</p>';
+            };
+
+            container.appendChild(img);
+        }
+
         function openModal() {
+            // Limpiar previews
+            const previewFrente = document.getElementById('product-image-frente-preview');
+            const previewAtras = document.getElementById('product-image-atras-preview');
+
+            previewFrente.innerHTML = '';
+            previewFrente.style.display = 'none';
+            previewAtras.innerHTML = '';
+            previewAtras.style.display = 'none';
+
+            // Mostrar inputs de archivo
+            const frenteInput = document.getElementById('product-imagen-frente-file');
+            const atrasInput = document.getElementById('product-imagen-atras-file');
+            if (frenteInput) frenteInput.style.display = 'block';
+            if (atrasInput) atrasInput.style.display = 'block';
+
             document.getElementById('product-modal').classList.add('active');
             document.getElementById('product-modal-backdrop').classList.add('active');
             document.body.style.overflow = 'hidden';

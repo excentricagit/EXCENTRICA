@@ -143,36 +143,62 @@
         <div class="modal-body">
             <form id="category-form" onsubmit="saveCategory(event)">
                 <input type="hidden" id="category-id">
+                <input type="hidden" id="category-icono">
 
-                <div class="form-group">
-                    <label for="category-nombre">Nombre *</label>
-                    <input type="text" id="category-nombre" class="form-control" required>
-                </div>
+                <div class="modal-grid-2">
+                    <!-- Columna 1 -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="category-nombre">Nombre *</label>
+                            <input type="text" id="category-nombre" class="form-control" required placeholder="Ej: Deportes, Tecnología, Política...">
+                        </div>
 
-                <div class="form-group">
-                    <label for="category-icono">Icono (emoji)</label>
-                    <input type="text" id="category-icono" class="form-control" placeholder="📰" maxlength="4">
-                    <small class="text-muted">Usa un emoji para representar la categoría</small>
-                </div>
+                        <div class="form-group">
+                            <label for="category-seccion">Sección *</label>
+                            <select id="category-seccion" class="form-control" required>
+                                <option value="noticias">📰 Noticias</option>
+                                <option value="productos">🛒 Productos</option>
+                                <option value="eventos">📅 Eventos</option>
+                            </select>
+                        </div>
 
-                <div class="form-group">
-                    <label for="category-seccion">Sección *</label>
-                    <select id="category-seccion" class="form-control" required>
-                        <option value="noticias">Noticias</option>
-                        <option value="productos">Productos</option>
-                        <option value="eventos">Eventos</option>
-                    </select>
-                </div>
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <span>Estado de la categoría</span>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="category-activa" checked>
+                                    <span class="toggle-slider"></span>
+                                    <span class="toggle-text" id="toggle-text">Activa</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="category-activa">
-                        <input type="checkbox" id="category-activa" checked> Categoría activa
-                    </label>
+                    <!-- Columna 2 -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label>Icono (emoji)</label>
+                            <div class="emoji-selector-wrapper">
+                                <button type="button" class="emoji-selector-btn" id="emoji-selector-btn" onclick="toggleEmojiPicker()">
+                                    <span class="emoji-preview" id="emoji-preview">📁</span>
+                                    <span class="emoji-label">Seleccionar emoji</span>
+                                </button>
+                                <div class="emoji-picker" id="emoji-picker">
+                                    <div class="emoji-picker-header">
+                                        <input type="text" class="emoji-search" id="emoji-search" placeholder="Buscar emoji..." onkeyup="filterEmojis(this.value)">
+                                    </div>
+                                    <div class="emoji-picker-body" id="emoji-picker-body">
+                                        <!-- Emojis se generan dinámicamente -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Categoría</button>
                 </div>
             </form>
         </div>
@@ -193,6 +219,89 @@
 
         let allCategories = [];
         let currentSection = 'noticias';
+        let selectedEmoji = '📁';
+
+        // Lista de emojis populares para categorías
+        const emojisList = [
+            // Noticias y Medios
+            '📰', '📺', '📻', '🎙️', '📡', '🗞️', '📢', '📣', '💬',
+            // Política y Gobierno
+            '🏛️', '⚖️', '🗳️', '📊', '📈', '💼', '🏆', '🎯',
+            // Deportes
+            '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🥊', '🥋', '⛳', '🏂',
+            // Entretenimiento
+            '🎬', '🎭', '🎪', '🎨', '🎤', '🎧', '🎵', '🎮', '🎲', '🎳',
+            // Tecnología
+            '💻', '🖥️', '📱', '☎️', '🔌', '🔋', '💾', '🎥', '📷', '📸',
+            // Educación
+            '📚', '📖', '📝', '✏️', '🖊️', '📏', '🎓',
+            // Salud y Medicina
+            '🏥', '⚕️', '💊', '💉', '🧬', '🦠',
+            // Comida y Bebida
+            '🍔', '🍕', '🍟', '🌭', '🥪', '🌮', '🍝', '🍰', '☕', '🍺',
+            // Viajes y Lugares
+            '✈️', '🚗', '🚕', '🚌', '🏎️', '🏨', '🏪', '🏫', '🏬',
+            // Naturaleza
+            '🌍', '🌎', '🗺️', '🏔️', '⛰️', '🏖️', '🌊', '🌳', '🌱', '🌿',
+            // Clima
+            '☀️', '⛅', '☁️', '🌧️', '⛈️', '🌨️',
+            // Animales
+            '🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐯',
+            // Objetos
+            '📦', '📫', '📧', '📨', '📁', '📂', '📋', '📌', '📍',
+            // Símbolos
+            '❤️', '💙', '💚', '💛', '🧡', '💜', '💯', '⭐', '🌟', '✨', '⚡', '🔥', '💥', '🎉', '🎊'
+        ];
+
+        // Inicializar el selector de emojis
+        function initEmojiPicker() {
+            const pickerBody = document.getElementById('emoji-picker-body');
+            pickerBody.innerHTML = emojisList.map(emoji =>
+                `<button type="button" class="emoji-option" onclick="selectEmoji('${emoji}')">${emoji}</button>`
+            ).join('');
+        }
+
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emoji-picker');
+            picker.classList.toggle('active');
+        }
+
+        function selectEmoji(emoji) {
+            selectedEmoji = emoji;
+            document.getElementById('emoji-preview').textContent = emoji;
+            document.getElementById('category-icono').value = emoji;
+            document.getElementById('emoji-picker').classList.remove('active');
+        }
+
+        function filterEmojis(searchTerm) {
+            // Si no hay búsqueda, mostrar todos
+            if (!searchTerm.trim()) {
+                initEmojiPicker();
+                return;
+            }
+
+            // Filtrar por nombre/categoría (simple - podría mejorarse con un diccionario)
+            const pickerBody = document.getElementById('emoji-picker-body');
+            const filtered = emojisList;
+
+            pickerBody.innerHTML = filtered.map(emoji =>
+                `<button type="button" class="emoji-option" onclick="selectEmoji('${emoji}')">${emoji}</button>`
+            ).join('');
+        }
+
+        // Actualizar texto del toggle
+        document.getElementById('category-activa').addEventListener('change', function() {
+            document.getElementById('toggle-text').textContent = this.checked ? 'Activa' : 'Inactiva';
+        });
+
+        // Cerrar emoji picker al hacer click fuera
+        document.addEventListener('click', function(event) {
+            const picker = document.getElementById('emoji-picker');
+            const btn = document.getElementById('emoji-selector-btn');
+            if (!picker.contains(event.target) && !btn.contains(event.target)) {
+                picker.classList.remove('active');
+            }
+        });
 
         async function loadCategories() {
             try {
@@ -343,6 +452,14 @@
             document.getElementById('category-id').value = '';
             document.getElementById('category-seccion').value = currentSection;
             document.getElementById('category-activa').checked = true;
+            document.getElementById('toggle-text').textContent = 'Activa';
+
+            // Resetear emoji
+            selectedEmoji = '📁';
+            document.getElementById('emoji-preview').textContent = '📁';
+            document.getElementById('category-icono').value = '📁';
+
+            initEmojiPicker();
             openModal();
         }
 
@@ -353,9 +470,17 @@
             document.getElementById('modal-title').textContent = 'Editar Categoría';
             document.getElementById('category-id').value = category.id;
             document.getElementById('category-nombre').value = category.name || '';
-            document.getElementById('category-icono').value = category.icon || '';
+
+            // Configurar emoji
+            selectedEmoji = category.icon || '📁';
+            document.getElementById('emoji-preview').textContent = selectedEmoji;
+            document.getElementById('category-icono').value = selectedEmoji;
+
             document.getElementById('category-seccion').value = category.section || 'noticias';
             document.getElementById('category-activa').checked = category.is_active !== false;
+            document.getElementById('toggle-text').textContent = category.is_active !== false ? 'Activa' : 'Inactiva';
+
+            initEmojiPicker();
             openModal();
         }
 
@@ -403,6 +528,7 @@
 
         // Load initial data
         loadCategories();
+        initEmojiPicker();
     </script>
     <style>
         .tabs {
@@ -429,6 +555,258 @@
             color: var(--primary);
             border-bottom-color: var(--primary);
             font-weight: 600;
+        }
+
+        /* Emoji Selector */
+        .emoji-selector-wrapper {
+            position: relative;
+        }
+
+        .emoji-selector-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .emoji-selector-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .emoji-preview {
+            font-size: 2.5rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .emoji-label {
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .emoji-picker {
+            display: none;
+            position: absolute;
+            top: calc(100% + 0.5rem);
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .emoji-picker.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .emoji-picker-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            background: #f8f9fa;
+        }
+
+        .emoji-search {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .emoji-search:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .emoji-picker-body {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0.5rem;
+            padding: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .emoji-option {
+            width: 100%;
+            aspect-ratio: 1;
+            padding: 0.5rem;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emoji-option:hover {
+            background: #f0f0f0;
+            border-color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .emoji-option:active {
+            transform: scale(0.95);
+        }
+
+        /* Toggle Switch */
+        .toggle-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            border-radius: 12px;
+            border: 1px solid #4a5568;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-label > span:first-child {
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: relative;
+            display: inline-block;
+            width: 56px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider::before {
+            transform: translateX(26px);
+        }
+
+        .toggle-text {
+            font-weight: 600;
+            min-width: 60px;
+            color: #cbd5e0;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked ~ .toggle-text {
+            color: #a78bfa;
+        }
+
+        /* Mejorar el modal */
+        #category-modal .modal-body {
+            padding: 2rem;
+        }
+
+        /* Grid de 2 columnas para el modal */
+        .modal-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .modal-grid-2 {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+
+        #category-modal .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        #category-modal .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        #category-modal .form-control {
+            font-size: 1rem;
+        }
+
+        #category-modal .modal-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Responsive para emoji picker */
+        @media (max-width: 768px) {
+            .emoji-picker-body {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .emoji-picker-body {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .emoji-option {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </body>
