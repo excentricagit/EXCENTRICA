@@ -8,42 +8,89 @@ export async function handleGetStats(request, env) {
     if (authError) return authError;
 
     try {
+        // Helper to safely count from a table
+        const safeCount = async (query) => {
+            try {
+                const result = await env.DB.prepare(query).first();
+                return result?.count || 0;
+            } catch (e) {
+                return 0;
+            }
+        };
+
+        // Get all counts in parallel
         const [
-            usersCount,
-            newsCount,
-            productsCount,
-            eventsCount,
-            pendingProducts,
-            pendingNews
+            users, news, products, events, categories, zones, provinces,
+            cinemas, movies, showtimes,
+            restaurants, accommodations, services, poi,
+            busLines, busStops,
+            pendingProducts, pendingNews, pendingPoi
         ] = await Promise.all([
-            env.DB.prepare('SELECT COUNT(*) as count FROM users').first(),
-            env.DB.prepare('SELECT COUNT(*) as count FROM news').first(),
-            env.DB.prepare('SELECT COUNT(*) as count FROM products').first(),
-            env.DB.prepare('SELECT COUNT(*) as count FROM events').first(),
-            env.DB.prepare("SELECT COUNT(*) as count FROM products WHERE status = 'pending'").first(),
-            env.DB.prepare("SELECT COUNT(*) as count FROM news WHERE status = 'pending'").first()
+            safeCount('SELECT COUNT(*) as count FROM users'),
+            safeCount('SELECT COUNT(*) as count FROM news'),
+            safeCount('SELECT COUNT(*) as count FROM products'),
+            safeCount('SELECT COUNT(*) as count FROM events'),
+            safeCount('SELECT COUNT(*) as count FROM categories'),
+            safeCount('SELECT COUNT(*) as count FROM zones'),
+            safeCount('SELECT COUNT(*) as count FROM provinces'),
+            safeCount('SELECT COUNT(*) as count FROM cinemas'),
+            safeCount('SELECT COUNT(*) as count FROM movies'),
+            safeCount('SELECT COUNT(*) as count FROM showtimes'),
+            safeCount('SELECT COUNT(*) as count FROM restaurants'),
+            safeCount('SELECT COUNT(*) as count FROM accommodations'),
+            safeCount('SELECT COUNT(*) as count FROM services'),
+            safeCount('SELECT COUNT(*) as count FROM points_of_interest'),
+            safeCount('SELECT COUNT(*) as count FROM bus_lines'),
+            safeCount('SELECT COUNT(*) as count FROM bus_stops'),
+            safeCount("SELECT COUNT(*) as count FROM products WHERE status = 'pending'"),
+            safeCount("SELECT COUNT(*) as count FROM news WHERE status = 'pending'"),
+            safeCount("SELECT COUNT(*) as count FROM points_of_interest WHERE status = 'pending'")
         ]);
 
-        // Obtener últimos registros
-        const [recentUsers, recentNews, recentProducts] = await Promise.all([
-            env.DB.prepare('SELECT id, name, email, created_at FROM users ORDER BY created_at DESC LIMIT 5').all(),
-            env.DB.prepare('SELECT id, title, status, created_at FROM news ORDER BY created_at DESC LIMIT 5').all(),
-            env.DB.prepare('SELECT id, title, status, price, created_at FROM products ORDER BY created_at DESC LIMIT 5').all()
+        // Get recent items from various tables
+        const safeRecent = async (query) => {
+            try {
+                const result = await env.DB.prepare(query).all();
+                return result?.results || [];
+            } catch (e) {
+                return [];
+            }
+        };
+
+        const [recentNews, recentProducts, recentPoi, recentEvents] = await Promise.all([
+            safeRecent('SELECT id, title, status, created_at FROM news ORDER BY created_at DESC LIMIT 5'),
+            safeRecent('SELECT id, title, status, created_at FROM products ORDER BY created_at DESC LIMIT 5'),
+            safeRecent('SELECT id, name, status, created_at FROM points_of_interest ORDER BY created_at DESC LIMIT 5'),
+            safeRecent('SELECT id, title, status, created_at FROM events ORDER BY created_at DESC LIMIT 5')
         ]);
 
         return success({
             counts: {
-                users: usersCount.count,
-                news: newsCount.count,
-                products: productsCount.count,
-                events: eventsCount.count,
-                pending_products: pendingProducts.count,
-                pending_news: pendingNews.count
+                users,
+                news,
+                products,
+                events,
+                categories,
+                zones,
+                provinces,
+                cinemas,
+                movies,
+                showtimes,
+                restaurants,
+                accommodations,
+                services,
+                poi,
+                bus_lines: busLines,
+                bus_stops: busStops,
+                pending_products: pendingProducts,
+                pending_news: pendingNews,
+                pending_poi: pendingPoi
             },
             recent: {
-                users: recentUsers.results,
-                news: recentNews.results,
-                products: recentProducts.results
+                news: recentNews,
+                products: recentProducts,
+                poi: recentPoi,
+                events: recentEvents
             }
         });
 

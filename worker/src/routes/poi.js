@@ -117,6 +117,9 @@ export async function getPublicPoiById(request, env, params) {
  * Listar todos los puntos de interés (admin)
  */
 export async function getAdminPoi(request, env) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
     try {
         const url = new URL(request.url);
         const status = url.searchParams.get('status');
@@ -196,9 +199,11 @@ export async function getAdminPoi(request, env) {
  * Crear punto de interés
  */
 export async function createPoi(request, env) {
+    const { user, error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
     try {
         const data = await request.json();
-        const user = request.user;
 
         if (!data.name || !data.description) {
             return error('Nombre y descripción son requeridos', 400);
@@ -242,6 +247,9 @@ export async function createPoi(request, env) {
  * Actualizar punto de interés
  */
 export async function updatePoi(request, env, params) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
     try {
         const data = await request.json();
 
@@ -290,6 +298,9 @@ export async function updatePoi(request, env, params) {
  * Eliminar punto de interés
  */
 export async function deletePoi(request, env, params) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
     try {
         const existing = await env.DB.prepare('SELECT id FROM points_of_interest WHERE id = ?')
             .bind(params.id).first();

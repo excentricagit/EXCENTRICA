@@ -371,9 +371,10 @@
                     Components.toast('Zona eliminada', 'success');
                     loadData();
                 } else {
-                    // If has associated data, suggest merge
-                    if (response.message && response.message.includes('Fusionar')) {
-                        Components.toast(response.message, 'warning');
+                    // If has associated data, open merge modal
+                    if (response.message && (response.message.includes('Fusionar') || response.message.includes('asociado'))) {
+                        Components.toast('Esta zona tiene datos asociados. Selecciona a qué zona transferirlos.', 'warning');
+                        showMergeModal(zoneId);
                     } else {
                         Components.toast(response.message || 'Error eliminando zona', 'error');
                     }
@@ -381,8 +382,9 @@
             } catch (e) {
                 console.error('Error deleting zone:', e);
                 const msg = e.message || 'Error eliminando zona';
-                if (msg.includes('Fusionar')) {
-                    Components.toast(msg, 'warning');
+                if (msg.includes('Fusionar') || msg.includes('asociado')) {
+                    Components.toast('Esta zona tiene datos asociados. Selecciona a qué zona transferirlos.', 'warning');
+                    showMergeModal(zoneId);
                 } else {
                     Components.toast(msg, 'error');
                 }
