@@ -37,39 +37,41 @@ export async function handleUpload(request, env) {
             return error('El archivo excede el tamaño máximo de 10MB');
         }
 
-        // Generar nombre único
-        const ext = file.name.split('.').pop().toLowerCase();
+        // Convertir a base64
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+
+        // Convertir bytes a string binario
+        let binary = '';
+        for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+        }
+
+        // Codificar a base64
+        const base64 = btoa(binary);
+        const dataUrl = `data:${file.type};base64,${base64}`;
+
+        // Generar key para registro
         const timestamp = Date.now();
         const random = Math.random().toString(36).substring(2, 8);
-        const key = `uploads/${timestamp}-${random}.${ext}`;
+        const key = `base64-${timestamp}-${random}`;
 
-        // Subir a R2
-        await env.R2.put(key, file.stream(), {
-            httpMetadata: {
-                contentType: file.type
-            }
-        });
-
-        // Construir URL pública
-        // Nota: Necesitas configurar un dominio personalizado o usar el dominio de R2
-        const url = `https://pub-excentrica.r2.dev/${key}`;
-
-        // Guardar en base de datos
+        // Guardar en base de datos (solo metadata, la imagen va en las noticias directamente)
         await env.DB.prepare(`
             INSERT INTO media (key, url, filename, content_type, size, uploaded_by)
             VALUES (?, ?, ?, ?, ?, ?)
-        `).bind(key, url, file.name, file.type, file.size, user.id).run();
+        `).bind(key, dataUrl, file.name, file.type, file.size, user.id).run();
 
         return success({
             key,
-            url,
+            url: dataUrl,  // Devuelve el data URL directamente
             filename: file.name,
             content_type: file.type,
             size: file.size
-        }, 'Archivo subido correctamente');
+        }, 'Imagen convertida a base64 correctamente');
 
     } catch (e) {
-        return error('Error subiendo archivo: ' + e.message, 500);
+        return error('Error procesando archivo: ' + e.message, 500);
     }
 }
 
@@ -91,10 +93,7 @@ export async function handleDeleteFile(request, env, key) {
             return error('No tienes permiso para eliminar este archivo', 403);
         }
 
-        // Eliminar de R2
-        await env.R2.delete(key);
-
-        // Eliminar de base de datos
+        // Eliminar de base de datos (base64 no necesita borrar de storage)
         await env.DB.prepare('DELETE FROM media WHERE key = ?').bind(key).run();
 
         return success(null, 'Archivo eliminado');

@@ -21,7 +21,8 @@
       "Bash(do sed -i \"s/zones = zonesResponse\\\\.data;/zones = Array.isArray\\(zonesResponse.data\\) ? zonesResponse.data : [];/g\" \"c:\\\\Users\\\\Ezekiel\\\\Documents\\\\GitHub\\\\EXCENTRICA\\\\public\\\\editor$file\")",
       "Bash(done)",
       "Bash(curl:*)",
-      "Bash(powershell -Command \"$response = Invoke-RestMethod -Uri ''https://excentrica.pages.dev/api/auth/login'' -Method Post -Body \\(ConvertTo-Json @{email=''editor@excentrica.com''; password=''editor123''}\\) -ContentType ''application/json''; Write-Output $response\")"
+      "Bash(powershell -Command \"$response = Invoke-RestMethod -Uri ''https://excentrica.pages.dev/api/auth/login'' -Method Post -Body \\(ConvertTo-Json @{email=''editor@excentrica.com''; password=''editor123''}\\) -ContentType ''application/json''; Write-Output $response\")",
+      "Bash(start:*)"
     ]
   }
 }

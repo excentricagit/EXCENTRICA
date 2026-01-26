@@ -498,9 +498,16 @@
             document.getElementById('news-id').value = '';
 
             // Limpiar previsualizaciones de imágenes
-            document.getElementById('main-image-preview').innerHTML = '';
-            document.getElementById('extra-image-1-preview').innerHTML = '';
-            document.getElementById('extra-image-2-preview').innerHTML = '';
+            const mainPreview = document.getElementById('main-image-preview');
+            const extra1Preview = document.getElementById('extra-image-1-preview');
+            const extra2Preview = document.getElementById('extra-image-2-preview');
+
+            mainPreview.innerHTML = '';
+            mainPreview.style.display = 'none';
+            extra1Preview.innerHTML = '';
+            extra1Preview.style.display = 'none';
+            extra2Preview.innerHTML = '';
+            extra2Preview.style.display = 'none';
 
             // Establecer fecha de publicación a ahora (autocompletada pero editable)
             const now = new Date();
@@ -676,9 +683,36 @@
                 return;
             }
 
-            console.log('Showing preview for:', containerId, url);
-            container.innerHTML = `<img src="${url}" alt="Preview" onload="console.log('Image loaded successfully')" onerror="console.error('Image failed to load')">`;
+            // Validar URL
+            if (!url || url === 'undefined' || url === 'null') {
+                console.error('Invalid URL');
+                container.innerHTML = '<p style="color: #f44336; text-align: center;">URL inválida</p>';
+                container.style.display = 'flex';
+                return;
+            }
+
+            // Limpiar contenedor
+            container.innerHTML = '';
             container.style.display = 'flex';
+
+            // Crear imagen
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Preview';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '260px';
+            img.style.objectFit = 'contain';
+
+            img.onload = function() {
+                console.log('✅ Image loaded:', containerId);
+            };
+
+            img.onerror = function() {
+                console.error('❌ Error loading image');
+                container.innerHTML = '<p style="color: #f44336; text-align: center;">Error cargando imagen</p>';
+            };
+
+            container.appendChild(img);
         }
 
         // Formatear fecha para datetime-local input
@@ -748,35 +782,6 @@
         }
 
         /* Previsualizaciones de imagen */
-        .image-preview {
-            margin-top: 0.75rem;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            background: #f8f9fa;
-            min-height: 120px;
-        }
-
-        .image-preview img {
-            max-width: 100%;
-            max-height: 200px;
-            object-fit: contain;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .image-preview:empty {
-            display: none;
-        }
-
-        .image-preview:not(:empty) {
-            background: #ffffff;
-            border-color: var(--primary);
-            border-style: solid;
-        }
 
         /* Ajustes para inputs de archivo */
         input[type="file"].form-control {
@@ -905,7 +910,7 @@
             margin-top: 0.75rem;
             border: 2px solid var(--primary);
             border-radius: 8px;
-            display: none !important;
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 1rem;
@@ -914,6 +919,10 @@
             max-height: 300px;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview.show {
+            display: flex;
         }
 
         .image-preview img {
