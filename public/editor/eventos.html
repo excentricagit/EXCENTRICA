@@ -599,7 +599,7 @@
             }
         }
 
-        // Image Upload
+        // Image Upload - Convert to base64 directly in browser
         async function uploadEventImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -620,19 +620,31 @@
             }
 
             try {
-                Components.toast('Subiendo imagen...', 'info');
+                Components.toast('Procesando imagen...', 'info');
 
-                const response = await api.uploadFile(file);
-                if (response.success) {
-                    document.getElementById('event-imagen').value = response.data.url;
-                    showImagePreview('event-image-preview', response.data.url);
+                // Convert to base64 directly in browser
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const base64String = e.target.result;
+                    document.getElementById('event-imagen').value = base64String;
+                    showImagePreview('event-image-preview', base64String);
                     // Once uploaded, no longer required
                     event.target.required = false;
-                    Components.toast('Imagen subida correctamente', 'success');
-                }
+                    Components.toast('Imagen cargada correctamente', 'success');
+                };
+
+                reader.onerror = function(e) {
+                    console.error('Error reading file:', e);
+                    Components.toast('Error procesando imagen', 'error');
+                    event.target.value = '';
+                };
+
+                reader.readAsDataURL(file);
+
             } catch (e) {
                 console.error('Error uploading image:', e);
-                Components.toast('Error subiendo imagen: ' + e.message, 'error');
+                Components.toast('Error procesando imagen: ' + e.message, 'error');
                 event.target.value = '';
             }
         }
