@@ -112,9 +112,9 @@
                     <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="approved">Aprobado</option>
+                        <option value="rejected">Rechazado</option>
                     </select>
                     <select id="filter-date" class="form-control" style="max-width: 150px;">
                         <option value="">Todas las fechas</option>
@@ -145,92 +145,200 @@
     <div class="modal" id="event-modal">
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Nuevo Evento</h3>
-            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                <button type="submit" form="event-form" class="btn btn-primary btn-sm">Guardar Evento</button>
+            </div>
         </div>
         <div class="modal-body">
             <form id="event-form" onsubmit="saveEvent(event)">
                 <input type="hidden" id="event-id">
+                <input type="hidden" id="event-imagen">
 
-                <div class="form-group">
-                    <label for="event-titulo">Título *</label>
-                    <input type="text" id="event-titulo" class="form-control" required>
-                </div>
+                <div class="modal-grid-3-compact">
+                    <!-- Column 1: Información Principal -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="event-titulo">Título *</label>
+                            <input type="text" id="event-titulo" class="form-control" placeholder="Nombre del evento" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-descripcion">Descripción *</label>
-                    <textarea id="event-descripcion" class="form-control" rows="4" required></textarea>
-                </div>
+                        <div class="form-group">
+                            <label for="event-descripcion">Descripción *</label>
+                            <textarea id="event-descripcion" class="form-control" rows="3" placeholder="Describe el evento..." required></textarea>
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-fecha">Fecha del Evento *</label>
-                    <input type="datetime-local" id="event-fecha" class="form-control" required>
-                </div>
+                        <div class="form-group">
+                            <label for="event-fecha">📅 Fecha del Evento *</label>
+                            <input type="datetime-local" id="event-fecha" class="form-control" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-lugar">Lugar *</label>
-                    <input type="text" id="event-lugar" class="form-control" required>
-                </div>
+                        <div class="form-group">
+                            <label for="event-lugar">📍 Lugar *</label>
+                            <input type="text" id="event-lugar" class="form-control" placeholder="Ej: Teatro 25 de Mayo" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-direccion">Dirección</label>
-                    <input type="text" id="event-direccion" class="form-control">
-                </div>
+                        <div class="form-group">
+                            <label for="event-direccion">🗺️ Dirección</label>
+                            <input type="text" id="event-direccion" class="form-control" placeholder="Dirección completa">
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="event-precio">Precio de Entrada</label>
-                    <input type="number" id="event-precio" class="form-control" step="0.01" min="0" placeholder="0 para eventos gratuitos">
-                </div>
+                    <!-- Column 2: Detalles y Contacto -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="event-precio">💰 Precio de Entrada</label>
+                            <input type="number" id="event-precio" class="form-control" step="0.01" min="0" placeholder="0 para eventos gratuitos">
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-imagen">URL de Imagen</label>
-                    <input type="url" id="event-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
-                </div>
+                        <div class="form-group">
+                            <label for="event-categoria">📁 Categoría</label>
+                            <select id="event-categoria" class="form-control">
+                                <option value="">Sin categoría</option>
+                            </select>
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-categoria">Categoría</label>
-                    <select id="event-categoria" class="form-control">
-                        <option value="">Sin categoría</option>
-                    </select>
-                </div>
+                        <div class="form-group">
+                            <label for="event-zona">🌎 Zona</label>
+                            <select id="event-zona" class="form-control">
+                                <option value="">Sin zona específica</option>
+                            </select>
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-zona">Zona</label>
-                    <select id="event-zona" class="form-control">
-                        <option value="">Sin zona específica</option>
-                    </select>
-                </div>
+                        <div class="form-group">
+                            <label for="event-telefono">📞 Teléfono</label>
+                            <input type="tel" id="event-telefono" class="form-control" placeholder="+54 9 385 123 4567">
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-telefono">Teléfono de Contacto</label>
-                    <input type="tel" id="event-telefono" class="form-control">
-                </div>
+                        <div class="form-group">
+                            <label for="event-whatsapp">💬 WhatsApp</label>
+                            <input type="tel" id="event-whatsapp" class="form-control" placeholder="+54 9 385 123 4567">
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-whatsapp">WhatsApp</label>
-                    <input type="tel" id="event-whatsapp" class="form-control">
-                </div>
+                        <div class="form-group">
+                            <label for="event-web">🌐 Sitio Web</label>
+                            <input type="url" id="event-web" class="form-control" placeholder="https://ejemplo.com">
+                        </div>
 
-                <div class="form-group">
-                    <label for="event-web">Sitio Web</label>
-                    <input type="url" id="event-web" class="form-control">
-                </div>
+                        <div class="form-group">
+                            <label for="event-estado">⚙️ Estado</label>
+                            <select id="event-estado" class="form-control">
+                                <option value="pending">Pendiente</option>
+                                <option value="approved">Aprobado</option>
+                                <option value="rejected">Rechazado</option>
+                            </select>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="event-estado">Estado</label>
-                    <select id="event-estado" class="form-control">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
-                    </select>
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <!-- Column 3: Imagen -->
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label for="event-imagen-file">📸 Imagen del Evento *</label>
+                            <input type="file" id="event-imagen-file" class="form-control-file" accept="image/*" onchange="uploadEventImage(event)">
+                            <div id="event-image-preview" class="image-preview-compact"></div>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
+
+    <style>
+        /* Compact Modal Styling for Events */
+        #event-modal {
+            max-width: 1400px !important;
+            width: 95% !important;
+        }
+
+        #event-modal .modal-body {
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1rem !important;
+        }
+
+        .modal-grid-3-compact {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 0;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        #event-modal .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        #event-modal .form-group label {
+            font-size: 0.75rem;
+            margin-bottom: 0.3rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        #event-modal .form-control {
+            padding: 0.5rem;
+            font-size: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        #event-modal textarea.form-control {
+            min-height: 50px;
+            resize: vertical;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .image-preview-compact {
+            min-height: 150px;
+            max-height: 300px;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f8f9fa;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .image-preview-compact img {
+            max-width: 100%;
+            max-height: 280px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 1200px) {
+            .modal-grid-3-compact {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .modal-grid-3-compact {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
@@ -299,16 +407,16 @@
 
             filteredEvents = allEvents.filter(event => {
                 const matchSearch = !search ||
-                    event.titulo.toLowerCase().includes(search) ||
-                    (event.descripcion && event.descripcion.toLowerCase().includes(search));
+                    event.title.toLowerCase().includes(search) ||
+                    (event.description && event.description.toLowerCase().includes(search));
 
-                const matchStatus = !status || event.estado === status;
+                const matchStatus = !status || event.status === status;
 
                 let matchDate = true;
                 if (dateFilter === 'upcoming') {
-                    matchDate = new Date(event.fecha_evento) >= now;
+                    matchDate = new Date(event.event_date) >= now;
                 } else if (dateFilter === 'past') {
-                    matchDate = new Date(event.fecha_evento) < now;
+                    matchDate = new Date(event.event_date) < now;
                 }
 
                 return matchSearch && matchStatus && matchDate;
@@ -343,25 +451,25 @@
                             <tr>
                                 <td>
                                     <div class="event-info">
-                                        <strong>${event.titulo}</strong>
-                                        ${event.descripcion ? `<br><small class="text-muted">${truncate(event.descripcion, 60)}</small>` : ''}
+                                        <strong>${event.title}</strong>
+                                        ${event.description ? `<br><small class="text-muted">${truncate(event.description, 60)}</small>` : ''}
                                     </div>
                                 </td>
-                                <td>${event.organizador_nombre || '-'}</td>
+                                <td>${event.author_name || '-'}</td>
                                 <td>
-                                    <strong>${formatEventDate(event.fecha_evento)}</strong>
-                                    ${isUpcoming(event.fecha_evento) ? '<br><span class="badge badge-info">Próximo</span>' : ''}
+                                    <strong>${formatEventDate(event.event_date)}</strong>
+                                    ${isUpcoming(event.event_date) ? '<br><span class="badge badge-info">Próximo</span>' : ''}
                                 </td>
-                                <td>${event.lugar || '-'}</td>
+                                <td>${event.location || '-'}</td>
                                 <td>
-                                    <span class="badge badge-${getStatusBadgeClass(event.estado)}">
-                                        ${getStatusLabel(event.estado)}
+                                    <span class="badge badge-${getStatusBadgeClass(event.status)}">
+                                        ${getStatusLabel(event.status)}
                                     </span>
                                 </td>
                                 <td>${formatDate(event.created_at)}</td>
                                 <td>
                                     <div class="btn-group">
-                                        ${event.estado === 'pendiente' ? `
+                                        ${event.status === 'pending' ? `
                                             <button class="btn btn-sm btn-success" onclick="approveEvent(${event.id})" title="Aprobar">
                                                 ✅
                                             </button>
@@ -387,25 +495,25 @@
         function updateStats() {
             const now = new Date();
             document.getElementById('total-events').textContent = allEvents.length;
-            document.getElementById('pending-events').textContent = allEvents.filter(e => e.estado === 'pendiente').length;
-            document.getElementById('approved-events').textContent = allEvents.filter(e => e.estado === 'aprobado').length;
-            document.getElementById('upcoming-events').textContent = allEvents.filter(e => new Date(e.fecha_evento) >= now).length;
+            document.getElementById('pending-events').textContent = allEvents.filter(e => e.status === 'pending').length;
+            document.getElementById('approved-events').textContent = allEvents.filter(e => e.status === 'approved').length;
+            document.getElementById('upcoming-events').textContent = allEvents.filter(e => new Date(e.event_date) >= now).length;
         }
 
         function getStatusBadgeClass(status) {
             const classes = {
-                pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
+                pending: 'warning',
+                approved: 'success',
+                rejected: 'danger'
             };
             return classes[status] || 'secondary';
         }
 
         function getStatusLabel(status) {
             const labels = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                pending: 'Pendiente',
+                approved: 'Aprobado',
+                rejected: 'Rechazado'
             };
             return labels[status] || status;
         }
@@ -450,7 +558,7 @@
             if (!confirm('¿Aprobar este evento?')) return;
 
             try {
-                const response = await api.updateEvent(eventId, { estado: 'aprobado' });
+                const response = await api.updateEvent(eventId, { status: 'approved' });
                 if (response.success) {
                     Components.toast('Evento aprobado exitosamente', 'success');
                     loadData();
@@ -465,7 +573,7 @@
             if (!confirm('¿Rechazar este evento?')) return;
 
             try {
-                const response = await api.updateEvent(eventId, { estado: 'rechazado' });
+                const response = await api.updateEvent(eventId, { status: 'rejected' });
                 if (response.success) {
                     Components.toast('Evento rechazado', 'success');
                     loadData();
@@ -491,12 +599,86 @@
             }
         }
 
+        // Image Upload
+        async function uploadEventImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                Components.toast('Tipo de archivo no permitido. Usa JPG, PNG, GIF o WebP', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                Components.toast('El archivo excede el tamaño máximo de 10MB', 'error');
+                event.target.value = '';
+                return;
+            }
+
+            try {
+                Components.toast('Subiendo imagen...', 'info');
+
+                const response = await api.uploadFile(file);
+                if (response.success) {
+                    document.getElementById('event-imagen').value = response.data.url;
+                    showImagePreview('event-image-preview', response.data.url);
+                    // Once uploaded, no longer required
+                    event.target.required = false;
+                    Components.toast('Imagen subida correctamente', 'success');
+                }
+            } catch (e) {
+                console.error('Error uploading image:', e);
+                Components.toast('Error subiendo imagen: ' + e.message, 'error');
+                event.target.value = '';
+            }
+        }
+
+        function showImagePreview(containerId, url) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            // Hide the file input when showing preview
+            const inputId = containerId.replace('-preview', '-file');
+            const fileInput = document.getElementById(inputId);
+            if (fileInput) {
+                fileInput.style.display = 'none';
+            }
+
+            container.innerHTML = '';
+            container.style.display = 'flex';
+
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '280px';
+            img.style.objectFit = 'contain';
+
+            container.appendChild(img);
+        }
+
         function showCreateModal() {
             document.getElementById('modal-title').textContent = 'Nuevo Evento';
             document.getElementById('event-form').reset();
             document.getElementById('event-id').value = '';
+            document.getElementById('event-imagen').value = '';
             document.getElementById('event-precio').value = '0';
-            document.getElementById('event-estado').value = 'pendiente';
+            document.getElementById('event-estado').value = 'pending';
+
+            // Clear image preview
+            const previewContainer = document.getElementById('event-image-preview');
+            previewContainer.innerHTML = '';
+            previewContainer.style.display = 'flex';
+
+            // Show file input again and make it required for new events
+            const fileInput = document.getElementById('event-imagen-file');
+            fileInput.style.display = 'block';
+            fileInput.value = '';
+            fileInput.required = true;
+
             openModal();
         }
 
@@ -506,26 +688,42 @@
 
             document.getElementById('modal-title').textContent = 'Editar Evento';
             document.getElementById('event-id').value = event.id;
-            document.getElementById('event-titulo').value = event.titulo || '';
-            document.getElementById('event-descripcion').value = event.descripcion || '';
+            document.getElementById('event-titulo').value = event.title || '';
+            document.getElementById('event-descripcion').value = event.description || '';
 
             // Format datetime for input
-            if (event.fecha_evento) {
-                const date = new Date(event.fecha_evento);
+            if (event.event_date) {
+                const date = new Date(event.event_date);
                 const formattedDate = date.toISOString().slice(0, 16);
                 document.getElementById('event-fecha').value = formattedDate;
             }
 
-            document.getElementById('event-lugar').value = event.lugar || '';
-            document.getElementById('event-direccion').value = event.direccion || '';
-            document.getElementById('event-precio').value = event.precio || '0';
-            document.getElementById('event-imagen').value = event.imagen_url || '';
-            document.getElementById('event-categoria').value = event.categoria_id || '';
-            document.getElementById('event-zona').value = event.zona_id || '';
-            document.getElementById('event-telefono').value = event.telefono || '';
+            document.getElementById('event-lugar').value = event.location || '';
+            document.getElementById('event-direccion').value = event.address || '';
+            document.getElementById('event-precio').value = event.price || '0';
+            document.getElementById('event-imagen').value = event.image_url || '';
+            document.getElementById('event-categoria').value = event.category_id || '';
+            document.getElementById('event-zona').value = event.zone_id || '';
+            document.getElementById('event-telefono').value = event.phone || '';
             document.getElementById('event-whatsapp').value = event.whatsapp || '';
-            document.getElementById('event-web').value = event.sitio_web || '';
-            document.getElementById('event-estado').value = event.estado || 'pendiente';
+            document.getElementById('event-web').value = event.website || '';
+            document.getElementById('event-estado').value = event.status || 'pending';
+
+            const fileInput = document.getElementById('event-imagen-file');
+
+            // Show image preview if exists
+            if (event.image_url) {
+                showImagePreview('event-image-preview', event.image_url);
+                // Don't require new image if one already exists
+                fileInput.required = false;
+            } else {
+                const previewContainer = document.getElementById('event-image-preview');
+                previewContainer.innerHTML = '';
+                previewContainer.style.display = 'flex';
+                fileInput.style.display = 'block';
+                fileInput.required = true;
+            }
+
             openModal();
         }
 
@@ -533,20 +731,40 @@
             event.preventDefault();
 
             const eventId = document.getElementById('event-id').value;
+            const imagenUrl = document.getElementById('event-imagen').value;
+
+            // Validate image for new events
+            if (!eventId && !imagenUrl) {
+                Components.toast('Debe subir una imagen del evento', 'error');
+                return;
+            }
+
+            // Get datetime-local value and split it
+            const fechaEvento = document.getElementById('event-fecha').value;
+            let eventDate = null;
+            let eventTime = null;
+
+            if (fechaEvento) {
+                const dateObj = new Date(fechaEvento);
+                eventDate = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD
+                eventTime = dateObj.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
+            }
+
             const data = {
-                titulo: document.getElementById('event-titulo').value,
-                descripcion: document.getElementById('event-descripcion').value,
-                fecha_evento: document.getElementById('event-fecha').value,
-                lugar: document.getElementById('event-lugar').value,
-                direccion: document.getElementById('event-direccion').value || null,
-                precio: parseFloat(document.getElementById('event-precio').value) || 0,
-                imagen_url: document.getElementById('event-imagen').value || null,
-                categoria_id: document.getElementById('event-categoria').value || null,
-                zona_id: document.getElementById('event-zona').value || null,
-                telefono: document.getElementById('event-telefono').value || null,
+                title: document.getElementById('event-titulo').value,
+                description: document.getElementById('event-descripcion').value,
+                event_date: eventDate,
+                event_time: eventTime,
+                location: document.getElementById('event-lugar').value,
+                address: document.getElementById('event-direccion').value || null,
+                price: parseFloat(document.getElementById('event-precio').value) || 0,
+                image_url: imagenUrl || null,
+                category_id: document.getElementById('event-categoria').value || null,
+                zone_id: document.getElementById('event-zona').value || null,
+                phone: document.getElementById('event-telefono').value || null,
                 whatsapp: document.getElementById('event-whatsapp').value || null,
-                sitio_web: document.getElementById('event-web').value || null,
-                estado: document.getElementById('event-estado').value
+                website: document.getElementById('event-web').value || null,
+                status: document.getElementById('event-estado').value
             };
 
             try {
