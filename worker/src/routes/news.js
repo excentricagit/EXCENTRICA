@@ -193,7 +193,7 @@ export async function handleAdminCreateNews(request, env) {
 
     try {
         const data = await request.json();
-        const { title, summary, content, image_url, category_id, status, featured } = data;
+        const { title, summary, content, image_url, image_alt, images, category_id, status, featured, source_url, expiration_date, published_date } = data;
 
         if (!title || !content) {
             return error('Título y contenido son requeridos');
@@ -206,21 +206,26 @@ export async function handleAdminCreateNews(request, env) {
             slug = slug + '-' + Date.now();
         }
 
-        const publishedAt = status === 'published' ? new Date().toISOString() : null;
+        // Si hay fecha de publicación manual, usarla; sino usar la fecha actual si está publicada
+        const publishedAt = published_date || (status === 'published' ? new Date().toISOString() : null);
 
         const result = await env.DB.prepare(`
-            INSERT INTO news (title, slug, summary, content, image_url, category_id, author_id, status, featured, published_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO news (title, slug, summary, content, image_url, image_alt, images, category_id, author_id, status, featured, source_url, expiration_date, published_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             title,
             slug,
             summary || null,
             content,
             image_url || null,
+            image_alt || null,
+            images ? JSON.stringify(images) : null,
             category_id || null,
             user.id,
             status || 'draft',
             featured ? 1 : 0,
+            source_url || null,
+            expiration_date || null,
             publishedAt
         ).run();
 
@@ -237,15 +242,18 @@ export async function handleAdminUpdateNews(request, env, id) {
 
     try {
         const data = await request.json();
-        const { title, summary, content, image_url, category_id, status, featured } = data;
+        const { title, summary, content, image_url, image_alt, images, category_id, status, featured, source_url, expiration_date, published_date } = data;
 
         const existing = await env.DB.prepare('SELECT * FROM news WHERE id = ?').bind(id).first();
         if (!existing) {
             return notFound('Noticia no encontrada');
         }
 
+        // Si hay fecha de publicación manual, usarla; sino mantener la existente o usar fecha actual si recién se publica
         let publishedAt = existing.published_at;
-        if (status === 'published' && existing.status !== 'published') {
+        if (published_date) {
+            publishedAt = published_date;
+        } else if (status === 'published' && existing.status !== 'published') {
             publishedAt = new Date().toISOString();
         }
 
@@ -255,9 +263,13 @@ export async function handleAdminUpdateNews(request, env, id) {
                 summary = COALESCE(?, summary),
                 content = COALESCE(?, content),
                 image_url = COALESCE(?, image_url),
+                image_alt = COALESCE(?, image_alt),
+                images = COALESCE(?, images),
                 category_id = COALESCE(?, category_id),
                 status = COALESCE(?, status),
                 featured = COALESCE(?, featured),
+                source_url = COALESCE(?, source_url),
+                expiration_date = COALESCE(?, expiration_date),
                 published_at = ?,
                 updated_at = datetime('now')
             WHERE id = ?
@@ -266,9 +278,13 @@ export async function handleAdminUpdateNews(request, env, id) {
             summary || null,
             content || null,
             image_url || null,
+            image_alt || null,
+            images ? JSON.stringify(images) : null,
             category_id || null,
             status || null,
             featured !== undefined ? (featured ? 1 : 0) : null,
+            source_url || null,
+            expiration_date || null,
             publishedAt,
             id
         ).run();

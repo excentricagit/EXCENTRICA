@@ -306,7 +306,6 @@
             document.getElementById('modal-title').textContent = 'Nueva Zona';
             document.getElementById('zone-form').reset();
             document.getElementById('zone-id').value = '';
-            document.getElementById('zone-tipo').value = 'ciudad';
             document.getElementById('zone-activa').checked = true;
             openModal();
         }
@@ -333,18 +332,12 @@
                 is_active: document.getElementById('zone-activa').checked
             };
 
-            console.log('Saving zone:', { zoneId, data });
-
             try {
                 let response;
                 if (zoneId) {
-                    console.log('Updating zone:', zoneId);
                     response = await api.updateZone(zoneId, data);
-                    console.log('Update response:', response);
                 } else {
-                    console.log('Creating zone');
                     response = await api.createZone(data);
-                    console.log('Create response:', response);
                 }
 
                 if (response.success) {
@@ -352,7 +345,6 @@
                     closeModal();
                     loadZones();
                 } else {
-                    console.error('API returned failure:', response);
                     Components.toast(response.message || 'Error guardando zona', 'error');
                 }
             } catch (e) {

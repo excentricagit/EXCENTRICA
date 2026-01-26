@@ -140,7 +140,7 @@
 
     <!-- Modal para crear/editar noticia -->
     <div class="modal-backdrop" id="news-modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal" id="news-modal">
+    <div class="modal modal-large" id="news-modal">
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Nueva Noticia</h3>
             <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -149,52 +149,114 @@
             <form id="news-form" onsubmit="saveNews(event)">
                 <input type="hidden" id="news-id">
 
-                <div class="form-group">
-                    <label for="news-titulo">Título *</label>
-                    <input type="text" id="news-titulo" class="form-control" required>
-                </div>
+                <div class="form-grid-3">
+                    <!-- COLUMNA 1: Información Principal -->
+                    <div class="form-column">
+                        <h4 class="form-section-title">Información Principal</h4>
 
-                <div class="form-group">
-                    <label for="news-contenido">Contenido *</label>
-                    <textarea id="news-contenido" class="form-control" rows="6" required></textarea>
-                </div>
+                        <div class="form-group">
+                            <label for="news-titulo">Título *</label>
+                            <input type="text" id="news-titulo" class="form-control" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="news-resumen">Resumen</label>
-                    <textarea id="news-resumen" class="form-control" rows="2" placeholder="Breve resumen de la noticia"></textarea>
-                </div>
+                        <div class="form-group">
+                            <label for="news-resumen">Subtítulo/Resumen *</label>
+                            <textarea id="news-resumen" class="form-control" rows="3" placeholder="Breve resumen que aparecerá en la vista previa" required></textarea>
+                        </div>
 
-                <div class="form-group">
-                    <label for="news-imagen">URL de Imagen</label>
-                    <input type="url" id="news-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
-                </div>
+                        <div class="form-group">
+                            <label for="news-contenido">Contenido Completo *</label>
+                            <textarea id="news-contenido" class="form-control" rows="12" required></textarea>
+                        </div>
 
-                <div class="form-group">
-                    <label for="news-categoria">Categoría</label>
-                    <select id="news-categoria" class="form-control">
-                        <option value="">Sin categoría</option>
-                    </select>
-                </div>
+                        <div class="form-group">
+                            <label for="news-fuente">Fuente / URL de Origen</label>
+                            <input type="url" id="news-fuente" class="form-control" placeholder="https://fuente.com/articulo">
+                            <small class="text-muted">Enlace a la fuente original de la noticia</small>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label for="news-zona">Zona</label>
-                    <select id="news-zona" class="form-control">
-                        <option value="">Sin zona específica</option>
-                    </select>
-                </div>
+                    <!-- COLUMNA 2: Imágenes -->
+                    <div class="form-column">
+                        <h4 class="form-section-title">Imágenes</h4>
 
-                <div class="form-group">
-                    <label for="news-estado">Estado</label>
-                    <select id="news-estado" class="form-control">
-                        <option value="pending">Pendiente</option>
-                        <option value="published">Publicada</option>
-                        <option value="rejected">Rechazada</option>
-                    </select>
+                        <div class="form-group">
+                            <label for="news-imagen-principal-file">Imagen de Portada *</label>
+                            <input type="hidden" id="news-imagen-principal">
+                            <input type="file" id="news-imagen-principal-file" class="form-control" accept="image/*" onchange="uploadMainImage(event)" required>
+                            <div id="main-image-preview" class="image-preview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-imagen-alt">Texto Alternativo (Alt) *</label>
+                            <input type="text" id="news-imagen-alt" class="form-control" placeholder="Descripción de la imagen para accesibilidad" required>
+                            <small class="text-muted">Describe la imagen para lectores de pantalla</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-imagen-extra-1-file">Imagen Extra 1</label>
+                            <input type="hidden" id="news-imagen-extra-1">
+                            <input type="file" id="news-imagen-extra-1-file" class="form-control" accept="image/*" onchange="uploadExtraImage(event, 1)">
+                            <div id="extra-image-1-preview" class="image-preview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-imagen-extra-2-file">Imagen Extra 2</label>
+                            <input type="hidden" id="news-imagen-extra-2">
+                            <input type="file" id="news-imagen-extra-2-file" class="form-control" accept="image/*" onchange="uploadExtraImage(event, 2)">
+                            <div id="extra-image-2-preview" class="image-preview"></div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA 3: Metadatos y Configuración -->
+                    <div class="form-column">
+                        <h4 class="form-section-title">Configuración</h4>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="news-categoria">Categoría</label>
+                                <select id="news-categoria" class="form-control">
+                                    <option value="">Sin categoría</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="news-estado">Estado</label>
+                                <select id="news-estado" class="form-control">
+                                    <option value="draft">Borrador</option>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="published">Publicada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-switch">
+                                <input type="checkbox" id="news-destacada">
+                                <label for="news-destacada">
+                                    <strong>Noticia Destacada</strong>
+                                    <small class="text-muted d-block">Aparecerá en la portada principal</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-fecha-publicacion">Fecha de Publicación</label>
+                            <input type="datetime-local" id="news-fecha-publicacion" class="form-control">
+                            <small class="text-muted">Fecha y hora de publicación de la noticia</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-fecha-expiracion">Fecha de Expiración</label>
+                            <input type="datetime-local" id="news-fecha-expiracion" class="form-control">
+                            <small class="text-muted">Fecha en que la noticia dejará de mostrarse</small>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="submit" class="btn btn-primary" id="save-btn">Guardar</button>
                 </div>
             </form>
         </div>
@@ -216,14 +278,12 @@
         let allNews = [];
         let filteredNews = [];
         let categories = [];
-        let zones = [];
 
         async function loadData() {
             try {
-                const [newsResponse, categoriesResponse, zonesResponse] = await Promise.all([
+                const [newsResponse, categoriesResponse] = await Promise.all([
                     api.getAdminNews(),
-                    api.getAdminCategories('noticias'),
-                    api.getAdminZones()
+                    api.getAdminCategories('noticias')
                 ]);
 
                 if (newsResponse.success) {
@@ -237,11 +297,6 @@
                     renderCategoryFilter();
                     renderCategoryOptions();
                 }
-
-                if (zonesResponse.success) {
-                    zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
-                    renderZoneOptions();
-                }
             } catch (e) {
                 console.error('Error loading data:', e);
                 Components.toast('Error cargando datos', 'error');
@@ -252,12 +307,6 @@
             const select = document.getElementById('news-categoria');
             select.innerHTML = '<option value="">Sin categoría</option>' +
                 categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
-        }
-
-        function renderZoneOptions() {
-            const select = document.getElementById('news-zona');
-            select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
         }
 
         function renderCategoryFilter() {
@@ -447,6 +496,17 @@
             document.getElementById('modal-title').textContent = 'Nueva Noticia';
             document.getElementById('news-form').reset();
             document.getElementById('news-id').value = '';
+
+            // Limpiar previsualizaciones de imágenes
+            document.getElementById('main-image-preview').innerHTML = '';
+            document.getElementById('extra-image-1-preview').innerHTML = '';
+            document.getElementById('extra-image-2-preview').innerHTML = '';
+
+            // Establecer fecha de publicación a ahora (autocompletada pero editable)
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('news-fecha-publicacion').value = now.toISOString().slice(0, 16);
+
             openModal();
         }
 
@@ -459,25 +519,73 @@
             document.getElementById('news-titulo').value = news.title || '';
             document.getElementById('news-contenido').value = news.content || '';
             document.getElementById('news-resumen').value = news.summary || '';
-            document.getElementById('news-imagen').value = news.image_url || '';
+            document.getElementById('news-imagen-principal').value = news.image_url || '';
+            document.getElementById('news-imagen-alt').value = news.image_alt || '';
+            document.getElementById('news-fuente').value = news.source_url || '';
             document.getElementById('news-categoria').value = news.category_id || '';
-            document.getElementById('news-zona').value = news.zone_id || '';
-            document.getElementById('news-estado').value = news.status || 'pending';
+            document.getElementById('news-estado').value = news.status || 'draft';
+            document.getElementById('news-destacada').checked = news.featured || false;
+
+            // Cargar imágenes extras si existen
+            if (news.images) {
+                try {
+                    const images = JSON.parse(news.images);
+                    if (images[0]) {
+                        document.getElementById('news-imagen-extra-1').value = images[0];
+                        showImagePreview('extra-image-1-preview', images[0]);
+                    }
+                    if (images[1]) {
+                        document.getElementById('news-imagen-extra-2').value = images[1];
+                        showImagePreview('extra-image-2-preview', images[1]);
+                    }
+                } catch (e) {
+                    console.error('Error parsing images:', e);
+                }
+            }
+
+            // Cargar fechas
+            if (news.published_at) {
+                document.getElementById('news-fecha-publicacion').value = formatDateTimeLocal(news.published_at);
+            }
+            if (news.expiration_date) {
+                document.getElementById('news-fecha-expiracion').value = formatDateTimeLocal(news.expiration_date);
+            }
+
+            // Mostrar previsualizaciones
+            if (news.image_url) showImagePreview('main-image-preview', news.image_url);
+
             openModal();
         }
 
         async function saveNews(event) {
             event.preventDefault();
 
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Guardando...';
+
             const newsId = document.getElementById('news-id').value;
+
+            // Recopilar imágenes extras
+            const extraImages = [];
+            const img1 = document.getElementById('news-imagen-extra-1').value;
+            const img2 = document.getElementById('news-imagen-extra-2').value;
+            if (img1) extraImages.push(img1);
+            if (img2) extraImages.push(img2);
+
             const data = {
                 title: document.getElementById('news-titulo').value,
-                content: document.getElementById('news-contenido').value,
                 summary: document.getElementById('news-resumen').value || null,
-                image_url: document.getElementById('news-imagen').value || null,
+                content: document.getElementById('news-contenido').value,
+                image_url: document.getElementById('news-imagen-principal').value || null,
+                image_alt: document.getElementById('news-imagen-alt').value || null,
+                images: extraImages.length > 0 ? extraImages : null,
+                source_url: document.getElementById('news-fuente').value || null,
                 category_id: document.getElementById('news-categoria').value || null,
-                zone_id: document.getElementById('news-zona').value || null,
-                status: document.getElementById('news-estado').value
+                status: document.getElementById('news-estado').value,
+                featured: document.getElementById('news-destacada').checked,
+                published_date: document.getElementById('news-fecha-publicacion').value || null,
+                expiration_date: document.getElementById('news-fecha-expiracion').value || null
             };
 
             try {
@@ -492,11 +600,94 @@
                     Components.toast(newsId ? 'Noticia actualizada exitosamente' : 'Noticia creada exitosamente', 'success');
                     closeModal();
                     loadData();
+                } else {
+                    Components.toast(response.message || 'Error guardando noticia', 'error');
                 }
             } catch (e) {
                 console.error('Error saving news:', e);
                 Components.toast(e.message || 'Error guardando noticia', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Guardar';
             }
+        }
+
+        // Upload de imagen principal
+        async function uploadMainImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                Components.toast('Por favor selecciona un archivo de imagen', 'error');
+                return;
+            }
+
+            try {
+                Components.toast('Subiendo imagen...', 'info');
+                const response = await api.uploadFile(file);
+
+                if (response.success) {
+                    const imageUrl = response.data.url;
+                    document.getElementById('news-imagen-principal').value = imageUrl;
+                    showImagePreview('main-image-preview', imageUrl);
+                    Components.toast('Imagen subida exitosamente', 'success');
+                } else {
+                    Components.toast('Error subiendo imagen', 'error');
+                }
+            } catch (e) {
+                console.error('Error uploading image:', e);
+                Components.toast('Error subiendo imagen', 'error');
+            }
+        }
+
+        // Upload de imágenes extras
+        async function uploadExtraImage(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                Components.toast('Por favor selecciona un archivo de imagen', 'error');
+                return;
+            }
+
+            try {
+                Components.toast('Subiendo imagen...', 'info');
+                const response = await api.uploadFile(file);
+
+                if (response.success) {
+                    const imageUrl = response.data.url;
+                    document.getElementById(`news-imagen-extra-${index}`).value = imageUrl;
+                    showImagePreview(`extra-image-${index}-preview`, imageUrl);
+                    Components.toast('Imagen subida exitosamente', 'success');
+                } else {
+                    Components.toast('Error subiendo imagen', 'error');
+                }
+            } catch (e) {
+                console.error('Error uploading image:', e);
+                Components.toast('Error subiendo imagen', 'error');
+            }
+        }
+
+        // Mostrar preview de imagen
+        function showImagePreview(containerId, url) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error('Container not found:', containerId);
+                return;
+            }
+
+            console.log('Showing preview for:', containerId, url);
+            container.innerHTML = `<img src="${url}" alt="Preview" onload="console.log('Image loaded successfully')" onerror="console.error('Image failed to load')">`;
+            container.style.display = 'flex';
+        }
+
+        // Formatear fecha para datetime-local input
+        function formatDateTimeLocal(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const offset = date.getTimezoneOffset() * 60000;
+            const localDate = new Date(date.getTime() - offset);
+            return localDate.toISOString().slice(0, 16);
         }
 
         function openModal() {
@@ -519,5 +710,231 @@
         // Load initial data
         loadData();
     </script>
+    <style>
+        /* Modal grande para 3 columnas */
+        .modal-large {
+            max-width: 1400px;
+            width: 95%;
+        }
+
+        /* Grid de 3 columnas */
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Grid de 2 columnas para campos lado a lado */
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        /* Previsualizaciones de imagen */
+        .image-preview {
+            margin-top: 0.75rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            min-height: 120px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview:empty {
+            display: none;
+        }
+
+        .image-preview:not(:empty) {
+            background: #ffffff;
+            border-color: var(--primary);
+            border-style: solid;
+        }
+
+        /* Ajustes para inputs de archivo */
+        input[type="file"].form-control {
+            padding: 0.5rem;
+        }
+
+        /* Espaciado entre inputs */
+        .mt-2 {
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive: a 2 columnas en tablets */
+        @media (max-width: 1200px) {
+            .modal-large {
+                max-width: 1000px;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-column:last-child {
+                grid-column: span 2;
+            }
+        }
+
+        /* Responsive: a 1 columna en móviles */
+        @media (max-width: 768px) {
+            .modal-large {
+                max-width: 95%;
+                width: 95%;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-column:last-child {
+                grid-column: span 1;
+            }
+        }
+
+        /* Inputs de fecha - fondo blanco para que se vea el calendario */
+        input[type="datetime-local"].form-control {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #ddd;
+        }
+
+        input[type="datetime-local"].form-control::-webkit-calendar-picker-indicator {
+            filter: invert(0);
+            cursor: pointer;
+        }
+
+        /* Checkbox personalizado tipo switch */
+        .checkbox-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: #2d2d3d;
+            border-radius: 8px;
+            border: 1px solid #444;
+            transition: all 0.3s ease;
+        }
+
+        .checkbox-switch:hover {
+            background: #3a3a4a;
+            border-color: var(--primary);
+        }
+
+        .checkbox-switch label {
+            color: #ffffff;
+        }
+
+        .checkbox-switch label strong {
+            color: #ffffff;
+        }
+
+        .checkbox-switch .text-muted {
+            color: #b0b0b0 !important;
+        }
+
+        .checkbox-switch input[type="checkbox"] {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            appearance: none;
+            background: #ccc;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0;
+        }
+
+        .checkbox-switch input[type="checkbox"]:checked {
+            background: var(--primary);
+        }
+
+        .checkbox-switch input[type="checkbox"]::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .checkbox-switch input[type="checkbox"]:checked::before {
+            left: 26px;
+        }
+
+        .checkbox-switch label {
+            margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Preview de imagen mejorado */
+        .image-preview {
+            margin-top: 0.75rem;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            display: none !important;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            background: #ffffff;
+            min-height: 150px;
+            max-height: 300px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview img {
+            display: block;
+            max-width: 100%;
+            max-height: 260px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        /* Mejoras visuales */
+        .text-muted {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .d-block {
+            display: block;
+        }
+    </style>
 </body>
 </html>

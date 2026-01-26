@@ -121,7 +121,7 @@ export async function handleAdminUpdateCategory(request, env, id) {
     if (authError) return authError;
 
     try {
-        const { name, icon, is_active } = await request.json();
+        const { name, section, icon, is_active } = await request.json();
 
         const existing = await env.DB.prepare('SELECT * FROM categories WHERE id = ?').bind(id).first();
         if (!existing) {
@@ -133,16 +133,29 @@ export async function handleAdminUpdateCategory(request, env, id) {
             slug = generateSlug(name);
         }
 
+        // Verificar duplicado si cambia nombre o sección
+        if ((name && name !== existing.name) || (section && section !== existing.section)) {
+            const duplicate = await env.DB.prepare(
+                'SELECT id FROM categories WHERE slug = ? AND section = ? AND id != ?'
+            ).bind(slug, section || existing.section, id).first();
+
+            if (duplicate) {
+                return error('Ya existe una categoría con ese nombre en esta sección');
+            }
+        }
+
         await env.DB.prepare(`
             UPDATE categories SET
                 name = COALESCE(?, name),
                 slug = ?,
+                section = COALESCE(?, section),
                 icon = COALESCE(?, icon),
                 is_active = COALESCE(?, is_active)
             WHERE id = ?
         `).bind(
             name || null,
             slug,
+            section || null,
             icon || null,
             is_active !== undefined ? (is_active ? 1 : 0) : null,
             id
