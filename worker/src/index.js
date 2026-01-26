@@ -46,8 +46,15 @@ import {
     handleAdminGetCinemas, handleAdminCreateCinema, handleAdminUpdateCinema, handleAdminDeleteCinema,
     handleAdminGetMovies, handleAdminCreateMovie, handleAdminUpdateMovie, handleAdminDeleteMovie,
     handleAdminGetShowtimes, handleAdminCreateShowtime, handleAdminUpdateShowtime, handleAdminDeleteShowtime,
-    handleAdminBulkCreateShowtimes
+    handleAdminBulkCreateShowtimes, handleAdminBulkDeleteShowtimes
 } from './routes/cinema.js';
+
+// Gastronomy routes
+import {
+    handleGetGastronomy, handleGetGastronomyById, handleGetGastronomyBySlug,
+    handleAdminGetGastronomy, handleAdminCreateGastronomy, handleAdminUpdateGastronomy,
+    handleAdminDeleteGastronomy, handleAdminUpdateGastronomyStatus, handleAdminToggleGastronomyFeatured
+} from './routes/gastronomy.js';
 
 // Simple router
 function matchRoute(method, path, routes) {
@@ -227,8 +234,24 @@ const routes = [
     { method: 'GET', path: '/api/admin/showtimes', handler: handleAdminGetShowtimes },
     { method: 'POST', path: '/api/admin/showtimes', handler: handleAdminCreateShowtime },
     { method: 'POST', path: '/api/admin/showtimes/bulk', handler: handleAdminBulkCreateShowtimes },
+    { method: 'POST', path: '/api/admin/showtimes/bulk-delete', handler: handleAdminBulkDeleteShowtimes },
     { method: 'PUT', path: '/api/admin/showtimes/:id', handler: (req, env, params) => handleAdminUpdateShowtime(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/showtimes/:id', handler: (req, env, params) => handleAdminDeleteShowtime(req, env, params.id) },
+
+    // ========== GASTRONOMY ROUTES ==========
+
+    // Gastronomy (public)
+    { method: 'GET', path: '/api/gastronomy', handler: handleGetGastronomy },
+    { method: 'GET', path: '/api/gastronomy/:id', handler: (req, env, params) => handleGetGastronomyById(req, env, params.id) },
+    { method: 'GET', path: '/api/gastronomy/slug/:slug', handler: (req, env, params) => handleGetGastronomyBySlug(req, env, params.slug) },
+
+    // Admin - Gastronomy
+    { method: 'GET', path: '/api/admin/gastronomy', handler: handleAdminGetGastronomy },
+    { method: 'POST', path: '/api/admin/gastronomy', handler: handleAdminCreateGastronomy },
+    { method: 'PUT', path: '/api/admin/gastronomy/:id', handler: (req, env, params) => handleAdminUpdateGastronomy(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/gastronomy/:id', handler: (req, env, params) => handleAdminDeleteGastronomy(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/gastronomy/:id/status', handler: (req, env, params) => handleAdminUpdateGastronomyStatus(req, env, params.id) },
+    { method: 'PATCH', path: '/api/admin/gastronomy/:id/featured', handler: (req, env, params) => handleAdminToggleGastronomyFeatured(req, env, params.id) },
 ];
 
 export default {

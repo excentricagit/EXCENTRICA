@@ -613,3 +613,28 @@ export async function handleAdminBulkCreateShowtimes(request, env) {
         return error('Error creando funciones: ' + e.message, 500);
     }
 }
+
+// Bulk delete showtimes
+export async function handleAdminBulkDeleteShowtimes(request, env) {
+    const { error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        const { ids } = await request.json();
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return error('Se requiere un array de IDs');
+        }
+
+        let deleted = 0;
+        for (const id of ids) {
+            const result = await env.DB.prepare('DELETE FROM showtimes WHERE id = ?').bind(id).run();
+            if (result.meta.changes > 0) deleted++;
+        }
+
+        return success({ deleted }, `${deleted} funciones eliminadas`);
+
+    } catch (e) {
+        return error('Error eliminando funciones: ' + e.message, 500);
+    }
+}

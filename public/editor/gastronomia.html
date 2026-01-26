@@ -3,61 +3,346 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gastronomía - Editor Excentrica</title>
+    <title>Gastronomia - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/editor/editor.css">
+    <style>
+        /* Modal Grande 3 columnas */
+        #restaurant-modal {
+            max-width: 1100px;
+            width: 95%;
+        }
+
+        .modal-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .modal-3col {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .modal-3col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .modal-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-col h4 {
+            color: #a855f7;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        /* Image preview */
+        .image-preview-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: 2px dashed rgba(168, 85, 247, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-preview-container:hover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .image-preview-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-container .placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .image-preview-container .placeholder span {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Services checkboxes */
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+
+        .service-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .service-checkbox:hover {
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .service-checkbox input {
+            accent-color: #a855f7;
+        }
+
+        .service-checkbox label {
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* Price range selector */
+        .price-range-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .price-option {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .price-option:hover {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .price-option.active {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .price-option .price-symbol {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #a855f7;
+        }
+
+        .price-option .price-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 0.25rem;
+        }
+
+        /* Status badge colors */
+        .badge-pending {
+            background: rgba(234, 179, 8, 0.2);
+            color: #eab308;
+        }
+
+        .badge-approved {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .badge-rejected {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        /* Featured star */
+        .featured-star {
+            color: #fbbf24;
+        }
+
+        /* Restaurant card grid */
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .restaurant-card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .restaurant-card:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .restaurant-card-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .restaurant-card-body {
+            padding: 1rem;
+        }
+
+        .restaurant-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .restaurant-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0;
+        }
+
+        .restaurant-card-badges {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .restaurant-card-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .restaurant-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .restaurant-card-services {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-tag {
+            padding: 0.25rem 0.5rem;
+            background: rgba(168, 85, 247, 0.2);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #a855f7;
+        }
+
+        .restaurant-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .restaurant-card-actions .btn {
+            flex: 1;
+        }
+
+        /* View toggle */
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .view-toggle button {
+            padding: 0.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .view-toggle button.active {
+            background: rgba(168, 85, 247, 0.3);
+            border-color: #a855f7;
+        }
+
+        /* Textarea smaller */
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
             <div class="admin-logo">
-                <a href="/"><span>⚡</span> Excentrica</a>
+                <a href="/"><span>EX</span> Excentrica</a>
                 <span class="admin-badge">EDITOR</span>
             </div>
             <nav class="admin-nav">
                 <a href="/editor/" class="admin-nav-item">
-                    <span class="icon">📊</span> Dashboard
+                    <span class="icon">D</span> Dashboard
                 </a>
                 <a href="/editor/noticias.html" class="admin-nav-item">
-                    <span class="icon">📰</span> Noticias
+                    <span class="icon">N</span> Noticias
                 </a>
                 <a href="/editor/productos.html" class="admin-nav-item">
-                    <span class="icon">🛒</span> Productos
+                    <span class="icon">P</span> Productos
                 </a>
                 <a href="/editor/eventos.html" class="admin-nav-item">
-                    <span class="icon">📅</span> Eventos
+                    <span class="icon">E</span> Eventos
                 </a>
                 <a href="/editor/categorias.html" class="admin-nav-item">
-                    <span class="icon">📁</span> Categorías
+                    <span class="icon">C</span> Categorias
                 </a>
                 <a href="/editor/zonas.html" class="admin-nav-item">
-                    <span class="icon">📍</span> Zonas
+                    <span class="icon">Z</span> Zonas
                 </a>
                 <a href="/editor/cine.html" class="admin-nav-item">
-                    <span class="icon">🎬</span> Cine
+                    <span class="icon">CI</span> Cine
                 </a>
                 <a href="/editor/gastronomia.html" class="admin-nav-item active">
-                    <span class="icon">🍽️</span> Gastronomía
+                    <span class="icon">G</span> Gastronomia
                 </a>
                 <a href="/editor/alojamiento.html" class="admin-nav-item">
-                    <span class="icon">🏨</span> Alojamiento
+                    <span class="icon">A</span> Alojamiento
                 </a>
                 <a href="/editor/transporte.html" class="admin-nav-item">
-                    <span class="icon">🚌</span> Transporte
+                    <span class="icon">T</span> Transporte
                 </a>
                 <a href="/editor/servicios.html" class="admin-nav-item">
-                    <span class="icon">🔧</span> Servicios
+                    <span class="icon">S</span> Servicios
                 </a>
                 <a href="/editor/puntos-interes.html" class="admin-nav-item">
-                    <span class="icon">📍</span> Turismo
+                    <span class="icon">PI</span> Turismo
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
-                    <span class="icon">🏠</span> Volver al sitio
+                    <span class="icon">H</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">X</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
@@ -65,11 +350,11 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🍽️ Gestión de Gastronomía</h1>
+                <h1>Gestion de Gastronomia</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
                     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
-                        <span>➕</span> Nuevo Restaurante
+                        + Nuevo Restaurante
                     </button>
                 </div>
             </header>
@@ -78,57 +363,65 @@
                 <!-- Stats -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card">
-                        <div class="stat-icon">🍽️</div>
+                        <div class="stat-icon">R</div>
                         <div class="stat-info">
                             <span class="stat-value" id="total-items">0</span>
-                            <span class="stat-label">Total restaurantes</span>
+                            <span class="stat-label">Total registros</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">✅</div>
+                        <div class="stat-icon">OK</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="active-items">0</span>
-                            <span class="stat-label">Activos</span>
+                            <span class="stat-value" id="approved-items">0</span>
+                            <span class="stat-label">Aprobados</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">⏳</div>
+                        <div class="stat-icon">...</div>
                         <div class="stat-info">
                             <span class="stat-value" id="pending-items">0</span>
                             <span class="stat-label">Pendientes</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">❌</div>
+                        <div class="stat-icon">*</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="rejected-items">0</span>
-                            <span class="stat-label">Rechazados</span>
+                            <span class="stat-value" id="featured-items">0</span>
+                            <span class="stat-label">Destacados</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Compact filters -->
-                <div class="d-flex gap-3 mb-4 flex-wrap">
+                <!-- Filters -->
+                <div class="d-flex gap-3 mb-4 flex-wrap" style="align-items: center;">
                     <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="approved">Aprobado</option>
+                        <option value="rejected">Rechazado</option>
+                    </select>
+                    <select id="filter-zone" class="form-control" style="max-width: 180px;">
+                        <option value="">Todas las zonas</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
                         Limpiar
                     </button>
+                    <div style="flex: 1;"></div>
+                    <div class="view-toggle">
+                        <button id="view-grid" class="active" onclick="setView('grid')" title="Vista de tarjetas">
+                            [=]
+                        </button>
+                        <button id="view-table" onclick="setView('table')" title="Vista de tabla">
+                            [T]
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Table -->
-                <div class="card">
-                    <div class="card-body">
-                        <div id="items-table-container">
-                            <div class="text-center p-4">
-                                <div class="spinner"></div>
-                            </div>
-                        </div>
+                <!-- Content -->
+                <div id="content-container">
+                    <div class="text-center p-4">
+                        <div class="spinner"></div>
                     </div>
                 </div>
             </div>
@@ -136,85 +429,150 @@
     </div>
 
     <!-- Modal para crear/editar -->
-    <div class="modal-backdrop" id="item-modal-backdrop" onclick="closeModal()"></div>
-    <div class="modal" id="item-modal">
+    <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="restaurant-modal">
         <div class="modal-header">
             <h3 class="modal-title" id="modal-title">Nuevo Restaurante</h3>
             <span class="modal-close" onclick="closeModal()">&times;</span>
         </div>
         <div class="modal-body">
-            <form id="item-form" onsubmit="saveItem(event)">
-                <input type="hidden" id="item-id">
+            <form id="restaurant-form" onsubmit="saveRestaurant(event)">
+                <input type="hidden" id="restaurant-id">
 
-                <div class="form-group">
-                    <label for="item-titulo">Nombre *</label>
-                    <input type="text" id="item-titulo" class="form-control" required>
+                <div class="modal-3col">
+                    <!-- Columna 1: Informacion Basica -->
+                    <div class="modal-col">
+                        <h4>Informacion Basica</h4>
+
+                        <div class="form-group">
+                            <label for="restaurant-name">Nombre *</label>
+                            <input type="text" id="restaurant-name" class="form-control" required placeholder="Nombre del restaurante">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-description">Descripcion</label>
+                            <textarea id="restaurant-description" class="form-control" rows="3" placeholder="Breve descripcion del local..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-specialties">Especialidades / Tipo de cocina</label>
+                            <textarea id="restaurant-specialties" class="form-control" rows="2" placeholder="Ej: Parrilla, Pastas, Empanadas..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Rango de precios</label>
+                            <div class="price-range-selector">
+                                <div class="price-option" data-value="$" onclick="selectPriceRange('$')">
+                                    <div class="price-symbol">$</div>
+                                    <div class="price-label">Economico</div>
+                                </div>
+                                <div class="price-option" data-value="$$" onclick="selectPriceRange('$$')">
+                                    <div class="price-symbol">$$</div>
+                                    <div class="price-label">Moderado</div>
+                                </div>
+                                <div class="price-option" data-value="$$$" onclick="selectPriceRange('$$$')">
+                                    <div class="price-symbol">$$$</div>
+                                    <div class="price-label">Premium</div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="restaurant-price-range" value="">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Servicios</label>
+                            <div class="services-grid">
+                                <div class="service-checkbox">
+                                    <input type="checkbox" id="restaurant-delivery">
+                                    <label for="restaurant-delivery">Delivery</label>
+                                </div>
+                                <div class="service-checkbox">
+                                    <input type="checkbox" id="restaurant-takeaway">
+                                    <label for="restaurant-takeaway">Take away</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Ubicacion y Contacto -->
+                    <div class="modal-col">
+                        <h4>Ubicacion y Contacto</h4>
+
+                        <div class="form-group">
+                            <label for="restaurant-zone">Zona</label>
+                            <select id="restaurant-zone" class="form-control">
+                                <option value="">Seleccionar zona...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-address">Direccion</label>
+                            <input type="text" id="restaurant-address" class="form-control" placeholder="Calle y numero">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-phone">Telefono</label>
+                            <input type="tel" id="restaurant-phone" class="form-control" placeholder="Ej: 0385-4123456">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-email">Email</label>
+                            <input type="email" id="restaurant-email" class="form-control" placeholder="contacto@ejemplo.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-instagram">Instagram</label>
+                            <input type="text" id="restaurant-instagram" class="form-control" placeholder="@usuario">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-website">Sitio Web / Menu</label>
+                            <input type="url" id="restaurant-website" class="form-control" placeholder="https://...">
+                            <small style="color: rgba(255,255,255,0.5);">Link externo al menu o pagina del local</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="restaurant-schedule">Horarios</label>
+                            <textarea id="restaurant-schedule" class="form-control" rows="2" placeholder="Ej: Lun-Vie 12:00-15:00, 20:00-00:00"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: Imagen y Estado -->
+                    <div class="modal-col">
+                        <h4>Imagen</h4>
+
+                        <div class="form-group">
+                            <label>Foto del local</label>
+                            <div class="image-preview-container" onclick="document.getElementById('restaurant-image-file').click()">
+                                <div id="image-preview" class="placeholder">
+                                    <span>+</span>
+                                    Click para subir imagen
+                                </div>
+                            </div>
+                            <input type="file" id="restaurant-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+                            <input type="hidden" id="restaurant-image-url">
+                        </div>
+
+                        <h4 style="margin-top: 1rem;">Estado</h4>
+
+                        <div class="form-group">
+                            <label for="restaurant-status">Estado de publicacion</label>
+                            <select id="restaurant-status" class="form-control">
+                                <option value="pending">Pendiente</option>
+                                <option value="approved">Aprobado</option>
+                                <option value="rejected">Rechazado</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="service-checkbox" style="background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3);">
+                                <input type="checkbox" id="restaurant-featured">
+                                <label for="restaurant-featured" style="color: #fbbf24;">* Destacar restaurante</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="item-descripcion">Descripción *</label>
-                    <textarea id="item-descripcion" class="form-control" rows="4" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-imagen">URL de Imagen</label>
-                    <input type="url" id="item-imagen" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-categoria">Categoría</label>
-                    <select id="item-categoria" class="form-control">
-                        <option value="">Sin categoría</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-zona">Zona</label>
-                    <select id="item-zona" class="form-control">
-                        <option value="">Sin zona específica</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-direccion">Dirección</label>
-                    <input type="text" id="item-direccion" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-telefono">Teléfono</label>
-                    <input type="tel" id="item-telefono" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-whatsapp">WhatsApp</label>
-                    <input type="tel" id="item-whatsapp" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-horarios">Horarios</label>
-                    <textarea id="item-horarios" class="form-control" rows="2" placeholder="Ej: Lun-Vie 12:00-23:00"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="item-precio">Precio Promedio</label>
-                    <input type="number" id="item-precio" class="form-control" step="0.01" min="0">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-web">Sitio Web</label>
-                    <input type="url" id="item-web" class="form-control">
-                </div>
-
-                <div class="form-group">
-                    <label for="item-estado">Estado</label>
-                    <select id="item-estado" class="form-control">
-                        <option value="pendiente">Pendiente</option>
-                        <option value="aprobado">Aprobado</option>
-                        <option value="rechazado">Rechazado</option>
-                    </select>
-                </div>
-
-                <div class="modal-footer">
+                <div class="modal-footer" style="margin-top: 1.5rem;">
                     <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
@@ -228,39 +586,37 @@
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script>
+        // Auth check
         if (!auth.getUser()) {
-            // Se redirige automáticamente
+            // Redirect happens automatically
         }
-
         document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
 
-        const SECTION = 'gastronomia';
-        let allItems = [];
-        let filteredItems = [];
-        let categories = [];
+        // State
+        let allRestaurants = [];
+        let filteredRestaurants = [];
         let zones = [];
+        let currentView = 'grid';
+
+        // =============================================
+        // DATA LOADING
+        // =============================================
 
         async function loadData() {
             try {
-                const [itemsResponse, categoriesResponse, zonesResponse] = await Promise.all([
-                    api.getAdminProducts({ section: SECTION }),
-                    api.getAdminCategories('productos'),
+                const [restaurantsRes, zonesRes] = await Promise.all([
+                    api.getAdminGastronomy(),
                     api.getAdminZones()
                 ]);
 
-                if (itemsResponse.success) {
-                    allItems = itemsResponse.data[SECTION] || itemsResponse.data || [];
+                if (restaurantsRes.success) {
+                    allRestaurants = restaurantsRes.data.items || [];
                     applyFilters();
                     updateStats();
                 }
 
-                if (categoriesResponse.success) {
-                    categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
-                    renderCategoryOptions();
-                }
-
-                if (zonesResponse.success) {
-                    zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
+                if (zonesRes.success) {
+                    zones = Array.isArray(zonesRes.data) ? zonesRes.data : [];
                     renderZoneOptions();
                 }
             } catch (e) {
@@ -269,120 +625,203 @@
             }
         }
 
-        function renderCategoryOptions() {
-            const select = document.getElementById('item-categoria');
-            select.innerHTML = '<option value="">Sin categoría</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        function renderZoneOptions() {
+            // Filter dropdown
+            const filterZone = document.getElementById('filter-zone');
+            filterZone.innerHTML = '<option value="">Todas las zonas</option>' +
+                zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+
+            // Modal dropdown
+            const modalZone = document.getElementById('restaurant-zone');
+            modalZone.innerHTML = '<option value="">Seleccionar zona...</option>' +
+                zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
         }
 
-        function renderZoneOptions() {
-            const select = document.getElementById('item-zona');
-            select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
+        function updateStats() {
+            document.getElementById('total-items').textContent = allRestaurants.length;
+            document.getElementById('approved-items').textContent = allRestaurants.filter(r => r.status === 'approved').length;
+            document.getElementById('pending-items').textContent = allRestaurants.filter(r => r.status === 'pending').length;
+            document.getElementById('featured-items').textContent = allRestaurants.filter(r => r.featured).length;
         }
+
+        // =============================================
+        // FILTERS
+        // =============================================
 
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
             const status = document.getElementById('filter-status').value;
+            const zoneId = document.getElementById('filter-zone').value;
 
-            filteredItems = allItems.filter(item => {
+            filteredRestaurants = allRestaurants.filter(r => {
                 const matchSearch = !search ||
-                    item.titulo.toLowerCase().includes(search) ||
-                    (item.descripcion && item.descripcion.toLowerCase().includes(search));
+                    r.name.toLowerCase().includes(search) ||
+                    (r.description && r.description.toLowerCase().includes(search)) ||
+                    (r.specialties && r.specialties.toLowerCase().includes(search));
 
-                const matchStatus = !status || item.estado === status;
+                const matchStatus = !status || r.status === status;
+                const matchZone = !zoneId || r.zone_id == zoneId;
 
-                return matchSearch && matchStatus;
+                return matchSearch && matchStatus && matchZone;
             });
 
-            renderTable();
+            renderContent();
         }
 
-        function renderTable() {
-            const container = document.getElementById('items-table-container');
+        function resetFilters() {
+            document.getElementById('search').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('filter-zone').value = '';
+            applyFilters();
+        }
 
-            if (filteredItems.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron registros</p>';
+        // =============================================
+        // VIEW TOGGLE
+        // =============================================
+
+        function setView(view) {
+            currentView = view;
+            document.getElementById('view-grid').classList.toggle('active', view === 'grid');
+            document.getElementById('view-table').classList.toggle('active', view === 'table');
+            renderContent();
+        }
+
+        function renderContent() {
+            if (currentView === 'grid') {
+                renderGrid();
+            } else {
+                renderTable();
+            }
+        }
+
+        // =============================================
+        // GRID VIEW
+        // =============================================
+
+        function renderGrid() {
+            const container = document.getElementById('content-container');
+
+            if (filteredRestaurants.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron restaurantes</p>';
                 return;
             }
 
             container.innerHTML = `
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Zona</th>
-                            <th>Categoría</th>
-                            <th>Estado</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredItems.map(item => `
-                            <tr>
-                                <td>
-                                    <strong>${item.titulo}</strong>
-                                    ${item.descripcion ? `<br><small class="text-muted">${truncate(item.descripcion, 60)}</small>` : ''}
-                                </td>
-                                <td>${item.zona_nombre || '-'}</td>
-                                <td>
-                                    <span class="badge badge-secondary">
-                                        ${item.categoria_nombre || '-'}
+                <div class="restaurant-grid">
+                    ${filteredRestaurants.map(r => `
+                        <div class="restaurant-card">
+                            ${r.image_url ?
+                                `<img src="${r.image_url}" class="restaurant-card-image" alt="${r.name}">` :
+                                `<div class="restaurant-card-image" style="display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.3);">Sin imagen</div>`
+                            }
+                            <div class="restaurant-card-body">
+                                <div class="restaurant-card-header">
+                                    <h4 class="restaurant-card-title">
+                                        ${r.featured ? '<span class="featured-star">*</span> ' : ''}
+                                        ${r.name}
+                                    </h4>
+                                    <span class="badge badge-${r.status === 'approved' ? 'approved' : r.status === 'pending' ? 'pending' : 'rejected'}">
+                                        ${getStatusLabel(r.status)}
                                     </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-${getStatusBadgeClass(item.estado)}">
-                                        ${getStatusLabel(item.estado)}
-                                    </span>
-                                </td>
-                                <td>${formatDate(item.created_at)}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        ${item.estado === 'pendiente' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveItem(${item.id})" title="Aprobar">
-                                                ✅
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectItem(${item.id})" title="Rechazar">
-                                                ❌
-                                            </button>
-                                        ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editItem(${item.id})" title="Editar">
-                                            ✏️
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})" title="Eliminar">
-                                            🗑️
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                                </div>
+                                <div class="restaurant-card-meta">
+                                    ${r.zone_name ? `<span>[Z] ${r.zone_name}</span>` : ''}
+                                    ${r.price_range ? `<span>${r.price_range}</span>` : ''}
+                                    ${r.phone ? `<span>[T] ${r.phone}</span>` : ''}
+                                </div>
+                                ${r.specialties ? `<p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 0.75rem;">${truncate(r.specialties, 80)}</p>` : ''}
+                                <div class="restaurant-card-services">
+                                    ${r.has_delivery ? '<span class="service-tag">Delivery</span>' : ''}
+                                    ${r.has_takeaway ? '<span class="service-tag">Take away</span>' : ''}
+                                    ${r.website ? '<span class="service-tag">Web</span>' : ''}
+                                </div>
+                                <div class="restaurant-card-actions">
+                                    ${r.status === 'pending' ? `
+                                        <button class="btn btn-sm btn-success" onclick="approveRestaurant(${r.id})" title="Aprobar">OK</button>
+                                        <button class="btn btn-sm btn-danger" onclick="rejectRestaurant(${r.id})" title="Rechazar">X</button>
+                                    ` : ''}
+                                    <button class="btn btn-sm btn-outline" onclick="editRestaurant(${r.id})">Editar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteRestaurant(${r.id})">Borrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
             `;
         }
 
-        function updateStats() {
-            document.getElementById('total-items').textContent = allItems.length;
-            document.getElementById('active-items').textContent = allItems.filter(i => i.estado === 'aprobado').length;
-            document.getElementById('pending-items').textContent = allItems.filter(i => i.estado === 'pendiente').length;
-            document.getElementById('rejected-items').textContent = allItems.filter(i => i.estado === 'rechazado').length;
+        // =============================================
+        // TABLE VIEW
+        // =============================================
+
+        function renderTable() {
+            const container = document.getElementById('content-container');
+
+            if (filteredRestaurants.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron restaurantes</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="card">
+                    <div class="card-body" style="overflow-x: auto;">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Zona</th>
+                                    <th>Precio</th>
+                                    <th>Servicios</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${filteredRestaurants.map(r => `
+                                    <tr>
+                                        <td>
+                                            <strong>${r.featured ? '<span class="featured-star">*</span> ' : ''}${r.name}</strong>
+                                            ${r.specialties ? `<br><small style="color: rgba(255,255,255,0.5);">${truncate(r.specialties, 50)}</small>` : ''}
+                                        </td>
+                                        <td>${r.zone_name || '-'}</td>
+                                        <td>${r.price_range || '-'}</td>
+                                        <td>
+                                            ${r.has_delivery ? '<span class="service-tag">D</span>' : ''}
+                                            ${r.has_takeaway ? '<span class="service-tag">T</span>' : ''}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-${r.status === 'approved' ? 'approved' : r.status === 'pending' ? 'pending' : 'rejected'}">
+                                                ${getStatusLabel(r.status)}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                ${r.status === 'pending' ? `
+                                                    <button class="btn btn-sm btn-success" onclick="approveRestaurant(${r.id})" title="Aprobar">OK</button>
+                                                    <button class="btn btn-sm btn-danger" onclick="rejectRestaurant(${r.id})" title="Rechazar">X</button>
+                                                ` : ''}
+                                                <button class="btn btn-sm btn-outline" onclick="editRestaurant(${r.id})">Editar</button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteRestaurant(${r.id})">Borrar</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
         }
 
-        function getStatusBadgeClass(status) {
-            const classes = {
-                pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
-            };
-            return classes[status] || 'secondary';
-        }
+        // =============================================
+        // HELPERS
+        // =============================================
 
         function getStatusLabel(status) {
             const labels = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                pending: 'Pendiente',
+                approved: 'Aprobado',
+                rejected: 'Rechazado'
             };
             return labels[status] || status;
         }
@@ -392,151 +831,226 @@
             return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
-        function resetFilters() {
-            document.getElementById('search').value = '';
-            document.getElementById('filter-status').value = '';
-            applyFilters();
-        }
-
-        async function approveItem(itemId) {
-            if (!confirm('¿Aprobar este registro?')) return;
-
-            try {
-                const response = await api.adminUpdateProduct(itemId, { estado: 'aprobado' });
-                if (response.success) {
-                    Components.toast('Registro aprobado exitosamente', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error approving item:', e);
-                Components.toast('Error aprobando registro', 'error');
-            }
-        }
-
-        async function rejectItem(itemId) {
-            if (!confirm('¿Rechazar este registro?')) return;
-
-            try {
-                const response = await api.adminUpdateProduct(itemId, { estado: 'rechazado' });
-                if (response.success) {
-                    Components.toast('Registro rechazado', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error rejecting item:', e);
-                Components.toast('Error rechazando registro', 'error');
-            }
-        }
-
-        async function deleteItem(itemId) {
-            if (!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
-
-            try {
-                const response = await api.deleteProduct(itemId);
-                if (response.success) {
-                    Components.toast('Registro eliminado exitosamente', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error deleting item:', e);
-                Components.toast('Error eliminando registro', 'error');
-            }
-        }
-
-        function showCreateModal() {
-            document.getElementById('modal-title').textContent = 'Nuevo Restaurante';
-            document.getElementById('item-form').reset();
-            document.getElementById('item-id').value = '';
-            document.getElementById('item-estado').value = 'pendiente';
-            openModal();
-        }
-
-        function editItem(itemId) {
-            const item = allItems.find(i => i.id === itemId);
-            if (!item) return;
-
-            document.getElementById('modal-title').textContent = 'Editar Restaurante';
-            document.getElementById('item-id').value = item.id;
-            document.getElementById('item-titulo').value = item.titulo || '';
-            document.getElementById('item-descripcion').value = item.descripcion || '';
-            document.getElementById('item-imagen').value = item.imagen_url || '';
-            document.getElementById('item-categoria').value = item.categoria_id || '';
-            document.getElementById('item-zona').value = item.zona_id || '';
-            document.getElementById('item-direccion').value = item.direccion || '';
-            document.getElementById('item-telefono').value = item.telefono || '';
-            document.getElementById('item-whatsapp').value = item.whatsapp || '';
-            document.getElementById('item-horarios').value = item.horarios || '';
-            document.getElementById('item-precio').value = item.precio || '';
-            document.getElementById('item-web').value = item.sitio_web || '';
-            document.getElementById('item-estado').value = item.estado || 'pendiente';
-            openModal();
-        }
-
-        async function saveItem(event) {
-            event.preventDefault();
-
-            const itemId = document.getElementById('item-id').value;
-            const data = {
-                titulo: document.getElementById('item-titulo').value,
-                descripcion: document.getElementById('item-descripcion').value,
-                imagen_url: document.getElementById('item-imagen').value || null,
-                categoria_id: document.getElementById('item-categoria').value || null,
-                zona_id: document.getElementById('item-zona').value || null,
-                direccion: document.getElementById('item-direccion').value || null,
-                telefono: document.getElementById('item-telefono').value || null,
-                whatsapp: document.getElementById('item-whatsapp').value || null,
-                horarios: document.getElementById('item-horarios').value || null,
-                precio: document.getElementById('item-precio').value ? parseFloat(document.getElementById('item-precio').value) : null,
-                sitio_web: document.getElementById('item-web').value || null,
-                estado: document.getElementById('item-estado').value,
-                section: SECTION
-            };
-
-            try {
-                let response;
-                if (itemId) {
-                    response = await api.adminUpdateProduct(itemId, data);
-                } else {
-                    response = await api.adminCreateProduct(data);
-                }
-
-                if (response.success) {
-                    Components.toast(itemId ? 'Registro actualizado exitosamente' : 'Registro creado exitosamente', 'success');
-                    closeModal();
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error saving item:', e);
-                Components.toast(e.message || 'Error guardando registro', 'error');
-            }
-        }
+        // =============================================
+        // MODAL
+        // =============================================
 
         function openModal() {
-            document.getElementById('item-modal').classList.add('active');
-            document.getElementById('item-modal-backdrop').classList.add('active');
+            document.getElementById('restaurant-modal').classList.add('active');
+            document.getElementById('modal-backdrop').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            document.getElementById('item-modal').classList.remove('active');
-            document.getElementById('item-modal-backdrop').classList.remove('active');
+            document.getElementById('restaurant-modal').classList.remove('active');
+            document.getElementById('modal-backdrop').classList.remove('active');
             document.body.style.overflow = '';
         }
 
-        // Event listeners
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nuevo Restaurante';
+            document.getElementById('restaurant-form').reset();
+            document.getElementById('restaurant-id').value = '';
+            document.getElementById('restaurant-status').value = 'pending';
+            document.getElementById('restaurant-image-url').value = '';
+
+            // Reset image preview
+            document.getElementById('image-preview').innerHTML = '<span>+</span>Click para subir imagen';
+            document.getElementById('image-preview').className = 'placeholder';
+
+            // Reset price range
+            selectPriceRange('');
+
+            openModal();
+        }
+
+        function editRestaurant(id) {
+            const r = allRestaurants.find(x => x.id === id);
+            if (!r) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Restaurante';
+            document.getElementById('restaurant-id').value = r.id;
+            document.getElementById('restaurant-name').value = r.name || '';
+            document.getElementById('restaurant-description').value = r.description || '';
+            document.getElementById('restaurant-specialties').value = r.specialties || '';
+            document.getElementById('restaurant-zone').value = r.zone_id || '';
+            document.getElementById('restaurant-address').value = r.address || '';
+            document.getElementById('restaurant-phone').value = r.phone || '';
+            document.getElementById('restaurant-email').value = r.email || '';
+            document.getElementById('restaurant-instagram').value = r.instagram || '';
+            document.getElementById('restaurant-website').value = r.website || '';
+            document.getElementById('restaurant-schedule').value = r.schedule || '';
+            document.getElementById('restaurant-status').value = r.status || 'pending';
+            document.getElementById('restaurant-delivery').checked = r.has_delivery === 1;
+            document.getElementById('restaurant-takeaway').checked = r.has_takeaway === 1;
+            document.getElementById('restaurant-featured').checked = r.featured === 1;
+            document.getElementById('restaurant-image-url').value = r.image_url || '';
+
+            // Set price range
+            selectPriceRange(r.price_range || '');
+
+            // Set image preview
+            if (r.image_url) {
+                document.getElementById('image-preview').innerHTML = `<img src="${r.image_url}" alt="Preview">`;
+                document.getElementById('image-preview').className = '';
+            } else {
+                document.getElementById('image-preview').innerHTML = '<span>+</span>Click para subir imagen';
+                document.getElementById('image-preview').className = 'placeholder';
+            }
+
+            openModal();
+        }
+
+        function selectPriceRange(value) {
+            document.getElementById('restaurant-price-range').value = value;
+            document.querySelectorAll('.price-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.value === value);
+            });
+        }
+
+        // =============================================
+        // IMAGE UPLOAD
+        // =============================================
+
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                Components.toast('La imagen no puede superar 10MB', 'error');
+                return;
+            }
+
+            // Show loading
+            const preview = document.getElementById('image-preview');
+            preview.innerHTML = '<span>...</span>Subiendo...';
+
+            try {
+                // Convert to base64
+                const base64 = await fileToBase64(file);
+                document.getElementById('restaurant-image-url').value = base64;
+                preview.innerHTML = `<img src="${base64}" alt="Preview">`;
+                preview.className = '';
+            } catch (e) {
+                console.error('Error uploading:', e);
+                Components.toast('Error subiendo imagen', 'error');
+                preview.innerHTML = '<span>+</span>Click para subir imagen';
+                preview.className = 'placeholder';
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // =============================================
+        // CRUD OPERATIONS
+        // =============================================
+
+        async function saveRestaurant(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('restaurant-id').value;
+            const data = {
+                name: document.getElementById('restaurant-name').value.trim(),
+                description: document.getElementById('restaurant-description').value.trim() || null,
+                specialties: document.getElementById('restaurant-specialties').value.trim() || null,
+                zone_id: document.getElementById('restaurant-zone').value || null,
+                address: document.getElementById('restaurant-address').value.trim() || null,
+                phone: document.getElementById('restaurant-phone').value.trim() || null,
+                email: document.getElementById('restaurant-email').value.trim() || null,
+                instagram: document.getElementById('restaurant-instagram').value.trim() || null,
+                website: document.getElementById('restaurant-website').value.trim() || null,
+                schedule: document.getElementById('restaurant-schedule').value.trim() || null,
+                price_range: document.getElementById('restaurant-price-range').value || null,
+                has_delivery: document.getElementById('restaurant-delivery').checked,
+                has_takeaway: document.getElementById('restaurant-takeaway').checked,
+                status: document.getElementById('restaurant-status').value,
+                featured: document.getElementById('restaurant-featured').checked,
+                image_url: document.getElementById('restaurant-image-url').value || null
+            };
+
+            try {
+                let response;
+                if (id) {
+                    response = await api.updateGastronomy(id, data);
+                } else {
+                    response = await api.createGastronomy(data);
+                }
+
+                if (response.success) {
+                    Components.toast(id ? 'Restaurante actualizado' : 'Restaurante creado', 'success');
+                    closeModal();
+                    loadData();
+                } else {
+                    Components.toast(response.error || 'Error guardando', 'error');
+                }
+            } catch (e) {
+                console.error('Error saving:', e);
+                Components.toast(e.message || 'Error guardando restaurante', 'error');
+            }
+        }
+
+        async function approveRestaurant(id) {
+            if (!confirm('Aprobar este restaurante?')) return;
+
+            try {
+                const response = await api.updateGastronomyStatus(id, 'approved');
+                if (response.success) {
+                    Components.toast('Restaurante aprobado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error approving:', e);
+                Components.toast('Error aprobando', 'error');
+            }
+        }
+
+        async function rejectRestaurant(id) {
+            if (!confirm('Rechazar este restaurante?')) return;
+
+            try {
+                const response = await api.updateGastronomyStatus(id, 'rejected');
+                if (response.success) {
+                    Components.toast('Restaurante rechazado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error rejecting:', e);
+                Components.toast('Error rechazando', 'error');
+            }
+        }
+
+        async function deleteRestaurant(id) {
+            if (!confirm('Eliminar este restaurante? Esta accion no se puede deshacer.')) return;
+
+            try {
+                const response = await api.deleteGastronomy(id);
+                if (response.success) {
+                    Components.toast('Restaurante eliminado', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                console.error('Error deleting:', e);
+                Components.toast('Error eliminando', 'error');
+            }
+        }
+
+        // =============================================
+        // EVENT LISTENERS
+        // =============================================
+
         document.getElementById('search').addEventListener('input', applyFilters);
         document.getElementById('filter-status').addEventListener('change', applyFilters);
+        document.getElementById('filter-zone').addEventListener('change', applyFilters);
 
-        // Load initial data
+        // Load data
         loadData();
     </script>
 </body>

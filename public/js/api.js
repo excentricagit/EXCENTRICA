@@ -404,6 +404,50 @@ class ApiService {
     async deleteShowtime(id) {
         return this.delete(`/api/admin/showtimes/${id}`);
     }
+
+    async deleteShowtimesBulk(ids) {
+        return this.post('/api/admin/showtimes/bulk-delete', { ids });
+    }
+
+    // ========== GASTRONOMY ==========
+
+    // Public
+    async getGastronomy(params = {}) {
+        return this.get('/api/gastronomy', params);
+    }
+
+    async getGastronomyById(id) {
+        return this.get(`/api/gastronomy/${id}`);
+    }
+
+    async getGastronomyBySlug(slug) {
+        return this.get(`/api/gastronomy/slug/${slug}`);
+    }
+
+    // Admin
+    async getAdminGastronomy(params = {}) {
+        return this.get('/api/admin/gastronomy', params);
+    }
+
+    async createGastronomy(data) {
+        return this.post('/api/admin/gastronomy', data);
+    }
+
+    async updateGastronomy(id, data) {
+        return this.put(`/api/admin/gastronomy/${id}`, data);
+    }
+
+    async deleteGastronomy(id) {
+        return this.delete(`/api/admin/gastronomy/${id}`);
+    }
+
+    async updateGastronomyStatus(id, status) {
+        return this.patch(`/api/admin/gastronomy/${id}/status`, { status });
+    }
+
+    async toggleGastronomyFeatured(id) {
+        return this.patch(`/api/admin/gastronomy/${id}/featured`);
+    }
 }
 
 // Crear instancia global
