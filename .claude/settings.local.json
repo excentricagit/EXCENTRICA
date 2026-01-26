@@ -22,7 +22,8 @@
       "Bash(done)",
       "Bash(curl:*)",
       "Bash(powershell -Command \"$response = Invoke-RestMethod -Uri ''https://excentrica.pages.dev/api/auth/login'' -Method Post -Body \\(ConvertTo-Json @{email=''editor@excentrica.com''; password=''editor123''}\\) -ContentType ''application/json''; Write-Output $response\")",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "Bash(npm run deploy:*)"
     ]
   }
 }

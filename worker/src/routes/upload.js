@@ -27,9 +27,16 @@ export async function handleUpload(request, env) {
             return error('No se envió ningún archivo');
         }
 
+        // Log para debugging
+        console.log('File info:', {
+            name: file.name,
+            type: file.type,
+            size: file.size
+        });
+
         // Validar tipo
         if (!ALLOWED_TYPES.includes(file.type)) {
-            return error('Tipo de archivo no permitido. Permitidos: ' + ALLOWED_TYPES.join(', '));
+            return error(`Tipo de archivo no permitido: "${file.type}". Permitidos: ${ALLOWED_TYPES.join(', ')}`);
         }
 
         // Validar tamaño
