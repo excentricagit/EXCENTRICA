@@ -3,9 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor - Excentrica</title>
+    <title>Dashboard - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/editor/editor.css">
+    <style>
+        .dashboard-section {
+            margin-bottom: 2rem;
+        }
+        .dashboard-section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dashboard-section-title .icon {
+            font-size: 1.2rem;
+        }
+        .stats-grid-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+        }
+        .stat-card-mini {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 30, 0.95));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .stat-card-mini:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+        }
+        .stat-card-mini .stat-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 10px;
+        }
+        .stat-card-mini .stat-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .stat-card-mini .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-card-mini .stat-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Pending cards */
+        .pending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .pending-card {
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(30, 30, 40, 0.95));
+            border: 1px solid rgba(234, 179, 8, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pending-card.no-pending {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(30, 30, 40, 0.95));
+            border-color: rgba(34, 197, 94, 0.3);
+        }
+        .pending-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .pending-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(234, 179, 8, 0.15);
+            border-radius: 12px;
+        }
+        .pending-card.no-pending .pending-icon {
+            background: rgba(34, 197, 94, 0.15);
+        }
+        .pending-details h4 {
+            color: #fff;
+            font-size: 1rem;
+            margin: 0 0 0.25rem 0;
+        }
+        .pending-count {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #eab308;
+        }
+        .pending-card.no-pending .pending-count {
+            color: #22c55e;
+        }
+
+        /* Quick actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+        .quick-action {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(30, 30, 40, 0.95));
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #e2e8f0;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+        .quick-action:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(30, 30, 40, 0.95));
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .quick-action .icon {
+            font-size: 1.25rem;
+        }
+
+        /* Recent activity improved */
+        .activity-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .activity-tab {
+            padding: 0.5rem 1rem;
+            background: rgba(30, 30, 40, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .activity-tab:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            color: #e2e8f0;
+        }
+        .activity-tab.active {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.5);
+            color: #fff;
+        }
+        .activity-content {
+            display: none;
+        }
+        .activity-content.active {
+            display: block;
+        }
+
+        /* Summary row */
+        .summary-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.05), rgba(30, 30, 40, 0.95));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .summary-item {
+            text-align: center;
+        }
+        .summary-item .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #a855f7;
+        }
+        .summary-item .label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid-compact {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .pending-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -29,7 +239,7 @@
                     <span class="icon">📅</span> Eventos
                 </a>
                 <a href="/editor/categorias.html" class="admin-nav-item">
-                    <span class="icon">📁</span> Categorías
+                    <span class="icon">📁</span> Categorias
                 </a>
                 <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
@@ -38,7 +248,7 @@
                     <span class="icon">🎬</span> Cine
                 </a>
                 <a href="/editor/gastronomia.html" class="admin-nav-item">
-                    <span class="icon">🍽️</span> Gastronomía
+                    <span class="icon">🍽️</span> Gastronomia
                 </a>
                 <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
@@ -50,14 +260,14 @@
                     <span class="icon">🔧</span> Servicios
                 </a>
                 <a href="/editor/puntos-interes.html" class="admin-nav-item">
-                    <span class="icon">📍</span> Turismo
+                    <span class="icon">🗺️</span> Turismo
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
                     <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">🚪</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
@@ -65,67 +275,277 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>Dashboard - Editor</h1>
+                <h1>Dashboard</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
                 </div>
             </header>
 
             <div class="admin-content">
-                <!-- Stats cards -->
-                <div class="stats-grid" id="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">📰</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="stat-news">-</span>
-                            <span class="stat-label">Noticias</span>
-                        </div>
+                <!-- Summary row -->
+                <div class="summary-row" id="summary-row">
+                    <div class="summary-item">
+                        <div class="value" id="total-content">-</div>
+                        <div class="label">Total Contenido</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🛒</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="stat-products">-</span>
-                            <span class="stat-label">Productos</span>
-                        </div>
+                    <div class="summary-item">
+                        <div class="value" id="total-pending">-</div>
+                        <div class="label">Pendientes</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="stat-events">-</span>
-                            <span class="stat-label">Eventos</span>
-                        </div>
+                    <div class="summary-item">
+                        <div class="value" id="total-locations">-</div>
+                        <div class="label">Ubicaciones</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📁</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="stat-categories">-</span>
-                            <span class="stat-label">Categorías</span>
-                        </div>
+                    <div class="summary-item">
+                        <div class="value" id="total-users">-</div>
+                        <div class="label">Usuarios</div>
                     </div>
                 </div>
 
                 <!-- Pending items -->
-                <div class="grid grid-2 mt-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="mb-3">⏳ Productos pendientes: <span id="pending-products">0</span></h3>
-                            <a href="/editor/productos.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
-                        </div>
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">⏳</span> Pendientes de Aprobacion
                     </div>
-                    <div class="card">
-                        <div class="card-body">
-                            <h3 class="mb-3">⏳ Noticias pendientes: <span id="pending-news">0</span></h3>
-                            <a href="/editor/noticias.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                    <div class="pending-grid" id="pending-grid">
+                        <div class="pending-card" id="pending-products-card">
+                            <div class="pending-info">
+                                <div class="pending-icon">🛒</div>
+                                <div class="pending-details">
+                                    <h4>Productos</h4>
+                                    <span class="pending-count" id="pending-products">0</span> pendientes
+                                </div>
+                            </div>
+                            <a href="/editor/productos.html?status=pending" class="btn btn-sm btn-warning">Revisar</a>
+                        </div>
+                        <div class="pending-card" id="pending-news-card">
+                            <div class="pending-info">
+                                <div class="pending-icon">📰</div>
+                                <div class="pending-details">
+                                    <h4>Noticias</h4>
+                                    <span class="pending-count" id="pending-news">0</span> pendientes
+                                </div>
+                            </div>
+                            <a href="/editor/noticias.html?status=pending" class="btn btn-sm btn-warning">Revisar</a>
+                        </div>
+                        <div class="pending-card" id="pending-poi-card">
+                            <div class="pending-info">
+                                <div class="pending-icon">🗺️</div>
+                                <div class="pending-details">
+                                    <h4>Puntos de Interes</h4>
+                                    <span class="pending-count" id="pending-poi">0</span> pendientes
+                                </div>
+                            </div>
+                            <a href="/editor/puntos-interes.html?status=pending" class="btn btn-sm btn-warning">Revisar</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent activity -->
-                <div class="card mt-4">
-                    <div class="card-body">
-                        <h3 class="mb-3">🕐 Contenido reciente</h3>
-                        <div id="recent-content">
-                            <div class="text-center p-3"><div class="spinner"></div></div>
+                <!-- Quick Actions -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">⚡</span> Acciones Rapidas
+                    </div>
+                    <div class="quick-actions">
+                        <a href="/editor/noticias.html#crear" class="quick-action" onclick="localStorage.setItem('autoOpenCreate', 'true')">
+                            <span class="icon">➕</span> Nueva Noticia
+                        </a>
+                        <a href="/editor/productos.html#crear" class="quick-action" onclick="localStorage.setItem('autoOpenCreate', 'true')">
+                            <span class="icon">➕</span> Nuevo Producto
+                        </a>
+                        <a href="/editor/eventos.html#crear" class="quick-action" onclick="localStorage.setItem('autoOpenCreate', 'true')">
+                            <span class="icon">➕</span> Nuevo Evento
+                        </a>
+                        <a href="/editor/puntos-interes.html#crear" class="quick-action" onclick="localStorage.setItem('autoOpenCreate', 'true')">
+                            <span class="icon">➕</span> Nuevo Lugar
+                        </a>
+                        <a href="/editor/gastronomia.html#crear" class="quick-action" onclick="localStorage.setItem('autoOpenCreate', 'true')">
+                            <span class="icon">➕</span> Nuevo Restaurant
+                        </a>
+                        <a href="/editor/cine.html" class="quick-action">
+                            <span class="icon">🎬</span> Gestionar Cine
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Content Stats -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">📝</span> Contenido Principal
+                    </div>
+                    <div class="stats-grid-compact">
+                        <a href="/editor/noticias.html" class="stat-card-mini">
+                            <div class="stat-icon">📰</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-news">-</span>
+                                <span class="stat-label">Noticias</span>
+                            </div>
+                        </a>
+                        <a href="/editor/productos.html" class="stat-card-mini">
+                            <div class="stat-icon">🛒</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-products">-</span>
+                                <span class="stat-label">Productos</span>
+                            </div>
+                        </a>
+                        <a href="/editor/eventos.html" class="stat-card-mini">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-events">-</span>
+                                <span class="stat-label">Eventos</span>
+                            </div>
+                        </a>
+                        <a href="/editor/categorias.html" class="stat-card-mini">
+                            <div class="stat-icon">📁</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-categories">-</span>
+                                <span class="stat-label">Categorias</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cinema Stats -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">🎬</span> Cine
+                    </div>
+                    <div class="stats-grid-compact">
+                        <a href="/editor/cine.html" class="stat-card-mini">
+                            <div class="stat-icon">🏛️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-cinemas">-</span>
+                                <span class="stat-label">Cines</span>
+                            </div>
+                        </a>
+                        <a href="/editor/cine.html" class="stat-card-mini">
+                            <div class="stat-icon">🎞️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-movies">-</span>
+                                <span class="stat-label">Peliculas</span>
+                            </div>
+                        </a>
+                        <a href="/editor/cine.html" class="stat-card-mini">
+                            <div class="stat-icon">🎟️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-showtimes">-</span>
+                                <span class="stat-label">Funciones</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Commercial Guide Stats -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">🏪</span> Guia Comercial
+                    </div>
+                    <div class="stats-grid-compact">
+                        <a href="/editor/gastronomia.html" class="stat-card-mini">
+                            <div class="stat-icon">🍽️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-restaurants">-</span>
+                                <span class="stat-label">Restaurantes</span>
+                            </div>
+                        </a>
+                        <a href="/editor/alojamiento.html" class="stat-card-mini">
+                            <div class="stat-icon">🏨</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-accommodations">-</span>
+                                <span class="stat-label">Alojamientos</span>
+                            </div>
+                        </a>
+                        <a href="/editor/servicios.html" class="stat-card-mini">
+                            <div class="stat-icon">🔧</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-services">-</span>
+                                <span class="stat-label">Servicios</span>
+                            </div>
+                        </a>
+                        <a href="/editor/puntos-interes.html" class="stat-card-mini">
+                            <div class="stat-icon">🗺️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-poi">-</span>
+                                <span class="stat-label">Puntos Interes</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Transport Stats -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">🚌</span> Transporte
+                    </div>
+                    <div class="stats-grid-compact">
+                        <a href="/editor/transporte.html" class="stat-card-mini">
+                            <div class="stat-icon">🚍</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-bus-lines">-</span>
+                                <span class="stat-label">Lineas</span>
+                            </div>
+                        </a>
+                        <a href="/editor/transporte.html" class="stat-card-mini">
+                            <div class="stat-icon">🚏</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-bus-stops">-</span>
+                                <span class="stat-label">Paradas</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- System Stats -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">⚙️</span> Sistema
+                    </div>
+                    <div class="stats-grid-compact">
+                        <a href="/admin/usuarios.html" class="stat-card-mini">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-users">-</span>
+                                <span class="stat-label">Usuarios</span>
+                            </div>
+                        </a>
+                        <a href="/editor/zonas.html" class="stat-card-mini">
+                            <div class="stat-icon">📍</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-zones">-</span>
+                                <span class="stat-label">Zonas</span>
+                            </div>
+                        </a>
+                        <a href="/editor/zonas.html" class="stat-card-mini">
+                            <div class="stat-icon">🗺️</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="stat-provinces">-</span>
+                                <span class="stat-label">Provincias</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-section">
+                    <div class="dashboard-section-title">
+                        <span class="icon">🕐</span> Actividad Reciente
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="activity-tabs">
+                                <button class="activity-tab active" data-tab="all">Todo</button>
+                                <button class="activity-tab" data-tab="news">Noticias</button>
+                                <button class="activity-tab" data-tab="products">Productos</button>
+                                <button class="activity-tab" data-tab="events">Eventos</button>
+                                <button class="activity-tab" data-tab="poi">Turismo</button>
+                            </div>
+                            <div id="activity-all" class="activity-content active">
+                                <div class="text-center p-3"><div class="spinner"></div></div>
+                            </div>
+                            <div id="activity-news" class="activity-content"></div>
+                            <div id="activity-products" class="activity-content"></div>
+                            <div id="activity-events" class="activity-content"></div>
+                            <div id="activity-poi" class="activity-content"></div>
                         </div>
                     </div>
                 </div>
@@ -152,56 +572,197 @@
                 const response = await api.getAdminStats();
                 if (response.success) {
                     const data = response.data;
+                    const counts = data.counts;
 
-                    document.getElementById('stat-news').textContent = data.counts.news || 0;
-                    document.getElementById('stat-products').textContent = data.counts.products || 0;
-                    document.getElementById('stat-events').textContent = data.counts.events || 0;
-                    document.getElementById('stat-categories').textContent = data.counts.categories || 0;
-                    document.getElementById('pending-products').textContent = data.counts.pending_products || 0;
-                    document.getElementById('pending-news').textContent = data.counts.pending_news || 0;
+                    // Summary row
+                    const totalContent = (counts.news || 0) + (counts.products || 0) + (counts.events || 0) + (counts.poi || 0);
+                    const totalPending = (counts.pending_products || 0) + (counts.pending_news || 0) + (counts.pending_poi || 0);
+                    const totalLocations = (counts.zones || 0) + (counts.provinces || 0);
 
-                    // Recent content
-                    const contentContainer = document.getElementById('recent-content');
-                    const recentItems = [];
+                    document.getElementById('total-content').textContent = totalContent;
+                    document.getElementById('total-pending').textContent = totalPending;
+                    document.getElementById('total-locations').textContent = totalLocations;
+                    document.getElementById('total-users').textContent = counts.users || 0;
 
-                    if (data.recent?.news) {
-                        recentItems.push(...data.recent.news.map(n => ({...n, type: 'Noticia'})));
-                    }
-                    if (data.recent?.products) {
-                        recentItems.push(...data.recent.products.map(p => ({...p, type: 'Producto'})));
-                    }
+                    // Content stats
+                    document.getElementById('stat-news').textContent = counts.news || 0;
+                    document.getElementById('stat-products').textContent = counts.products || 0;
+                    document.getElementById('stat-events').textContent = counts.events || 0;
+                    document.getElementById('stat-categories').textContent = counts.categories || 0;
 
-                    if (recentItems.length > 0) {
-                        contentContainer.innerHTML = `
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tipo</th>
-                                        <th>Título</th>
-                                        <th>Estado</th>
-                                        <th>Fecha</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${recentItems.slice(0, 10).map(item => `
-                                        <tr>
-                                            <td><span class="badge badge-secondary">${item.type}</span></td>
-                                            <td>${Utils.escapeHtml(item.titulo || item.nombre)}</td>
-                                            <td><span class="badge badge-${item.estado === 'aprobada' || item.estado === 'aprobado' ? 'success' : 'warning'}">${item.estado}</span></td>
-                                            <td>${Utils.formatDate(item.created_at)}</td>
-                                        </tr>
-                                    `).join('')}
-                                </tbody>
-                            </table>
-                        `;
-                    } else {
-                        contentContainer.innerHTML = '<p class="text-muted">No hay contenido reciente</p>';
-                    }
+                    // Cinema stats
+                    document.getElementById('stat-cinemas').textContent = counts.cinemas || 0;
+                    document.getElementById('stat-movies').textContent = counts.movies || 0;
+                    document.getElementById('stat-showtimes').textContent = counts.showtimes || 0;
+
+                    // Commercial guide stats
+                    document.getElementById('stat-restaurants').textContent = counts.restaurants || 0;
+                    document.getElementById('stat-accommodations').textContent = counts.accommodations || 0;
+                    document.getElementById('stat-services').textContent = counts.services || 0;
+                    document.getElementById('stat-poi').textContent = counts.poi || 0;
+
+                    // Transport stats
+                    document.getElementById('stat-bus-lines').textContent = counts.bus_lines || 0;
+                    document.getElementById('stat-bus-stops').textContent = counts.bus_stops || 0;
+
+                    // System stats
+                    document.getElementById('stat-users').textContent = counts.users || 0;
+                    document.getElementById('stat-zones').textContent = counts.zones || 0;
+                    document.getElementById('stat-provinces').textContent = counts.provinces || 0;
+
+                    // Pending items
+                    updatePendingCard('pending-products', 'pending-products-card', counts.pending_products || 0);
+                    updatePendingCard('pending-news', 'pending-news-card', counts.pending_news || 0);
+                    updatePendingCard('pending-poi', 'pending-poi-card', counts.pending_poi || 0);
+
+                    // Recent activity
+                    renderRecentActivity(data.recent);
                 }
             } catch (e) {
                 console.error('Error loading dashboard:', e);
             }
         }
+
+        function updatePendingCard(countId, cardId, count) {
+            document.getElementById(countId).textContent = count;
+            const card = document.getElementById(cardId);
+            if (count === 0) {
+                card.classList.add('no-pending');
+                card.querySelector('.btn').textContent = 'Ver todos';
+                card.querySelector('.btn').classList.remove('btn-warning');
+                card.querySelector('.btn').classList.add('btn-outline');
+            } else {
+                card.classList.remove('no-pending');
+                card.querySelector('.btn').textContent = 'Revisar';
+                card.querySelector('.btn').classList.add('btn-warning');
+                card.querySelector('.btn').classList.remove('btn-outline');
+            }
+        }
+
+        function renderRecentActivity(recent) {
+            const allItems = [];
+
+            if (recent?.news) {
+                allItems.push(...recent.news.map(n => ({
+                    ...n,
+                    type: 'Noticia',
+                    typeIcon: '📰',
+                    typeClass: 'primary',
+                    name: n.title
+                })));
+            }
+            if (recent?.products) {
+                allItems.push(...recent.products.map(p => ({
+                    ...p,
+                    type: 'Producto',
+                    typeIcon: '🛒',
+                    typeClass: 'success',
+                    name: p.title
+                })));
+            }
+            if (recent?.events) {
+                allItems.push(...recent.events.map(e => ({
+                    ...e,
+                    type: 'Evento',
+                    typeIcon: '📅',
+                    typeClass: 'warning',
+                    name: e.title
+                })));
+            }
+            if (recent?.poi) {
+                allItems.push(...recent.poi.map(p => ({
+                    ...p,
+                    type: 'Lugar',
+                    typeIcon: '🗺️',
+                    typeClass: 'secondary',
+                    name: p.name
+                })));
+            }
+
+            // Sort by date
+            allItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            // Render all tab
+            document.getElementById('activity-all').innerHTML = renderActivityTable(allItems.slice(0, 15));
+
+            // Render individual tabs
+            document.getElementById('activity-news').innerHTML = renderActivityTable(
+                (recent?.news || []).map(n => ({ ...n, type: 'Noticia', typeIcon: '📰', typeClass: 'primary', name: n.title }))
+            );
+            document.getElementById('activity-products').innerHTML = renderActivityTable(
+                (recent?.products || []).map(p => ({ ...p, type: 'Producto', typeIcon: '🛒', typeClass: 'success', name: p.title }))
+            );
+            document.getElementById('activity-events').innerHTML = renderActivityTable(
+                (recent?.events || []).map(e => ({ ...e, type: 'Evento', typeIcon: '📅', typeClass: 'warning', name: e.title }))
+            );
+            document.getElementById('activity-poi').innerHTML = renderActivityTable(
+                (recent?.poi || []).map(p => ({ ...p, type: 'Lugar', typeIcon: '🗺️', typeClass: 'secondary', name: p.name }))
+            );
+        }
+
+        function renderActivityTable(items) {
+            if (items.length === 0) {
+                return '<p class="text-muted text-center p-3">No hay actividad reciente</p>';
+            }
+
+            return `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Titulo</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map(item => `
+                            <tr>
+                                <td><span class="badge badge-${item.typeClass}">${item.typeIcon} ${item.type}</span></td>
+                                <td>${Utils.escapeHtml(item.name || 'Sin titulo')}</td>
+                                <td><span class="badge badge-${getStatusClass(item.status)}">${getStatusLabel(item.status)}</span></td>
+                                <td>${Utils.formatDate(item.created_at)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                'approved': 'success',
+                'published': 'success',
+                'active': 'success',
+                'pending': 'warning',
+                'draft': 'secondary',
+                'rejected': 'danger'
+            };
+            return classes[status] || 'secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'approved': 'Aprobado',
+                'published': 'Publicado',
+                'active': 'Activo',
+                'pending': 'Pendiente',
+                'draft': 'Borrador',
+                'rejected': 'Rechazado'
+            };
+            return labels[status] || status || 'Desconocido';
+        }
+
+        // Tab switching
+        document.querySelectorAll('.activity-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.activity-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.activity-content').forEach(c => c.classList.remove('active'));
+
+                tab.classList.add('active');
+                document.getElementById('activity-' + tab.dataset.tab).classList.add('active');
+            });
+        });
 
         loadDashboard();
     </script>

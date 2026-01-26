@@ -4,12 +4,387 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excentrica - Santiago del Estero</title>
-    <meta name="description" content="Red social y marketplace de Santiago del Estero, Argentina. Noticias, eventos, productos y más.">
+    <meta name="description" content="Red social y marketplace de Santiago del Estero, Argentina. Noticias, eventos, productos y mas.">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="icon" href="/images/favicon.ico">
+    <style>
+        /* Home page specific styles */
+        .home-section {
+            margin-bottom: 2rem;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-title .icon {
+            font-size: 1.3rem;
+        }
+
+        /* News feed cards */
+        .news-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .news-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .news-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .news-card-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .news-card-body {
+            padding: 1rem;
+        }
+        .news-card-category {
+            display: inline-block;
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .news-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        .news-card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .news-card-title a:hover {
+            color: #a855f7;
+        }
+        .news-card-excerpt {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+        .news-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #64748b;
+            font-size: 0.8rem;
+        }
+
+        /* Product cards grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .product-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .product-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .product-card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .product-card-body {
+            padding: 0.75rem;
+        }
+        .product-card-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .product-card-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #22c55e;
+        }
+        .product-card-zone {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        /* Event cards */
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .event-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .event-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+        .event-date {
+            background: rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            padding: 0.75rem;
+            text-align: center;
+            min-width: 60px;
+        }
+        .event-date-day {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #a855f7;
+            line-height: 1;
+        }
+        .event-date-month {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+        }
+        .event-info {
+            flex: 1;
+        }
+        .event-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 0.25rem;
+        }
+        .event-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .event-location {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        /* Cinema section */
+        .cinema-movies {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+        .movie-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .movie-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .movie-card-poster {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .movie-card-body {
+            padding: 0.75rem;
+        }
+        .movie-card-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .movie-card-genre {
+            font-size: 0.7rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        /* POI (Tourism) section */
+        .poi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .poi-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        .poi-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .poi-card-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+        .poi-card-body {
+            padding: 0.75rem;
+        }
+        .poi-card-category {
+            display: inline-block;
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-bottom: 0.5rem;
+        }
+        .poi-card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 0.25rem;
+        }
+        .poi-card-location {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        /* Quick links grid */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .quick-link {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(30, 30, 40, 0.95));
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: #e2e8f0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+        .quick-link:hover {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(30, 30, 40, 0.95));
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+        .quick-link .icon {
+            font-size: 1.75rem;
+        }
+        .quick-link span:last-child {
+            font-size: 0.85rem;
+        }
+
+        /* Sidebar widgets */
+        .widget {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .widget-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .widget-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .widget-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        .widget-item:hover {
+            background: rgba(168, 85, 247, 0.1);
+            color: #e2e8f0;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #64748b;
+        }
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .cinema-movies {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .quick-links {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Sidebar de Navegación Lateral Fijo (estilo Facebook) -->
+    <!-- Sidebar de Navegacion Lateral Fijo -->
     <nav class="sidebar-nav">
         <a href="/" class="sidebar-nav-item active">
             <span class="icon">🏠</span>
@@ -17,7 +392,6 @@
         </a>
 
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-section-title">Explorar</div>
 
         <a href="/noticias.html" class="sidebar-nav-item">
@@ -26,7 +400,7 @@
         </a>
         <a href="/mercaderia.html" class="sidebar-nav-item">
             <span class="icon">🛒</span>
-            <span>Mercadería</span>
+            <span>Mercaderia</span>
         </a>
         <a href="/eventos.html" class="sidebar-nav-item">
             <span class="icon">📅</span>
@@ -38,12 +412,11 @@
         </a>
 
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-section-title">Servicios</div>
 
         <a href="/gastronomia.html" class="sidebar-nav-item">
             <span class="icon">🍽️</span>
-            <span>Gastronomía</span>
+            <span>Gastronomia</span>
         </a>
         <a href="/alojamiento.html" class="sidebar-nav-item">
             <span class="icon">🏨</span>
@@ -57,8 +430,8 @@
             <span class="icon">🔧</span>
             <span>Servicios</span>
         </a>
-        <a href="/puntos-interes.html" class="sidebar-nav-item">
-            <span class="icon">📍</span>
+        <a href="/turismo.html" class="sidebar-nav-item">
+            <span class="icon">🗺️</span>
             <span>Turismo</span>
         </a>
 
@@ -72,7 +445,6 @@
             <span class="icon">📞</span>
             <span>Contacto</span>
         </a>
-
     </nav>
 
     <!-- Header Superior -->
@@ -83,12 +455,12 @@
             </a>
 
             <div class="header-search">
-                <input type="search" placeholder="Buscar en Excentrica..." />
+                <input type="search" id="global-search" placeholder="Buscar en Excentrica..." />
             </div>
 
-            <div class="user-menu"></div>
+            <div class="user-menu" id="user-menu"></div>
 
-            <button class="menu-toggle" aria-label="Abrir menú">
+            <button class="menu-toggle" aria-label="Abrir menu">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -102,93 +474,137 @@
             <!-- Feed principal -->
             <div class="content">
                 <!-- Tarjeta de bienvenida -->
-                <div class="welcome-card mb-5">
+                <div class="welcome-card mb-4">
                     <h1 class="welcome-title">Bienvenido a <span class="text-accent">Excentrica</span></h1>
-                    <p class="welcome-text">La red social de Santiago del Estero. Descubrí noticias, eventos, videos y mucho más de nuestra comunidad.</p>
+                    <p class="welcome-text">La red social de Santiago del Estero. Descubri noticias, eventos, productos y mucho mas de nuestra comunidad.</p>
                 </div>
 
-                <!-- Noticias destacadas -->
-                <section class="mb-5">
-                    <div class="d-flex justify-between align-center mb-3">
-                        <h2 class="text-xl font-semibold">📰 Últimas Noticias</h2>
+                <!-- Quick Links -->
+                <div class="quick-links">
+                    <a href="/noticias.html" class="quick-link">
+                        <span class="icon">📰</span>
+                        <span>Noticias</span>
+                    </a>
+                    <a href="/mercaderia.html" class="quick-link">
+                        <span class="icon">🛒</span>
+                        <span>Mercaderia</span>
+                    </a>
+                    <a href="/eventos.html" class="quick-link">
+                        <span class="icon">📅</span>
+                        <span>Eventos</span>
+                    </a>
+                    <a href="/cine.html" class="quick-link">
+                        <span class="icon">🎬</span>
+                        <span>Cartelera</span>
+                    </a>
+                    <a href="/turismo.html" class="quick-link">
+                        <span class="icon">🗺️</span>
+                        <span>Turismo</span>
+                    </a>
+                    <a href="/transporte.html" class="quick-link">
+                        <span class="icon">🚌</span>
+                        <span>Transporte</span>
+                    </a>
+                </div>
+
+                <!-- Noticias -->
+                <section class="home-section">
+                    <div class="section-header">
+                        <h2 class="section-title"><span class="icon">📰</span> Ultimas Noticias</h2>
                         <a href="/noticias.html" class="btn btn-outline btn-sm">Ver todas</a>
                     </div>
-                    <div id="news-feed" class="feed">
-                        <div class="text-center p-5">
-                            <div class="spinner spinner-lg mx-auto"></div>
-                        </div>
+                    <div id="news-feed" class="news-feed">
+                        <div class="loading"><div class="spinner"></div></div>
                     </div>
                 </section>
 
-                <!-- Productos destacados -->
-                <section class="mb-5">
-                    <div class="d-flex justify-between align-center mb-3">
-                        <h2 class="text-xl font-semibold">🛒 Productos Destacados</h2>
+                <!-- Productos -->
+                <section class="home-section">
+                    <div class="section-header">
+                        <h2 class="section-title"><span class="icon">🛒</span> Productos Destacados</h2>
                         <a href="/mercaderia.html" class="btn btn-outline btn-sm">Ver todos</a>
                     </div>
-                    <div id="products-grid" class="grid grid-4">
-                        <div class="text-center p-5">
-                            <div class="spinner spinner-lg mx-auto"></div>
-                        </div>
+                    <div id="products-grid" class="products-grid">
+                        <div class="loading"><div class="spinner"></div></div>
                     </div>
                 </section>
 
-                <!-- Próximos eventos -->
-                <section class="mb-5">
-                    <div class="d-flex justify-between align-center mb-3">
-                        <h2 class="text-xl font-semibold">📅 Próximos Eventos</h2>
+                <!-- Eventos -->
+                <section class="home-section">
+                    <div class="section-header">
+                        <h2 class="section-title"><span class="icon">📅</span> Proximos Eventos</h2>
                         <a href="/eventos.html" class="btn btn-outline btn-sm">Ver todos</a>
                     </div>
-                    <div id="events-list" class="d-flex flex-column gap-3">
-                        <div class="text-center p-5">
-                            <div class="spinner spinner-lg mx-auto"></div>
-                        </div>
+                    <div id="events-list" class="events-list">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </section>
+
+                <!-- Cine / Cartelera -->
+                <section class="home-section">
+                    <div class="section-header">
+                        <h2 class="section-title"><span class="icon">🎬</span> Cartelera de Cine</h2>
+                        <a href="/cine.html" class="btn btn-outline btn-sm">Ver cartelera</a>
+                    </div>
+                    <div id="movies-grid" class="cinema-movies">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </section>
+
+                <!-- Turismo / POI -->
+                <section class="home-section">
+                    <div class="section-header">
+                        <h2 class="section-title"><span class="icon">🗺️</span> Lugares para Visitar</h2>
+                        <a href="/turismo.html" class="btn btn-outline btn-sm">Ver todos</a>
+                    </div>
+                    <div id="poi-grid" class="poi-grid">
+                        <div class="loading"><div class="spinner"></div></div>
                     </div>
                 </section>
             </div>
 
-            <!-- Sidebar derecho (widgets) -->
+            <!-- Sidebar derecho -->
             <aside class="sidebar">
-                <!-- Widget de usuario / Login -->
-                <div class="widget widget-user">
-                    <div class="widget-icon">👤</div>
-                    <h3 class="widget-title">Únete a Excentrica</h3>
-                    <p class="widget-text">Iniciá sesión para dar likes y guardar favoritos.</p>
-                    <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/login.html'">Iniciar Sesión</button>
-                    <button class="btn btn-outline btn-block" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
-                </div>
-
-                <!-- Contenido patrocinado -->
-                <div class="widget widget-sponsored">
-                    <div class="widget-icon">📹</div>
-                    <h3 class="widget-title">Contenido Patrocinado</h3>
-                    <p class="widget-text">No hay anuncios</p>
-                </div>
-
-                <!-- Seguinos -->
-                <div class="widget widget-social">
-                    <div class="widget-icon">🔗</div>
-                    <h3 class="widget-title">Seguinos</h3>
-                    <div class="social-icons-grid">
-                        <a href="https://facebook.com/excentrica" class="social-icon" target="_blank" rel="noopener" title="Facebook">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        </a>
-                        <a href="https://instagram.com/excentricaok" class="social-icon" target="_blank" rel="noopener" title="Instagram">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                        </a>
-                        <a href="https://open.spotify.com" class="social-icon" target="_blank" rel="noopener" title="Spotify">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-                        </a>
-                        <a href="https://youtube.com/revistaexcentrica" class="social-icon" target="_blank" rel="noopener" title="YouTube">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-                        </a>
+                <!-- Widget de usuario -->
+                <div class="widget" id="user-widget">
+                    <div class="widget-title">👤 Mi Cuenta</div>
+                    <div id="user-widget-content">
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.75rem;">Inicia sesion para acceder a todas las funciones.</p>
+                        <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
+                        <button class="btn btn-outline btn-block" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
                     </div>
                 </div>
 
-                <!-- Footer en widget -->
-                <div class="widget widget-footer">
-                    <p class="widget-text text-muted">© 2026 Excentrica</p>
-                    <p class="widget-text text-muted">Santiago del Estero, Argentina</p>
+                <!-- Widget de categorias -->
+                <div class="widget">
+                    <div class="widget-title">📁 Categorias</div>
+                    <div id="categories-widget" class="widget-list">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Widget de zonas -->
+                <div class="widget">
+                    <div class="widget-title">📍 Zonas</div>
+                    <div id="zones-widget" class="widget-list">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Widget de redes sociales -->
+                <div class="widget">
+                    <div class="widget-title">🔗 Seguinos</div>
+                    <div class="social-icons-grid" style="display: flex; gap: 0.75rem; justify-content: center;">
+                        <a href="https://facebook.com/excentrica" class="social-icon" target="_blank" rel="noopener" title="Facebook" style="font-size: 1.5rem;">📘</a>
+                        <a href="https://instagram.com/excentricaok" class="social-icon" target="_blank" rel="noopener" title="Instagram" style="font-size: 1.5rem;">📸</a>
+                        <a href="https://youtube.com/revistaexcentrica" class="social-icon" target="_blank" rel="noopener" title="YouTube" style="font-size: 1.5rem;">📺</a>
+                    </div>
+                </div>
+
+                <!-- Footer widget -->
+                <div class="widget" style="text-align: center;">
+                    <p style="color: #64748b; font-size: 0.8rem;">© 2026 Excentrica</p>
+                    <p style="color: #64748b; font-size: 0.75rem;">Santiago del Estero, Argentina</p>
                 </div>
             </aside>
         </div>
@@ -201,18 +617,12 @@
                 <div>
                     <h4 class="footer-title">Excentrica</h4>
                     <p class="text-muted">Red social y marketplace de Santiago del Estero, Argentina.</p>
-                    <div class="social-icons mt-3">
-                        <a href="https://facebook.com/excentrica" class="social-icon" target="_blank" rel="noopener">📘</a>
-                        <a href="https://instagram.com/excentricaok" class="social-icon" target="_blank" rel="noopener">📸</a>
-                        <a href="https://twitter.com/excentricaok" class="social-icon" target="_blank" rel="noopener">🐦</a>
-                        <a href="https://youtube.com/revistaexcentrica" class="social-icon" target="_blank" rel="noopener">📺</a>
-                    </div>
                 </div>
                 <div>
                     <h4 class="footer-title">Secciones</h4>
                     <div class="footer-links">
                         <a href="/noticias.html" class="footer-link">Noticias</a>
-                        <a href="/mercaderia.html" class="footer-link">Mercadería</a>
+                        <a href="/mercaderia.html" class="footer-link">Mercaderia</a>
                         <a href="/eventos.html" class="footer-link">Eventos</a>
                         <a href="/videos.html" class="footer-link">Videos</a>
                     </div>
@@ -220,23 +630,22 @@
                 <div>
                     <h4 class="footer-title">Servicios</h4>
                     <div class="footer-links">
-                        <a href="/gastronomia.html" class="footer-link">Gastronomía</a>
+                        <a href="/gastronomia.html" class="footer-link">Gastronomia</a>
                         <a href="/alojamiento.html" class="footer-link">Alojamiento</a>
                         <a href="/transporte.html" class="footer-link">Transporte</a>
-                        <a href="/servicios.html" class="footer-link">Servicios</a>
+                        <a href="/turismo.html" class="footer-link">Turismo</a>
                     </div>
                 </div>
                 <div>
                     <h4 class="footer-title">Contacto</h4>
                     <div class="footer-links">
-                        <span class="footer-link">📧 contacto@excentrica.com.ar</span>
-                        <span class="footer-link">📍 Santiago del Estero, Argentina</span>
-                        <a href="https://excentrica.com.ar" class="footer-link" target="_blank" rel="noopener">🌐 excentrica.com.ar</a>
+                        <span class="footer-link">contacto@excentrica.com.ar</span>
+                        <span class="footer-link">Santiago del Estero, Argentina</span>
                     </div>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 Excentrica - Contenidos y Comunicación. Todos los derechos reservados.</p>
+                <p>© 2026 Excentrica - Contenidos y Comunicacion. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
@@ -249,89 +658,310 @@
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
     <script>
-        // Cargar contenido de la página principal
+        // Helper function to format date
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // Helper to get event date parts
+        function getEventDateParts(dateStr) {
+            if (!dateStr) return { day: '?', month: '???' };
+            const date = new Date(dateStr);
+            return {
+                day: date.getDate(),
+                month: date.toLocaleDateString('es-AR', { month: 'short' }).toUpperCase()
+            };
+        }
+
+        // Helper to escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+
+        // Helper to truncate text
+        function truncate(str, len) {
+            if (!str) return '';
+            return str.length > len ? str.substring(0, len) + '...' : str;
+        }
+
+        // Render news card
+        function renderNewsCard(news) {
+            const imageUrl = news.image_url || news.imageUrl || '/images/placeholder.jpg';
+            return `
+                <article class="news-card">
+                    ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(news.title)}" class="news-card-image" onerror="this.style.display='none'">` : ''}
+                    <div class="news-card-body">
+                        ${news.category_name ? `<span class="news-card-category">${escapeHtml(news.category_name)}</span>` : ''}
+                        <h3 class="news-card-title">
+                            <a href="/noticia.html?id=${news.id}">${escapeHtml(news.title)}</a>
+                        </h3>
+                        <p class="news-card-excerpt">${escapeHtml(truncate(news.excerpt || news.content, 150))}</p>
+                        <div class="news-card-meta">
+                            <span>${formatDate(news.created_at)}</span>
+                            <span>${news.views || 0} vistas</span>
+                        </div>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Render product card
+        function renderProductCard(product) {
+            const imageUrl = product.image_url || product.imageUrl || '/images/placeholder.jpg';
+            const price = product.price ? `$${Number(product.price).toLocaleString('es-AR')}` : 'Consultar';
+            return `
+                <article class="product-card">
+                    <img src="${imageUrl}" alt="${escapeHtml(product.title || product.name)}" class="product-card-image" onerror="this.src='/images/placeholder.jpg'">
+                    <div class="product-card-body">
+                        <h3 class="product-card-title">
+                            <a href="/producto.html?id=${product.id}">${escapeHtml(product.title || product.name)}</a>
+                        </h3>
+                        <div class="product-card-price">${price}</div>
+                        ${product.zone_name ? `<div class="product-card-zone">📍 ${escapeHtml(product.zone_name)}</div>` : ''}
+                    </div>
+                </article>
+            `;
+        }
+
+        // Render event card
+        function renderEventCard(event) {
+            const dateParts = getEventDateParts(event.event_date || event.start_date);
+            return `
+                <article class="event-card">
+                    <div class="event-date">
+                        <div class="event-date-day">${dateParts.day}</div>
+                        <div class="event-date-month">${dateParts.month}</div>
+                    </div>
+                    <div class="event-info">
+                        <h3 class="event-title">
+                            <a href="/evento.html?id=${event.id}">${escapeHtml(event.title)}</a>
+                        </h3>
+                        <div class="event-location">📍 ${escapeHtml(event.location || event.venue || 'Por confirmar')}</div>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Render movie card
+        function renderMovieCard(movie) {
+            const posterUrl = movie.poster_url || movie.image_url || '/images/movie-placeholder.jpg';
+            return `
+                <article class="movie-card">
+                    <img src="${posterUrl}" alt="${escapeHtml(movie.title)}" class="movie-card-poster" onerror="this.src='/images/placeholder.jpg'">
+                    <div class="movie-card-body">
+                        <h3 class="movie-card-title">${escapeHtml(movie.title)}</h3>
+                        <div class="movie-card-genre">${escapeHtml(movie.genre || '')}</div>
+                    </div>
+                </article>
+            `;
+        }
+
+        // Render POI card
+        function renderPoiCard(poi) {
+            const imageUrl = poi.image_url || '/images/placeholder.jpg';
+            return `
+                <article class="poi-card">
+                    <img src="${imageUrl}" alt="${escapeHtml(poi.name)}" class="poi-card-image" onerror="this.src='/images/placeholder.jpg'">
+                    <div class="poi-card-body">
+                        ${poi.category_name ? `<span class="poi-card-category">${escapeHtml(poi.category_name)}</span>` : ''}
+                        <h3 class="poi-card-title">${escapeHtml(poi.name)}</h3>
+                        ${poi.zone_name ? `<div class="poi-card-location">📍 ${escapeHtml(poi.zone_name)}</div>` : ''}
+                    </div>
+                </article>
+            `;
+        }
+
+        // Show empty state
+        function showEmpty(container, message, icon) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="icon">${icon}</div>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+
+        // Load home page content
         async function loadHomePage() {
-            // Cargar noticias
+            // Load user menu
+            const user = auth.getUser();
+            const userMenu = document.getElementById('user-menu');
+            const userWidget = document.getElementById('user-widget-content');
+
+            if (user) {
+                userMenu.innerHTML = `
+                    <span style="color: #e2e8f0; margin-right: 0.5rem;">${escapeHtml(user.name || user.email)}</span>
+                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-outline btn-sm" style="margin-right: 0.5rem;">Editor</a>' : ''}
+                    <button class="btn btn-outline btn-sm" onclick="auth.logout()">Salir</button>
+                `;
+                userWidget.innerHTML = `
+                    <p style="color: #e2e8f0; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${escapeHtml(user.name || 'Usuario')}</p>
+                    <p style="color: #64748b; font-size: 0.8rem; margin-bottom: 0.75rem;">${escapeHtml(user.email)}</p>
+                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-primary btn-block mb-2">Panel de Editor</a>' : ''}
+                    <button class="btn btn-outline btn-block" onclick="auth.logout()">Cerrar Sesion</button>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="/login.html" class="btn btn-outline btn-sm" style="margin-right: 0.5rem;">Ingresar</a>
+                    <a href="/registro.html" class="btn btn-primary btn-sm">Registrarse</a>
+                `;
+            }
+
+            // Helper to extract array from API response (handles different formats)
+            function extractArray(response, ...keys) {
+                if (!response || !response.success) return [];
+                const data = response.data;
+                if (Array.isArray(data)) return data;
+                for (const key of keys) {
+                    if (data && Array.isArray(data[key])) return data[key];
+                }
+                return [];
+            }
+
+            // Load news (API returns data.news)
             try {
                 const newsResponse = await api.getNews({ limit: 5 });
                 const newsFeed = document.getElementById('news-feed');
-                if (newsResponse.success && newsResponse.data.news.length > 0) {
-                    newsFeed.innerHTML = newsResponse.data.news.map(n => Components.newsCard(n)).join('');
+                const newsData = extractArray(newsResponse, 'news', 'items');
+
+                if (newsData.length > 0) {
+                    newsFeed.innerHTML = newsData.map(n => renderNewsCard(n)).join('');
                 } else {
-                    Components.showEmpty(newsFeed, 'No hay noticias disponibles', '📰');
+                    showEmpty(newsFeed, 'No hay noticias disponibles', '📰');
                 }
             } catch (e) {
-                Components.showError(document.getElementById('news-feed'), 'Error cargando noticias');
+                console.error('Error loading news:', e);
+                showEmpty(document.getElementById('news-feed'), 'Error cargando noticias', '❌');
             }
 
-            // Cargar productos
+            // Load products (API returns data.products)
             try {
                 const productsResponse = await api.getProducts({ limit: 8 });
                 const productsGrid = document.getElementById('products-grid');
-                if (productsResponse.success && productsResponse.data.products.length > 0) {
-                    productsGrid.innerHTML = productsResponse.data.products.map(p => Components.productCard(p)).join('');
+                const productsData = extractArray(productsResponse, 'products', 'items');
+
+                if (productsData.length > 0) {
+                    productsGrid.innerHTML = productsData.map(p => renderProductCard(p)).join('');
                 } else {
-                    Components.showEmpty(productsGrid, 'No hay productos disponibles', '🛒');
+                    showEmpty(productsGrid, 'No hay productos disponibles', '🛒');
                 }
             } catch (e) {
-                Components.showError(document.getElementById('products-grid'), 'Error cargando productos');
+                console.error('Error loading products:', e);
+                showEmpty(document.getElementById('products-grid'), 'Error cargando productos', '❌');
             }
 
-            // Cargar eventos
+            // Load events (API returns data.events)
             try {
-                const eventsResponse = await api.getEvents({ limit: 4, upcoming: 1 });
+                const eventsResponse = await api.getEvents({ limit: 4 });
                 const eventsList = document.getElementById('events-list');
-                if (eventsResponse.success && eventsResponse.data.events.length > 0) {
-                    eventsList.innerHTML = eventsResponse.data.events.map(e => Components.eventCard(e)).join('');
+                const eventsData = extractArray(eventsResponse, 'events', 'items');
+
+                if (eventsData.length > 0) {
+                    eventsList.innerHTML = eventsData.map(e => renderEventCard(e)).join('');
                 } else {
-                    Components.showEmpty(eventsList, 'No hay eventos próximos', '📅');
+                    showEmpty(eventsList, 'No hay eventos proximos', '📅');
                 }
             } catch (e) {
-                Components.showError(document.getElementById('events-list'), 'Error cargando eventos');
+                console.error('Error loading events:', e);
+                showEmpty(document.getElementById('events-list'), 'Error cargando eventos', '❌');
             }
 
-            // Cargar categorías en widget
+            // Load movies (API returns data as array, uses status param)
+            try {
+                const moviesResponse = await api.getMovies({ status: 'now_showing' });
+                const moviesGrid = document.getElementById('movies-grid');
+                const moviesData = extractArray(moviesResponse, 'movies', 'items');
+
+                if (moviesData.length > 0) {
+                    moviesGrid.innerHTML = moviesData.slice(0, 6).map(m => renderMovieCard(m)).join('');
+                } else {
+                    showEmpty(moviesGrid, 'No hay peliculas en cartelera', '🎬');
+                }
+            } catch (e) {
+                console.error('Error loading movies:', e);
+                showEmpty(document.getElementById('movies-grid'), 'No hay cartelera disponible', '🎬');
+            }
+
+            // Load POI (API returns data.items)
+            try {
+                const poiResponse = await api.getPoi({ limit: 6 });
+                const poiGrid = document.getElementById('poi-grid');
+                const poiData = extractArray(poiResponse, 'items', 'poi');
+
+                if (poiData.length > 0) {
+                    poiGrid.innerHTML = poiData.map(p => renderPoiCard(p)).join('');
+                } else {
+                    showEmpty(poiGrid, 'No hay lugares para mostrar', '🗺️');
+                }
+            } catch (e) {
+                console.error('Error loading POI:', e);
+                showEmpty(document.getElementById('poi-grid'), 'No hay lugares disponibles', '🗺️');
+            }
+
+            // Load categories widget (API returns data as array)
             try {
                 const catResponse = await api.getCategories('noticias');
                 const catWidget = document.getElementById('categories-widget');
-                if (catResponse.success && catResponse.data.length > 0) {
-                    catWidget.innerHTML = catResponse.data.slice(0, 6).map(c => `
-                        <a href="/noticias.html?category=${c.slug}" class="widget-item">
+                const catData = extractArray(catResponse, 'categories', 'items');
+
+                if (catData.length > 0) {
+                    catWidget.innerHTML = catData.slice(0, 6).map(c => `
+                        <a href="/noticias.html?category=${c.slug || c.id}" class="widget-item">
                             <span>${c.icon || '📁'}</span>
-                            <span>${c.name}</span>
+                            <span>${escapeHtml(c.name)}</span>
                         </a>
                     `).join('');
+                } else {
+                    catWidget.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay categorias</p>';
                 }
             } catch (e) {
                 console.error('Error loading categories:', e);
+                document.getElementById('categories-widget').innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay categorias</p>';
             }
 
-            // Cargar zonas en widget
+            // Load zones widget (API returns data as array)
             try {
                 const zonesResponse = await api.getZones();
                 const zonesWidget = document.getElementById('zones-widget');
-                if (zonesResponse.success && zonesResponse.data.length > 0) {
-                    zonesWidget.innerHTML = zonesResponse.data.map(z => `
-                        <a href="/mercaderia.html?zone=${z.slug}" class="widget-item">
+                const zonesData = extractArray(zonesResponse, 'zones', 'items');
+
+                if (zonesData.length > 0) {
+                    zonesWidget.innerHTML = zonesData.slice(0, 8).map(z => `
+                        <a href="/mercaderia.html?zone=${z.slug || z.id}" class="widget-item">
                             <span>📍</span>
-                            <span>${z.name}</span>
+                            <span>${escapeHtml(z.name)}</span>
                         </a>
                     `).join('');
+                } else {
+                    zonesWidget.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay zonas</p>';
                 }
             } catch (e) {
                 console.error('Error loading zones:', e);
+                document.getElementById('zones-widget').innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay zonas</p>';
             }
-
-            // Cargar anuncios
-            App.loadAds('sidebar-ads', 'sidebar');
         }
 
-        // Ejecutar al cargar
+        // Run on load
         document.addEventListener('DOMContentLoaded', loadHomePage);
 
-        // Toggle menú móvil
+        // Mobile menu toggle
         document.querySelector('.menu-toggle')?.addEventListener('click', () => {
             document.querySelector('.sidebar-nav').classList.toggle('active');
+        });
+
+        // Global search
+        document.getElementById('global-search')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = e.target.value.trim();
+                if (query) {
+                    window.location.href = `/buscar.html?q=${encodeURIComponent(query)}`;
+                }
+            }
         });
     </script>
 </body>
