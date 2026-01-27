@@ -231,12 +231,29 @@
                         </div>
                     </div>
 
-                    <!-- Column 3: Imagen -->
+                    <!-- Column 3: Imagen y Hero -->
                     <div class="form-column">
                         <div class="form-group">
                             <label for="event-imagen-file">📸 Imagen del Evento *</label>
+                            <small class="text-muted" style="display:block; margin-bottom:0.5rem;">Dimensiones recomendadas: 550 x 367 px</small>
                             <input type="file" id="event-imagen-file" class="form-control-file" accept="image/*" onchange="uploadEventImage(event)">
                             <div id="event-image-preview" class="image-preview-compact"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>⭐ Posicion en Hero</label>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="event-is-featured">
+                                    <span>Destacado</span>
+                                    <small>(columna derecha)</small>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="event-is-special">
+                                    <span>Evento Especial</span>
+                                    <small>(card inferior)</small>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>

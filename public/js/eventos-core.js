@@ -66,6 +66,38 @@ function getCountdown(dateStr) {
     }
 }
 
+function formatWhatsAppPhone(phone) {
+    if (!phone) return null;
+    // Remove spaces, dashes, and parentheses
+    let cleaned = phone.replace(/[\s\-\(\)]/g, '');
+    // Remove leading + if present
+    if (cleaned.startsWith('+')) {
+        cleaned = cleaned.substring(1);
+    }
+    // If starts with 0, remove it (local format)
+    if (cleaned.startsWith('0')) {
+        cleaned = cleaned.substring(1);
+    }
+    // If doesn't start with 54, add Argentina code
+    if (!cleaned.startsWith('54')) {
+        cleaned = '54' + cleaned;
+    }
+    return cleaned;
+}
+
+function getWhatsAppUrl(event) {
+    const phone = event.whatsapp || event.phone;
+    if (!phone) return null;
+
+    const formattedPhone = formatWhatsAppPhone(phone);
+    if (!formattedPhone) return null;
+
+    const dateInfo = formatEventDate(event.event_date);
+    const message = `Hola! Me inscribi al evento "${event.title}" del ${dateInfo.day} de ${dateInfo.month} y mi inscripcion esta pendiente. Podrian confirmarla? Gracias!`;
+
+    return `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;
+}
+
 // =============================================
 // HERO - EVENTOS DESTACADOS (DOBLE)
 // =============================================
@@ -89,29 +121,47 @@ function renderHeroCard(event, prefix) {
     priceEl.className = 'events-hero-price' + (isFree ? ' free' : '');
 
     const subscribeBtn = document.getElementById(`hero-${prefix}-subscribe-btn`);
+    const whatsappBtn = document.getElementById(`hero-${prefix}-whatsapp-btn`);
+
     if (registration) {
         subscribeBtn.innerHTML = `<span>✓</span> ${registration.status === 'confirmado' ? 'Inscrito' : 'Pendiente'}`;
         subscribeBtn.classList.add('subscribed');
         subscribeBtn.disabled = true;
+
+        // Show WhatsApp button only for pending status
+        if (registration.status === 'pendiente' && whatsappBtn) {
+            const whatsappUrl = getWhatsAppUrl(event);
+            if (whatsappUrl) {
+                whatsappBtn.href = whatsappUrl;
+                whatsappBtn.style.display = 'inline-flex';
+            } else {
+                whatsappBtn.style.display = 'none';
+            }
+        } else if (whatsappBtn) {
+            whatsappBtn.style.display = 'none';
+        }
     } else if (isLoggedIn) {
         subscribeBtn.innerHTML = '<span>📝</span> Inscribirse';
         subscribeBtn.classList.remove('subscribed');
         subscribeBtn.disabled = false;
         subscribeBtn.onclick = (e) => subscribeToEvent(event.id, e);
+        if (whatsappBtn) whatsappBtn.style.display = 'none';
     } else {
         subscribeBtn.innerHTML = '<span>🔒</span> Inicia sesion';
         subscribeBtn.classList.remove('subscribed');
         subscribeBtn.disabled = false;
         subscribeBtn.onclick = () => window.location.href = '/login.html';
+        if (whatsappBtn) whatsappBtn.style.display = 'none';
     }
 
     document.getElementById(`hero-${prefix}-view-btn`).onclick = () => openEventModal(event.id);
 }
 
-function renderHero(mainEvent, secondaryEvent) {
+function renderHero(mainEvent, secondaryEvent, tertiaryEvent) {
     const container = document.getElementById('events-hero-container');
     const mainCard = document.getElementById('events-hero-main');
     const secondaryCard = document.getElementById('events-hero-secondary');
+    const tertiaryCard = document.getElementById('events-hero-tertiary');
 
     if (!mainEvent) {
         container.style.display = 'none';
@@ -120,9 +170,21 @@ function renderHero(mainEvent, secondaryEvent) {
 
     featuredEvent = mainEvent;
 
+    // Renderizar evento principal (proximo)
     renderHeroCard(mainEvent, 'main');
     mainCard.style.display = 'grid';
 
+    // Renderizar evento terciario (especial) - en la columna izquierda
+    if (tertiaryEvent && tertiaryCard) {
+        renderHeroCard(tertiaryEvent, 'tertiary');
+        tertiaryCard.style.display = 'grid';
+        mainCard.classList.remove('solo');
+    } else if (tertiaryCard) {
+        tertiaryCard.style.display = 'none';
+        mainCard.classList.add('solo');
+    }
+
+    // Renderizar evento destacado (columna derecha)
     if (secondaryEvent) {
         renderHeroCard(secondaryEvent, 'secondary');
         secondaryCard.style.display = 'flex';
@@ -212,12 +274,25 @@ function renderEventCard(event) {
     const isLoggedIn = typeof auth !== 'undefined' && auth.isAuthenticated();
 
     let subscribeButton = '';
+    let whatsappButton = '';
+
     if (registration) {
         subscribeButton = `
             <button class="btn-event-subscribe subscribed" disabled>
                 <span>✓</span> ${registration.status === 'confirmado' ? 'Inscrito' : 'Pendiente'}
             </button>
         `;
+        // Add WhatsApp button for pending registrations
+        if (registration.status === 'pendiente') {
+            const whatsappUrl = getWhatsAppUrl(event);
+            if (whatsappUrl) {
+                whatsappButton = `
+                    <a class="btn-event-whatsapp" href="${whatsappUrl}" target="_blank">
+                        <span>💬</span> WhatsApp
+                    </a>
+                `;
+            }
+        }
     } else if (isLoggedIn) {
         subscribeButton = `
             <button class="btn-event-subscribe" onclick="subscribeToEvent(${event.id}, event)">
@@ -251,6 +326,7 @@ function renderEventCard(event) {
                 </div>
                 <div class="event-card-full-actions">
                     ${subscribeButton}
+                    ${whatsappButton}
                     <button class="btn-event-view" onclick="openEventModal(${event.id})">Ver</button>
                 </div>
             </div>

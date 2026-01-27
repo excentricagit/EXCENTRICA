@@ -18,42 +18,75 @@
     <main class="main">
         <div class="layout-sidebar">
             <div class="content">
-                <div class="section-header">
-                    <h2 class="section-title"><span>📅</span> Eventos</h2>
-                </div>
-
-                <!-- Hero - Eventos destacados (doble) -->
+                <!-- Hero - Eventos destacados (triple) -->
                 <div id="events-hero-container" class="events-hero-container" style="display: none;">
-                    <!-- Evento principal (proximo) -->
-                    <div id="events-hero-main" class="events-hero-card events-hero-main">
-                        <div class="events-hero-image">
-                            <img id="hero-main-image" src="" alt="" onerror="this.src='/images/placeholder.svg'">
-                            <span class="events-hero-badge">Proximo evento</span>
-                        </div>
-                        <div class="events-hero-content">
-                            <div class="events-hero-date">
-                                <div class="events-hero-date-box">
-                                    <span class="events-hero-date-day" id="hero-main-day">--</span>
-                                    <span class="events-hero-date-month" id="hero-main-month">---</span>
+                    <!-- Columna izquierda: 2 cards apiladas -->
+                    <div class="events-hero-left">
+                        <!-- Evento principal (proximo) -->
+                        <div id="events-hero-main" class="events-hero-card events-hero-main">
+                            <div class="events-hero-image">
+                                <img id="hero-main-image" src="" alt="" onerror="this.src='/images/placeholder.svg'">
+                                <span class="events-hero-badge">Proximo evento</span>
+                            </div>
+                            <div class="events-hero-content">
+                                <div class="events-hero-date">
+                                    <div class="events-hero-date-box">
+                                        <span class="events-hero-date-day" id="hero-main-day">--</span>
+                                        <span class="events-hero-date-month" id="hero-main-month">---</span>
+                                    </div>
+                                    <div class="events-hero-countdown" id="hero-main-countdown"></div>
                                 </div>
-                                <div class="events-hero-countdown" id="hero-main-countdown"></div>
+                                <h2 class="events-hero-title" id="hero-main-title"></h2>
+                                <div class="events-hero-meta">
+                                    <span id="hero-main-location"><span>📍</span> </span>
+                                    <span id="hero-main-time"><span>🕐</span> </span>
+                                </div>
+                                <div class="events-hero-price" id="hero-main-price"></div>
+                                <div class="events-hero-actions">
+                                    <button class="btn-event-subscribe" id="hero-main-subscribe-btn">
+                                        <span>📝</span> Inscribirse
+                                    </button>
+                                    <a class="btn-event-whatsapp" id="hero-main-whatsapp-btn" href="#" target="_blank" style="display:none;">
+                                        <span>💬</span> WhatsApp
+                                    </a>
+                                    <button class="btn-event-view" id="hero-main-view-btn">Ver detalles</button>
+                                </div>
                             </div>
-                            <h2 class="events-hero-title" id="hero-main-title"></h2>
-                            <div class="events-hero-meta">
-                                <span id="hero-main-location"><span>📍</span> </span>
-                                <span id="hero-main-time"><span>🕐</span> </span>
+                        </div>
+                        <!-- Evento terciario (especial) -->
+                        <div id="events-hero-tertiary" class="events-hero-card events-hero-tertiary">
+                            <div class="events-hero-image">
+                                <img id="hero-tertiary-image" src="" alt="" onerror="this.src='/images/placeholder.svg'">
+                                <span class="events-hero-badge special">Evento especial</span>
                             </div>
-                            <div class="events-hero-price" id="hero-main-price"></div>
-                            <div class="events-hero-actions">
-                                <button class="btn-event-subscribe" id="hero-main-subscribe-btn">
-                                    <span>📝</span> Inscribirse
-                                </button>
-                                <button class="btn-event-view" id="hero-main-view-btn">Ver detalles</button>
+                            <div class="events-hero-content">
+                                <div class="events-hero-date">
+                                    <div class="events-hero-date-box">
+                                        <span class="events-hero-date-day" id="hero-tertiary-day">--</span>
+                                        <span class="events-hero-date-month" id="hero-tertiary-month">---</span>
+                                    </div>
+                                    <div class="events-hero-countdown" id="hero-tertiary-countdown"></div>
+                                </div>
+                                <h2 class="events-hero-title" id="hero-tertiary-title"></h2>
+                                <div class="events-hero-meta">
+                                    <span id="hero-tertiary-location"><span>📍</span> </span>
+                                    <span id="hero-tertiary-time"><span>🕐</span> </span>
+                                </div>
+                                <div class="events-hero-price" id="hero-tertiary-price"></div>
+                                <div class="events-hero-actions">
+                                    <button class="btn-event-subscribe" id="hero-tertiary-subscribe-btn">
+                                        <span>📝</span> Inscribirse
+                                    </button>
+                                    <a class="btn-event-whatsapp" id="hero-tertiary-whatsapp-btn" href="#" target="_blank" style="display:none;">
+                                        <span>💬</span> WhatsApp
+                                    </a>
+                                    <button class="btn-event-view" id="hero-tertiary-view-btn">Ver detalles</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Evento secundario (destacado) -->
-                    <div id="events-hero-secondary" class="events-hero-card events-hero-secondary">
+                    <!-- Columna derecha: 1 card alta (destacada) -->
+                    <div id="events-hero-secondary" class="events-hero-card events-hero-featured">
                         <div class="events-hero-image">
                             <img id="hero-secondary-image" src="" alt="" onerror="this.src='/images/placeholder.svg'">
                             <span class="events-hero-badge featured">Destacado</span>
@@ -76,6 +109,9 @@
                                 <button class="btn-event-subscribe" id="hero-secondary-subscribe-btn">
                                     <span>📝</span> Inscribirse
                                 </button>
+                                <a class="btn-event-whatsapp" id="hero-secondary-whatsapp-btn" href="#" target="_blank" style="display:none;">
+                                    <span>💬</span> WhatsApp
+                                </a>
                                 <button class="btn-event-view" id="hero-secondary-view-btn">Ver detalles</button>
                             </div>
                         </div>

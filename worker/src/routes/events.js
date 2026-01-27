@@ -13,6 +13,8 @@ export async function handleGetEvents(request, env) {
         const upcoming = url.searchParams.get('upcoming');
         const dateTo = url.searchParams.get('dateTo') || '';
         const free = url.searchParams.get('free');
+        const isFeatured = url.searchParams.get('is_featured');
+        const isSpecial = url.searchParams.get('is_special');
         const offset = (page - 1) * limit;
 
         let query = `
@@ -54,7 +56,22 @@ export async function handleGetEvents(request, env) {
             countQuery += ' AND (price IS NULL OR price = 0)';
         }
 
-        query += ' ORDER BY e.event_date ASC, e.event_time ASC LIMIT ? OFFSET ?';
+        if (isFeatured === '1') {
+            query += ' AND e.is_featured = 1';
+            countQuery += ' AND is_featured = 1';
+        }
+
+        if (isSpecial === '1') {
+            query += ' AND e.is_special = 1';
+            countQuery += ' AND is_special = 1';
+        }
+
+        // Si es featured o special, ordenar aleatoriamente para rotar entre varios
+        if (isFeatured === '1' || isSpecial === '1') {
+            query += ' ORDER BY RANDOM() LIMIT ? OFFSET ?';
+        } else {
+            query += ' ORDER BY e.event_date ASC, e.event_time ASC LIMIT ? OFFSET ?';
+        }
 
         const [events, countResult] = await Promise.all([
             env.DB.prepare(query).bind(...params, limit, offset).all(),
@@ -166,15 +183,15 @@ export async function handleAdminCreateEvent(request, env) {
 
     try {
         const data = await request.json();
-        const { title, description, image_url, images, category_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, featured } = data;
+        const { title, description, image_url, images, category_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, featured, is_featured, is_special } = data;
 
         if (!title || !description || !event_date) {
             return error('Título, descripción y fecha son requeridos');
         }
 
         const result = await env.DB.prepare(`
-            INSERT INTO events (title, description, image_url, images, category_id, author_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, featured)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO events (title, description, image_url, images, category_id, author_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, featured, is_featured, is_special)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).bind(
             title,
             description,
@@ -197,7 +214,9 @@ export async function handleAdminCreateEvent(request, env) {
             whatsapp || null,
             website || null,
             status || 'pending',
-            featured ? 1 : 0
+            featured ? 1 : 0,
+            is_featured ? 1 : 0,
+            is_special ? 1 : 0
         ).run();
 
         return success({ id: result.meta.last_row_id }, 'Evento creado');
@@ -219,13 +238,13 @@ export async function handleAdminUpdateEvent(request, env, id) {
             return notFound('Evento no encontrado');
         }
 
-        const fields = ['title', 'description', 'image_url', 'category_id', 'zone_id', 'location', 'address', 'latitude', 'longitude', 'event_date', 'event_time', 'end_date', 'end_time', 'price', 'ticket_url', 'phone', 'whatsapp', 'website', 'status', 'featured'];
+        const fields = ['title', 'description', 'image_url', 'category_id', 'zone_id', 'location', 'address', 'latitude', 'longitude', 'event_date', 'event_time', 'end_date', 'end_time', 'price', 'ticket_url', 'phone', 'whatsapp', 'website', 'status', 'featured', 'is_featured', 'is_special'];
 
         let setClause = fields.map(f => `${f} = COALESCE(?, ${f})`).join(', ');
         setClause += ", updated_at = datetime('now')";
 
         const values = fields.map(f => {
-            if (f === 'featured') return data[f] !== undefined ? (data[f] ? 1 : 0) : null;
+            if (f === 'featured' || f === 'is_featured' || f === 'is_special') return data[f] !== undefined ? (data[f] ? 1 : 0) : null;
             return data[f] !== undefined ? data[f] : null;
         });
 

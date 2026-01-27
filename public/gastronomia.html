@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gastronomía - Excentrica</title>
+    <title>Gastronomia - Excentrica</title>
+    <meta name="description" content="Restaurantes y servicios gastronomicos en Santiago del Estero. Encuentra los mejores lugares para comer.">
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/gastronomia.css">
+    <link rel="icon" href="/images/favicon.ico">
 </head>
 <body>
-    <!-- Sidebar de Navegación Lateral Fijo -->
+    <!-- Sidebar de Navegacion Lateral Fijo -->
     <nav class="sidebar-nav">
         <a href="/" class="sidebar-nav-item">
             <span class="icon">🏠</span>
@@ -15,7 +18,6 @@
         </a>
 
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-section-title">Explorar</div>
 
         <a href="/noticias.html" class="sidebar-nav-item">
@@ -24,24 +26,23 @@
         </a>
         <a href="/mercaderia.html" class="sidebar-nav-item">
             <span class="icon">🛒</span>
-            <span>Mercadería</span>
+            <span>Mercaderia</span>
         </a>
         <a href="/eventos.html" class="sidebar-nav-item">
             <span class="icon">📅</span>
             <span>Eventos</span>
         </a>
         <a href="/videos.html" class="sidebar-nav-item">
-            <span class="icon">🎥</span>
+            <span class="icon">🎬</span>
             <span>Videos</span>
         </a>
 
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-section-title">Servicios</div>
 
         <a href="/gastronomia.html" class="sidebar-nav-item active">
             <span class="icon">🍽️</span>
-            <span>Gastronomía</span>
+            <span>Gastronomia</span>
         </a>
         <a href="/alojamiento.html" class="sidebar-nav-item">
             <span class="icon">🏨</span>
@@ -55,8 +56,8 @@
             <span class="icon">🔧</span>
             <span>Servicios</span>
         </a>
-        <a href="/puntos-interes.html" class="sidebar-nav-item">
-            <span class="icon">📍</span>
+        <a href="/turismo.html" class="sidebar-nav-item">
+            <span class="icon">🗺️</span>
             <span>Turismo</span>
         </a>
 
@@ -70,9 +71,9 @@
             <span class="icon">📞</span>
             <span>Contacto</span>
         </a>
-
     </nav>
 
+    <!-- Header Superior -->
     <header class="header">
         <div class="header-inner">
             <a href="/" class="logo">
@@ -81,39 +82,44 @@
             <div class="header-search">
                 <input type="search" placeholder="Buscar en Excentrica..." />
             </div>
-            <div class="user-menu"></div>
-            <button class="menu-toggle"><span></span><span></span><span></span></button>
+            <button class="menu-toggle" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main class="main">
         <div class="layout-sidebar">
             <!-- Contenido principal -->
             <div class="content">
                 <div class="page-header">
-                    <h1 class="page-title">🍽️ Gastronomía</h1>
-                    <p class="page-subtitle">Restaurantes y servicios gastronómicos en Santiago del Estero</p>
+                    <h1 class="page-title">🍽️ Gastronomia</h1>
+                    <p class="page-subtitle">Restaurantes y servicios gastronomicos en Santiago del Estero</p>
                 </div>
 
                 <!-- Filtros -->
-                <div class="d-flex gap-3 mb-4 flex-wrap">
-                    <input type="text" id="search-input" placeholder="Buscar restaurantes..."
-                           class="form-control" style="max-width:250px;">
-                    <select id="category-filter" class="form-control" style="max-width:200px;">
-                        <option value="">Todas las categorías</option>
+                <div class="filters-section">
+                    <input type="text" id="search-input" placeholder="Buscar restaurantes..." class="form-control" style="max-width: 280px;">
+                    <select id="category-filter" class="form-control" style="max-width: 200px;">
+                        <option value="">Todas las categorias</option>
                     </select>
-                    <select id="zone-filter" class="form-control" style="max-width:150px;">
+                    <select id="zone-filter" class="form-control" style="max-width: 180px;">
                         <option value="">Todas las zonas</option>
                     </select>
                 </div>
 
-                <!-- Grid de gastronomía -->
-                <div id="gastronomy-grid" class="grid grid-3">
-                    <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
+                <!-- Grid de gastronomia -->
+                <div id="gastronomy-grid" class="gastro-page-grid">
+                    <div class="loading-container" style="grid-column: 1 / -1;">
+                        <div class="spinner spinner-lg"></div>
+                    </div>
                 </div>
 
-                <!-- Paginación -->
-                <div id="pagination" class="mt-4"></div>
+                <!-- Paginacion -->
+                <div id="pagination" class="pagination-container"></div>
             </div>
 
             <!-- Sidebar derecho -->
@@ -129,14 +135,19 @@
                 </div>
 
                 <!-- Widget de contenido patrocinado -->
-                <div class="widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
-                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Contenido Patrocinado</div>
-                    <div id="sponsored-widget">
-                        <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem;">
-                            <p style="color: #f1f5f9; font-size: 0.9rem; margin-bottom: 0.25rem; font-weight: 600;">Tu negocio puede estar aqui</p>
-                            <p style="color: #cbd5e1; font-size: 0.8rem;">Contactanos para promocionar tu empresa</p>
+                <div class="widget" id="ad-widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(124, 58, 237, 0.15)); border: 2px solid rgba(168, 85, 247, 0.5); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%); animation: shimmer 3s infinite;"></div>
+                    <style>@keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }</style>
+                    <div style="position: relative; z-index: 1;">
+                        <div class="widget-title" style="color: #e9d5ff; font-size: 1rem;">
+                            <span style="font-size: 1.1rem;">⭐</span> Espacio Publicitario
                         </div>
-                        <a href="/contacto.html" class="btn btn-sm btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;">Quiero anunciar</a>
+                        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <div style="width: 60px; height: 60px; margin: 0 auto 0.75rem; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🍽️</div>
+                            <p style="color: #fff; font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;">Tu restaurante aqui</p>
+                            <p style="color: #c4b5fd; font-size: 0.8rem; margin-bottom: 0.75rem;">Promociona tu negocio gastronomico</p>
+                        </div>
+                        <a href="/contacto.html" class="btn btn-block" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; color: #1f2937; font-weight: 700; padding: 0.6rem; margin-top: 0.75rem;">Quiero Anunciar</a>
                     </div>
                 </div>
 
@@ -162,86 +173,22 @@
         </div>
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-bottom">
-                <p>&copy; 2026 Excentrica. Todos los derechos reservados.</p>
+                <p>© 2026 Excentrica - Contenidos y Comunicacion. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
-    <script>
-        let currentPage = 1;
-
-        async function loadGastronomy(page = 1) {
-            currentPage = page;
-            const search = document.getElementById('search-input').value;
-            const category = document.getElementById('category-filter').value;
-            const zone = document.getElementById('zone-filter').value;
-
-            Components.showLoading('#gastronomy-grid');
-
-            try {
-                const response = await api.getGastronomy({ page, limit: 12, search, category, zone });
-                const container = document.getElementById('gastronomy-grid');
-
-                const items = response.data?.items || [];
-                if (response.success && items.length > 0) {
-                    container.innerHTML = items.map(g => Components.gastronomyCard(g)).join('');
-                    document.getElementById('pagination').innerHTML = Components.pagination(
-                        response.data.pagination.page,
-                        response.data.pagination.pages,
-                        'loadGastronomy'
-                    );
-                } else {
-                    Components.showEmpty(container, 'No hay restaurantes disponibles', '🍽️');
-                    document.getElementById('pagination').innerHTML = '';
-                }
-            } catch (e) {
-                Components.showError('#gastronomy-grid', 'Error cargando restaurantes');
-            }
-
-            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null, zone: zone || null, search: search || null });
-        }
-
-        const debouncedSearch = Utils.debounce(() => loadGastronomy(1), 500);
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Cargar usuario en sidebar
-            const user = auth.getUser();
-            const userWidget = document.getElementById('user-widget-content');
-            if (user && userWidget) {
-                userWidget.innerHTML = `
-                    <p style="color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${Utils.escapeHtml(user.name || 'Usuario')}</p>
-                    <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 0.75rem;">${Utils.escapeHtml(user.email)}</p>
-                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;">Panel de Editor</a>' : ''}
-                    <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="auth.logout()">Cerrar Sesion</button>
-                `;
-            }
-
-            // Cargar filtros
-            await Promise.all([
-                App.loadCategories('category-filter', 'gastronomia'),
-                App.loadZones('zone-filter')
-            ]);
-
-            const params = Utils.getUrlParams();
-            if (params.category) document.getElementById('category-filter').value = params.category;
-            if (params.zone) document.getElementById('zone-filter').value = params.zone;
-            if (params.search) document.getElementById('search-input').value = params.search;
-
-            loadGastronomy(parseInt(params.page) || 1);
-
-            document.getElementById('search-input').addEventListener('input', debouncedSearch);
-            document.getElementById('category-filter').addEventListener('change', () => loadGastronomy(1));
-            document.getElementById('zone-filter').addEventListener('change', () => loadGastronomy(1));
-        });
-    </script>
+    <script src="/js/gastronomia.js"></script>
 </body>
 </html>

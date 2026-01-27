@@ -150,7 +150,7 @@ async function subscribeToEvent(eventId, e) {
             }
 
             if (featuredEvent && featuredEvent.id === eventId) {
-                renderHero(featuredEvent);
+                showHero();
             }
         }
     } catch (e) {
@@ -229,6 +229,66 @@ async function loadUserRegistrations() {
     }
 }
 
+// Variables para guardar los eventos del hero
+let heroMainEvent = null;
+let heroFeaturedEvent = null;
+let heroSpecialEvent = null;
+
+// Cargar hero de proximos eventos (siempre visible)
+async function loadHero() {
+    console.log('loadHero: starting...');
+    try {
+        // Cargar en paralelo: proximo evento, evento destacado, evento especial
+        const [mainResponse, featuredResponse, specialResponse, countResponse] = await Promise.all([
+            api.getEvents({ page: 1, limit: 1, upcoming: 1 }),
+            api.getEvents({ page: 1, limit: 1, upcoming: 1, is_featured: 1 }),
+            api.getEvents({ page: 1, limit: 1, upcoming: 1, is_special: 1 }),
+            api.getEvents({ page: 1, limit: 1, upcoming: 1 }) // Para el contador
+        ]);
+
+        console.log('loadHero: responses:', { mainResponse, featuredResponse, specialResponse });
+
+        // Evento principal (proximo)
+        heroMainEvent = mainResponse.success && mainResponse.data?.events?.length > 0
+            ? mainResponse.data.events[0]
+            : null;
+
+        // Evento destacado
+        heroFeaturedEvent = featuredResponse.success && featuredResponse.data?.events?.length > 0
+            ? featuredResponse.data.events[0]
+            : null;
+
+        // Evento especial
+        heroSpecialEvent = specialResponse.success && specialResponse.data?.events?.length > 0
+            ? specialResponse.data.events[0]
+            : null;
+
+        if (heroMainEvent) {
+            console.log('loadHero: rendering hero');
+            renderHero(heroMainEvent, heroFeaturedEvent, heroSpecialEvent);
+
+            // Actualizar contador de proximos
+            const tabCount = document.getElementById('tab-count-upcoming');
+            if (tabCount && countResponse.success) {
+                tabCount.textContent = countResponse.data.pagination.total || 0;
+            }
+        } else {
+            console.log('loadHero: no main event, hiding hero');
+            document.getElementById('events-hero-container').style.display = 'none';
+        }
+    } catch (e) {
+        console.error('loadHero error:', e);
+        document.getElementById('events-hero-container').style.display = 'none';
+    }
+}
+
+// Mostrar el hero (llamar despues de filtrar si se oculto)
+function showHero() {
+    if (heroMainEvent) {
+        renderHero(heroMainEvent, heroFeaturedEvent, heroSpecialEvent);
+    }
+}
+
 async function loadEvents(page = 1) {
     currentPage = page;
     const eventsGrid = document.getElementById('events-grid');
@@ -279,22 +339,9 @@ async function loadEvents(page = 1) {
             const events = response.data.events;
             console.log('loadEvents: got', events.length, 'events');
 
-            console.log('loadEvents: currentFilter =', currentFilter, 'page =', page, 'currentCategory =', currentCategory);
-
-            if (page === 1 && (currentFilter === 'upcoming' || currentFilter === 'week') && !currentCategory) {
-                console.log('loadEvents: rendering hero mode');
-                const mainEvent = events[0];
-                const secondaryEvent = events.length > 1 ? events[1] : null;
-                renderHero(mainEvent, secondaryEvent);
-                const skipCount = secondaryEvent ? 2 : 1;
-                eventsGrid.innerHTML = events.slice(skipCount).map(e => renderEventCard(e)).join('');
-            } else {
-                console.log('loadEvents: rendering grid mode (no hero), events count:', events.length);
-                document.getElementById('events-hero-container').style.display = 'none';
-                const cardsHtml = events.map(e => renderEventCard(e)).join('');
-                console.log('loadEvents: cards HTML length:', cardsHtml.length);
-                eventsGrid.innerHTML = cardsHtml;
-            }
+            // Mostrar los eventos como cards en el grid
+            console.log('loadEvents: rendering', events.length, 'cards in grid');
+            eventsGrid.innerHTML = events.map(e => renderEventCard(e)).join('');
 
             if (currentView === 'list') {
                 eventsGrid.classList.add('list-view');
@@ -306,13 +353,7 @@ async function loadEvents(page = 1) {
             if (resultsCount) {
                 resultsCount.textContent = response.data.pagination.total || events.length;
             }
-
-            const tabCount = document.getElementById('tab-count-upcoming');
-            if (tabCount && currentFilter === 'upcoming') {
-                tabCount.textContent = response.data.pagination.total || events.length;
-            }
         } else {
-            document.getElementById('events-hero-container').style.display = 'none';
             eventsGrid.innerHTML = `
                 <div class="events-empty">
                     <div class="events-empty-icon">📅</div>
@@ -326,13 +367,12 @@ async function loadEvents(page = 1) {
             const resultsCount = document.getElementById('results-count');
             if (resultsCount) resultsCount.textContent = '0';
         }
+
+        // Siempre mostrar el hero despues de cargar eventos
+        showHero();
+
     } catch (e) {
         console.error('loadEvents ERROR:', e);
-        console.error('loadEvents ERROR message:', e.message);
-        console.error('loadEvents ERROR stack:', e.stack);
-        const heroContainer = document.getElementById('events-hero-container');
-        if (heroContainer) heroContainer.style.display = 'none';
-
         eventsGrid.innerHTML = `
             <div class="events-empty">
                 <div class="events-empty-icon">⚠️</div>
@@ -343,6 +383,9 @@ async function loadEvents(page = 1) {
 
         const paginationEl = document.getElementById('pagination');
         if (paginationEl) paginationEl.innerHTML = '';
+
+        // Mostrar hero incluso si hay error en el grid
+        showHero();
     }
 }
 
@@ -401,10 +444,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const params = typeof Utils !== 'undefined' ? Utils.getUrlParams() : {};
     if (params.category) currentCategory = params.category;
 
-    loadEvents(parseInt(params.page) || 1);
+    // Cargar todo de forma asincrona
+    (async () => {
+        // PRIMERO cargar las inscripciones del usuario (para mostrar estado correcto)
+        await loadUserRegistrations().catch((e) => console.warn('loadUserRegistrations error:', e));
 
-    loadUserRegistrations().catch((e) => console.warn('loadUserRegistrations error:', e));
-    loadCategories().catch((e) => console.warn('loadCategories error:', e));
+        // Luego cargar el hero (siempre visible)
+        await loadHero().catch((e) => console.warn('loadHero error:', e));
+
+        // Luego cargar eventos del grid
+        loadEvents(parseInt(params.page) || 1);
+
+        // Cargar categorias en paralelo
+        loadCategories().catch((e) => console.warn('loadCategories error:', e));
+    })();
 
     if (typeof Components !== 'undefined') {
         Components.renderUserWidget();

@@ -121,6 +121,8 @@
                             <td>
                                 <div class="event-info">
                                     <strong>${event.title}</strong>
+                                    ${event.is_featured ? '<span class="badge badge-primary" style="margin-left:0.5rem;">⭐ Destacado</span>' : ''}
+                                    ${event.is_special ? '<span class="badge badge-info" style="margin-left:0.5rem;">✨ Especial</span>' : ''}
                                     ${event.description ? `<br><small class="text-muted">${truncate(event.description, 60)}</small>` : ''}
                                 </div>
                             </td>
@@ -332,7 +334,7 @@
         try {
             Components.toast('Procesando imagen...', 'info');
 
-            const base64String = await compressImage(file, 600, 0.6);
+            const base64String = await compressImage(file, 800, 0.75);
             document.getElementById('event-imagen').value = base64String;
             showImagePreview('event-image-preview', base64String);
             event.target.required = false;
@@ -374,6 +376,8 @@
         document.getElementById('event-imagen').value = '';
         document.getElementById('event-precio').value = '0';
         document.getElementById('event-estado').value = 'pending';
+        document.getElementById('event-is-featured').checked = false;
+        document.getElementById('event-is-special').checked = false;
 
         const previewContainer = document.getElementById('event-image-preview');
         previewContainer.innerHTML = '';
@@ -412,6 +416,8 @@
         document.getElementById('event-whatsapp').value = event.whatsapp || '';
         document.getElementById('event-web').value = event.website || '';
         document.getElementById('event-estado').value = event.status || 'pending';
+        document.getElementById('event-is-featured').checked = event.is_featured === 1;
+        document.getElementById('event-is-special').checked = event.is_special === 1;
 
         const fileInput = document.getElementById('event-imagen-file');
 
@@ -464,7 +470,9 @@
             phone: document.getElementById('event-telefono').value || null,
             whatsapp: document.getElementById('event-whatsapp').value || null,
             website: document.getElementById('event-web').value || null,
-            status: document.getElementById('event-estado').value
+            status: document.getElementById('event-estado').value,
+            is_featured: document.getElementById('event-is-featured').checked ? 1 : 0,
+            is_special: document.getElementById('event-is-special').checked ? 1 : 0
         };
 
         try {

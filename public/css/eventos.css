@@ -2,70 +2,189 @@
    EVENTOS - Estilos especificos v2
    ============================================= */
 
-/* Hero container - Dual layout */
+/* Hero container - Triple layout (2 columnas) - COMPACTO */
 .events-hero-container {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
 }
 
-/* Individual hero cards */
+/* Columna izquierda con 2 cards apiladas */
+.events-hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Individual hero cards - compactas */
 .events-hero-card {
     background: linear-gradient(145deg, rgba(25, 20, 35, 0.98), rgba(15, 12, 25, 0.99));
     border: 1px solid rgba(168, 85, 247, 0.3);
-    border-radius: 16px;
+    border-radius: 10px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 .events-hero-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.2);
 }
 
-/* Main hero (larger) */
+/* Main hero (proximo evento) - vertical, foto arriba */
 .events-hero-main {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 .events-hero-main .events-hero-image {
-    height: 100%;
+    height: 70px;
+}
+.events-hero-main .events-hero-content {
+    padding: 0.4rem;
+}
+.events-hero-main .events-hero-title {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+}
+.events-hero-main .events-hero-date-box {
+    padding: 0.2rem 0.35rem;
+    min-width: 32px;
+}
+.events-hero-main .events-hero-date-day {
+    font-size: 0.9rem;
+}
+.events-hero-main .events-hero-date-month {
+    font-size: 0.5rem;
+}
+.events-hero-main .btn-event-subscribe,
+.events-hero-main .btn-event-view {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.6rem;
 }
 
-/* Secondary hero (compact) */
-.events-hero-secondary {
+/* Main hero solo (sin evento especial) - imagen mas grande */
+.events-hero-main.solo {
+    flex: 1;
+}
+.events-hero-main.solo .events-hero-image {
+    height: 220px;
+    flex: 1;
+}
+.events-hero-main.solo .events-hero-content {
+    padding: 0.5rem 0.6rem;
+}
+.events-hero-main.solo .events-hero-title {
+    font-size: 1rem;
+    -webkit-line-clamp: 3;
+}
+.events-hero-main.solo .events-hero-date-box {
+    padding: 0.3rem 0.5rem;
+    min-width: 42px;
+}
+.events-hero-main.solo .events-hero-date-day {
+    font-size: 1.1rem;
+}
+.events-hero-main.solo .events-hero-date-month {
+    font-size: 0.55rem;
+}
+.events-hero-main.solo .events-hero-countdown {
+    font-size: 0.65rem;
+}
+.events-hero-main.solo .events-hero-meta {
+    font-size: 0.7rem;
+}
+.events-hero-main.solo .events-hero-price {
+    font-size: 0.85rem;
+}
+.events-hero-main.solo .btn-event-subscribe,
+.events-hero-main.solo .btn-event-view,
+.events-hero-main.solo .btn-event-whatsapp {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+}
+
+/* Tertiary hero (evento especial) - vertical, foto abajo */
+.events-hero-tertiary {
+    display: flex;
+    flex-direction: column-reverse;
+    flex: 1;
+}
+.events-hero-tertiary .events-hero-image {
+    height: 70px;
+}
+.events-hero-tertiary .events-hero-content {
+    padding: 0.4rem;
+}
+.events-hero-tertiary .events-hero-title {
+    font-size: 0.8rem;
+    margin-bottom: 0.15rem;
+}
+.events-hero-tertiary .events-hero-date-box {
+    padding: 0.2rem 0.35rem;
+    min-width: 32px;
+}
+.events-hero-tertiary .events-hero-date-day {
+    font-size: 0.9rem;
+}
+.events-hero-tertiary .events-hero-date-month {
+    font-size: 0.5rem;
+}
+.events-hero-tertiary .events-hero-actions {
+    flex-wrap: wrap;
+}
+.events-hero-tertiary .btn-event-subscribe,
+.events-hero-tertiary .btn-event-view {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.6rem;
+}
+
+/* Featured hero (destacado) - texto mas grande */
+.events-hero-featured {
     display: flex;
     flex-direction: column;
 }
-.events-hero-secondary .events-hero-image {
-    height: 140px;
+.events-hero-featured .events-hero-image {
+    height: 220px;
 }
-.events-hero-secondary .events-hero-content {
-    padding: 1rem;
+.events-hero-featured .events-hero-content {
+    padding: 0.5rem 0.6rem;
+    flex: 1;
 }
-.events-hero-secondary .events-hero-title {
+.events-hero-featured .events-hero-title {
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    -webkit-line-clamp: 3;
+}
+.events-hero-featured .events-hero-date {
+    margin-bottom: 0.3rem;
+}
+.events-hero-featured .events-hero-date-box {
+    padding: 0.3rem 0.5rem;
+    min-width: 42px;
+}
+.events-hero-featured .events-hero-date-day {
     font-size: 1.1rem;
 }
-.events-hero-secondary .events-hero-date-box {
-    padding: 0.5rem 0.75rem;
-    min-width: 55px;
+.events-hero-featured .events-hero-date-month {
+    font-size: 0.55rem;
 }
-.events-hero-secondary .events-hero-date-day {
-    font-size: 1.5rem;
+.events-hero-featured .events-hero-countdown {
+    font-size: 0.65rem;
 }
-.events-hero-secondary .events-hero-price {
-    font-size: 1rem;
+.events-hero-featured .events-hero-meta {
+    font-size: 0.7rem;
+    margin-bottom: 0.25rem;
 }
-.events-hero-secondary .events-hero-actions {
-    flex-wrap: wrap;
+.events-hero-featured .events-hero-price {
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
 }
-.events-hero-secondary .btn-event-subscribe,
-.events-hero-secondary .btn-event-view {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
+.events-hero-featured .btn-event-subscribe,
+.events-hero-featured .btn-event-view {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
 }
 
 /* Hero image */
@@ -83,98 +202,110 @@
     transform: scale(1.05);
 }
 
-/* Hero badge */
+/* Hero badge - compacto */
 .events-hero-badge {
     position: absolute;
-    top: 0.75rem;
-    left: 0.75rem;
+    top: 0.4rem;
+    left: 0.4rem;
     background: linear-gradient(135deg, #f59e0b, #d97706);
     color: #fff;
-    padding: 0.35rem 0.7rem;
-    border-radius: 20px;
-    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.55rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    letter-spacing: 0.3px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
 }
 .events-hero-badge.featured {
     background: linear-gradient(135deg, #ec4899, #be185d);
-    box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4);
+    box-shadow: 0 2px 8px rgba(236, 72, 153, 0.4);
+}
+.events-hero-badge.special {
+    background: linear-gradient(135deg, #06b6d4, #0891b2);
+    box-shadow: 0 2px 8px rgba(6, 182, 212, 0.4);
 }
 
-/* Hero content */
+/* Hero content - ultra compacto */
 .events-hero-content {
-    padding: 1.25rem;
+    padding: 0.3rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex: 1;
 }
 .events-hero-date {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.25rem;
+    margin-bottom: 0.15rem;
 }
 .events-hero-date-box {
     background: linear-gradient(135deg, #a855f7, #7c3aed);
     color: #fff;
-    padding: 0.6rem 0.85rem;
-    border-radius: 10px;
+    padding: 0.15rem 0.3rem;
+    border-radius: 4px;
     text-align: center;
-    min-width: 60px;
+    min-width: 30px;
 }
 .events-hero-date-day {
     display: block;
-    font-size: 1.75rem;
+    font-size: 0.85rem;
     font-weight: 800;
     line-height: 1;
 }
 .events-hero-date-month {
     display: block;
-    font-size: 0.7rem;
+    font-size: 0.45rem;
     text-transform: uppercase;
     font-weight: 600;
     opacity: 0.9;
 }
 .events-hero-countdown {
     color: #fbbf24;
-    font-size: 0.8rem;
+    font-size: 0.55rem;
     font-weight: 600;
 }
 .events-hero-title {
-    font-size: 1.35rem;
+    font-size: 0.75rem;
     font-weight: 700;
     color: #fff;
-    margin-bottom: 0.4rem;
-    line-height: 1.3;
+    margin-bottom: 0.1rem;
+    line-height: 1.15;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 .events-hero-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.2rem;
+    margin-bottom: 0.15rem;
     color: #9ca3af;
-    font-size: 0.8rem;
+    font-size: 0.55rem;
 }
 .events-hero-meta span {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.1rem;
 }
 .events-hero-price {
-    font-size: 1.15rem;
+    font-size: 0.65rem;
     font-weight: 700;
     color: #22c55e;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.15rem;
 }
 .events-hero-price.free {
     color: #4ade80;
 }
 .events-hero-actions {
     display: flex;
-    gap: 0.6rem;
+    gap: 0.2rem;
+}
+.events-hero-actions .btn-event-subscribe,
+.events-hero-actions .btn-event-view {
+    padding: 0.2rem 0.35rem;
+    font-size: 0.55rem;
 }
 
 /* Responsive */
@@ -182,16 +313,24 @@
     .events-hero-container {
         grid-template-columns: 1fr;
     }
-    .events-hero-main {
-        grid-template-columns: 1fr;
+    .events-hero-left {
+        flex-direction: row;
     }
-    .events-hero-main .events-hero-image {
-        height: 180px;
+    .events-hero-main .events-hero-image,
+    .events-hero-tertiary .events-hero-image {
+        height: 50px;
+    }
+    .events-hero-featured .events-hero-image {
+        height: 80px;
     }
 }
-@media (max-width: 500px) {
-    .events-hero-secondary .events-hero-actions {
+@media (max-width: 600px) {
+    .events-hero-left {
         flex-direction: column;
+    }
+    .events-hero-main .events-hero-image,
+    .events-hero-tertiary .events-hero-image {
+        height: 60px;
     }
 }
 
@@ -346,7 +485,7 @@
 .events-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.25rem;
+    gap: 1rem;
 }
 .events-grid.list-view {
     grid-template-columns: 1fr;
@@ -390,7 +529,7 @@
 .event-card-full-image {
     position: relative;
     width: 100%;
-    height: 180px;
+    height: 130px;
     overflow: hidden;
     background: #0a0a0f;
 }
@@ -458,7 +597,7 @@
     opacity: 1;
 }
 .event-card-full-body {
-    padding: 1rem;
+    padding: 0.75rem;
 }
 .event-card-full-category {
     display: inline-block;
@@ -550,6 +689,42 @@
     transform: translateY(-2px);
 }
 
+/* WhatsApp button for pending registrations */
+.btn-event-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    padding: 0.65rem 0.85rem;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+.btn-event-whatsapp:hover {
+    background: linear-gradient(135deg, #128c7e, #075e54);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+.events-hero-actions .btn-event-whatsapp {
+    padding: 0.2rem 0.35rem;
+    font-size: 0.55rem;
+}
+.events-hero-main .btn-event-whatsapp,
+.events-hero-tertiary .btn-event-whatsapp {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.6rem;
+}
+.events-hero-featured .btn-event-whatsapp {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.7rem;
+}
+
 /* List view card style */
 .events-grid.list-view .event-card-full {
     display: grid;
@@ -557,7 +732,7 @@
 }
 .events-grid.list-view .event-card-full-image {
     height: 100%;
-    min-height: 150px;
+    min-height: 120px;
 }
 .events-grid.list-view .event-card-full-body {
     display: flex;
@@ -569,7 +744,7 @@
         grid-template-columns: 1fr;
     }
     .events-grid.list-view .event-card-full-image {
-        height: 150px;
+        height: 120px;
     }
 }
 
@@ -863,7 +1038,7 @@
     overflow: hidden;
 }
 .skeleton-image {
-    height: 180px;
+    height: 130px;
     background: linear-gradient(90deg, rgba(168, 85, 247, 0.05) 25%, rgba(168, 85, 247, 0.1) 50%, rgba(168, 85, 247, 0.05) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;

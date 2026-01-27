@@ -147,6 +147,8 @@ CREATE TABLE IF NOT EXISTS events (
     website TEXT,
     status TEXT DEFAULT 'pending',
     featured INTEGER DEFAULT 0,
+    is_featured INTEGER DEFAULT 0,
+    is_special INTEGER DEFAULT 0,
     like_count INTEGER DEFAULT 0,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now')),
