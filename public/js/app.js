@@ -40,48 +40,7 @@ const App = {
         if (auth.isAuthenticated()) {
             const user = auth.getUser();
 
-            // Mostrar menú de usuario en header
-            if (userMenu) {
-                // Determinar panel según rol
-                let panelLink = '';
-                let panelLabel = '';
-                switch(user.role) {
-                    case 'admin':
-                        panelLink = '/admin/';
-                        panelLabel = '⚙️ Panel Admin';
-                        break;
-                    case 'editor':
-                    case 'reporter':
-                    case 'periodista':
-                        panelLink = '/editor/';
-                        panelLabel = '📝 Panel Editor';
-                        break;
-                    case 'merchant':
-                    case 'comerciante':
-                        panelLink = '/comerciante/';
-                        panelLabel = '🏪 Mi Negocio';
-                        break;
-                    case 'publicista':
-                        panelLink = '/publicista/';
-                        panelLabel = '📺 Mis Anuncios';
-                        break;
-                }
-
-                userMenu.innerHTML = `
-                    <div class="dropdown">
-                        <button class="user-avatar-btn" onclick="this.parentElement.classList.toggle('active')">
-                            <img src="${user.avatar_url || CONFIG.PLACEHOLDER_AVATAR}" alt="${user.name}" class="avatar avatar-sm">
-                            <span class="hide-mobile">${user.name}</span>
-                        </button>
-                        <div class="dropdown-menu">
-                            <a href="/perfil.html" class="dropdown-item">👤 Mi Perfil</a>
-                            ${panelLink ? `<a href="${panelLink}" class="dropdown-item">${panelLabel}</a>` : ''}
-                            <div class="dropdown-divider"></div>
-                            <a href="#" class="dropdown-item" onclick="auth.logout(); return false;">🚪 Cerrar Sesión</a>
-                        </div>
-                    </div>
-                `;
-            }
+            // No mostrar nada en el header - el usuario accede desde el widget del sidebar
 
             // Actualizar widget de usuario en sidebar (si existe)
             if (widgetUser) {
@@ -135,13 +94,7 @@ const App = {
             // Ocultar botones de auth
             if (authButtons) authButtons.style.display = 'none';
         } else {
-            // Mostrar botones de login/registro en header
-            if (userMenu) {
-                userMenu.innerHTML = `
-                    <a href="/login.html" class="btn btn-outline btn-sm">Ingresar</a>
-                    <a href="/registro.html" class="btn btn-primary btn-sm hide-mobile">Registrarse</a>
-                `;
-            }
+            // No mostrar nada en el header - el usuario accede desde el widget del sidebar
 
             // Mostrar botones de login en widget (si existe)
             if (widgetUser) {

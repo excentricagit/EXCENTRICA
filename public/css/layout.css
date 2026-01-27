@@ -26,7 +26,7 @@ body {
 .header {
     position: fixed;
     top: 0;
-    left: 0;
+    left: var(--sidebar-width);
     right: 0;
     height: var(--header-height);
     background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
@@ -143,16 +143,16 @@ body {
 
 .sidebar-nav {
     position: fixed;
-    top: var(--header-height);
+    top: 0;
     left: 0;
     width: var(--sidebar-width);
-    height: calc(100vh - var(--header-height));
+    height: 100vh;
     background: var(--bg-tertiary);
     border-right: 2px solid var(--primary);
     overflow-y: auto;
     overflow-x: hidden;
-    z-index: var(--z-fixed);
-    padding: var(--spacing-md) 0;
+    z-index: calc(var(--z-sticky) + 10);
+    padding: var(--spacing-lg) 0 var(--spacing-md) 0;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
 }
 
