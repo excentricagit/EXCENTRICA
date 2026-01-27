@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticia - Excentrica</title>
+    <meta name="description" content="">
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        /* Article styles */
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .article-header {
+            margin-bottom: 2rem;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: #fff;
+            padding: 0.35rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .article-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        .article-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .article-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .article-author {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .article-author-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .article-author-name {
+            color: #c4b5fd;
+            font-weight: 500;
+        }
+
+        /* Featured image */
+        .article-featured-image {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .article-featured-image img {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .article-image-caption {
+            padding: 0.75rem 1rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            font-style: italic;
+            background: rgba(20, 20, 30, 0.5);
+        }
+
+        /* Article content */
+        .article-content {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .article-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        .article-content h2 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin: 2rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .article-content h3 {
+            font-size: 1.25rem;
+            color: #c4b5fd;
+            margin: 1.5rem 0 1rem;
+        }
+
+        .article-content a {
+            color: #a855f7;
+            text-decoration: underline;
+        }
+
+        .article-content blockquote {
+            border-left: 4px solid #a855f7;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #c4b5fd;
+        }
+
+        .article-content ul, .article-content ol {
+            margin: 1rem 0 1.5rem 1.5rem;
+        }
+
+        .article-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Gallery / Additional images */
+        .article-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .article-gallery-item {
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .article-gallery-item:hover {
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: scale(1.02);
+        }
+
+        .article-gallery-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Actions */
+        .article-actions {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .article-action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 25px;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #c4b5fd;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .article-action-btn:hover {
+            background: rgba(168, 85, 247, 0.25);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+
+        .article-action-btn.liked {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* Source link */
+        .article-source {
+            margin-top: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .article-source-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.25rem;
+        }
+
+        .article-source a {
+            color: #a855f7;
+            word-break: break-all;
+        }
+
+        /* Related news */
+        .related-section {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(168, 85, 247, 0.2);
+        }
+
+        .related-title {
+            font-size: 1.25rem;
+            color: #a855f7;
+            margin-bottom: 1.5rem;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .related-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+            border: 1px solid rgba(168, 85, 247, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .related-card:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .related-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .related-card-body {
+            padding: 1rem;
+        }
+
+        .related-card-title {
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
+
+        .related-card-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .related-card-title a:hover {
+            color: #a855f7;
+        }
+
+        /* Image modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-modal img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Loading state */
+        .article-skeleton {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        .skeleton-title {
+            height: 2.5rem;
+            background: rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .skeleton-meta {
+            height: 1rem;
+            width: 60%;
+            background: rgba(168, 85, 247, 0.15);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+        }
+
+        .skeleton-image {
+            height: 400px;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+        }
+
+        .skeleton-text {
+            height: 1rem;
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 4px;
+            margin-bottom: 0.75rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 1.6rem;
+            }
+
+            .article-meta {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .article-content {
+                font-size: 1rem;
+            }
+
+            .article-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar de Navegacion Lateral Fijo -->
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">
+            <span class="icon">🏠</span>
+            <span>Inicio</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Explorar</div>
+
+        <a href="/noticias.html" class="sidebar-nav-item active">
+            <span class="icon">📰</span>
+            <span>Noticias</span>
+        </a>
+        <a href="/mercaderia.html" class="sidebar-nav-item">
+            <span class="icon">🛒</span>
+            <span>Mercaderia</span>
+        </a>
+        <a href="/eventos.html" class="sidebar-nav-item">
+            <span class="icon">📅</span>
+            <span>Eventos</span>
+        </a>
+        <a href="/videos.html" class="sidebar-nav-item">
+            <span class="icon">🎥</span>
+            <span>Videos</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Servicios</div>
+
+        <a href="/gastronomia.html" class="sidebar-nav-item">
+            <span class="icon">🍽️</span>
+            <span>Gastronomia</span>
+        </a>
+        <a href="/alojamiento.html" class="sidebar-nav-item">
+            <span class="icon">🏨</span>
+            <span>Alojamiento</span>
+        </a>
+        <a href="/transporte.html" class="sidebar-nav-item">
+            <span class="icon">🚌</span>
+            <span>Transporte</span>
+        </a>
+        <a href="/servicios.html" class="sidebar-nav-item">
+            <span class="icon">🔧</span>
+            <span>Servicios</span>
+        </a>
+        <a href="/turismo.html" class="sidebar-nav-item">
+            <span class="icon">🗺️</span>
+            <span>Turismo</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <a href="/cine.html" class="sidebar-nav-item">
+            <span class="icon">🎬</span>
+            <span>Cine</span>
+        </a>
+        <a href="/contacto.html" class="sidebar-nav-item">
+            <span class="icon">📞</span>
+            <span>Contacto</span>
+        </a>
+    </nav>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo"><span>⚡</span> Excentrica</a>
+            <div class="header-search">
+                <input type="search" placeholder="Buscar en Excentrica..." />
+            </div>
+            <div class="user-menu" id="user-menu"></div>
+            <button class="menu-toggle"><span></span><span></span><span></span></button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <div class="article-container" id="article-container">
+                <!-- Loading skeleton -->
+                <div class="article-skeleton">
+                    <div class="skeleton-title"></div>
+                    <div class="skeleton-meta"></div>
+                    <div class="skeleton-image"></div>
+                    <div class="skeleton-text" style="width: 100%"></div>
+                    <div class="skeleton-text" style="width: 95%"></div>
+                    <div class="skeleton-text" style="width: 90%"></div>
+                    <div class="skeleton-text" style="width: 97%"></div>
+                    <div class="skeleton-text" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Image modal -->
+    <div class="image-modal" id="image-modal">
+        <button class="image-modal-close" onclick="closeImageModal()">&times;</button>
+        <img src="" alt="" id="modal-image">
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Excentrica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        let currentNews = null;
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>"']/g, (m) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[m]));
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('es-AR', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getAuthorInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        function openImageModal(src) {
+            const modal = document.getElementById('image-modal');
+            const img = document.getElementById('modal-image');
+            img.src = src;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            const modal = document.getElementById('image-modal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeImageModal();
+        });
+
+        // Close modal on click outside image
+        document.getElementById('image-modal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeImageModal();
+        });
+
+        async function loadNews() {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get('id');
+
+            if (!id) {
+                window.location.href = '/noticias.html';
+                return;
+            }
+
+            try {
+                const response = await api.getNewsById(id);
+
+                if (!response.success || !response.data) {
+                    showError('Noticia no encontrada');
+                    return;
+                }
+
+                currentNews = response.data;
+                renderNews(currentNews);
+                loadRelatedNews();
+
+            } catch (e) {
+                console.error('Error loading news:', e);
+                showError('Error cargando la noticia');
+            }
+        }
+
+        function renderNews(news) {
+            // Update page title
+            document.title = `${news.title} - Excentrica`;
+
+            // Parse additional images
+            let additionalImages = [];
+            if (news.images) {
+                try {
+                    additionalImages = typeof news.images === 'string' ? JSON.parse(news.images) : news.images;
+                } catch (e) {
+                    console.error('Error parsing images:', e);
+                }
+            }
+
+            const container = document.getElementById('article-container');
+            container.innerHTML = `
+                <article class="article">
+                    <header class="article-header">
+                        ${news.category_name ? `<span class="article-category">${escapeHtml(news.category_name)}</span>` : ''}
+                        <h1 class="article-title">${escapeHtml(news.title)}</h1>
+                        <div class="article-meta">
+                            <div class="article-author">
+                                <div class="article-author-avatar">${getAuthorInitials(news.author_name)}</div>
+                                <div>
+                                    <div class="article-author-name">${escapeHtml(news.author_name || 'Excentrica')}</div>
+                                </div>
+                            </div>
+                            <div class="article-meta-item">
+                                <span>📅</span>
+                                <span>${formatDate(news.published_at || news.created_at)}</span>
+                            </div>
+                            <div class="article-meta-item">
+                                <span>👁️</span>
+                                <span>${news.view_count || 0} vistas</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    ${news.image_url ? `
+                        <figure class="article-featured-image">
+                            <img src="${news.image_url}" alt="${escapeHtml(news.image_alt || news.title)}"
+                                 onclick="openImageModal(this.src)"
+                                 onerror="this.parentElement.style.display='none'">
+                            ${news.image_alt ? `<figcaption class="article-image-caption">${escapeHtml(news.image_alt)}</figcaption>` : ''}
+                        </figure>
+                    ` : ''}
+
+                    <div class="article-content">
+                        ${news.summary ? `<p><strong>${escapeHtml(news.summary)}</strong></p>` : ''}
+                        ${formatContent(news.content)}
+                    </div>
+
+                    ${additionalImages.length > 0 ? `
+                        <div class="article-gallery">
+                            ${additionalImages.map(img => `
+                                <div class="article-gallery-item" onclick="openImageModal('${img.url || img}')">
+                                    <img src="${img.url || img}" alt="${escapeHtml(img.alt || 'Imagen')}"
+                                         onerror="this.parentElement.style.display='none'">
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+
+                    ${news.source_url ? `
+                        <div class="article-source">
+                            <div class="article-source-label">Fuente</div>
+                            <a href="${news.source_url}" target="_blank" rel="noopener">${news.source_url}</a>
+                        </div>
+                    ` : ''}
+
+                    <div class="article-actions">
+                        <button class="article-action-btn ${news.user_liked ? 'liked' : ''}"
+                                onclick="toggleLike()" id="like-btn">
+                            <span>❤️</span>
+                            <span id="like-count">${news.like_count || 0}</span>
+                        </button>
+                        <button class="article-action-btn" onclick="shareNews()">
+                            <span>📤</span>
+                            <span>Compartir</span>
+                        </button>
+                        <a href="/noticias.html" class="article-action-btn">
+                            <span>📰</span>
+                            <span>Mas noticias</span>
+                        </a>
+                    </div>
+                </article>
+
+                <section class="related-section" id="related-section" style="display: none;">
+                    <h2 class="related-title">Noticias relacionadas</h2>
+                    <div class="related-grid" id="related-grid"></div>
+                </section>
+            `;
+        }
+
+        function formatContent(content) {
+            if (!content) return '';
+
+            // Convert line breaks to paragraphs
+            let formatted = content
+                .split(/\n\n+/)
+                .map(para => para.trim())
+                .filter(para => para)
+                .map(para => `<p>${escapeHtml(para)}</p>`)
+                .join('');
+
+            // Convert single line breaks within paragraphs
+            formatted = formatted.replace(/\n/g, '<br>');
+
+            return formatted;
+        }
+
+        async function loadRelatedNews() {
+            if (!currentNews) return;
+
+            try {
+                const response = await api.getNews({
+                    limit: 4,
+                    category: currentNews.category_slug
+                });
+
+                if (response.success && response.data.news) {
+                    const related = response.data.news.filter(n => n.id !== currentNews.id).slice(0, 3);
+
+                    if (related.length > 0) {
+                        const section = document.getElementById('related-section');
+                        const grid = document.getElementById('related-grid');
+
+                        section.style.display = 'block';
+                        grid.innerHTML = related.map(news => `
+                            <article class="related-card">
+                                <img src="${news.image_url || '/images/placeholder.jpg'}"
+                                     alt="${escapeHtml(news.title)}"
+                                     onerror="this.src='/images/placeholder.jpg'">
+                                <div class="related-card-body">
+                                    <h3 class="related-card-title">
+                                        <a href="/noticia.html?id=${news.id}">${escapeHtml(news.title)}</a>
+                                    </h3>
+                                </div>
+                            </article>
+                        `).join('');
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading related news:', e);
+            }
+        }
+
+        async function toggleLike() {
+            const user = auth.getUser();
+            if (!user) {
+                window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname + window.location.search);
+                return;
+            }
+
+            try {
+                const response = await api.toggleLike('news', currentNews.id);
+                if (response.success) {
+                    const btn = document.getElementById('like-btn');
+                    const count = document.getElementById('like-count');
+                    const isLiked = btn.classList.toggle('liked');
+                    count.textContent = parseInt(count.textContent) + (isLiked ? 1 : -1);
+                }
+            } catch (e) {
+                console.error('Error toggling like:', e);
+            }
+        }
+
+        function shareNews() {
+            if (navigator.share) {
+                navigator.share({
+                    title: currentNews.title,
+                    text: currentNews.summary || '',
+                    url: window.location.href
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(window.location.href);
+                alert('Link copiado al portapapeles');
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('article-container').innerHTML = `
+                <div style="text-align: center; padding: 4rem 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📰</div>
+                    <h2 style="color: #e2e8f0; margin-bottom: 0.5rem;">${message}</h2>
+                    <p style="color: #94a3b8; margin-bottom: 1.5rem;">La noticia que buscas no esta disponible</p>
+                    <a href="/noticias.html" class="btn" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none;">
+                        Ver todas las noticias
+                    </a>
+                </div>
+            `;
+        }
+
+        // Load user menu
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = auth.getUser();
+            const userMenu = document.getElementById('user-menu');
+
+            if (user) {
+                userMenu.innerHTML = `
+                    <span style="color: #e2e8f0; margin-right: 0.5rem;">${escapeHtml(user.name || user.email)}</span>
+                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-outline btn-sm" style="margin-right: 0.5rem;">Editor</a>' : ''}
+                    <button class="btn btn-outline btn-sm" onclick="auth.logout()">Salir</button>
+                `;
+            } else {
+                userMenu.innerHTML = `
+                    <a href="/login.html" class="btn btn-outline btn-sm" style="margin-right: 0.5rem;">Ingresar</a>
+                    <a href="/registro.html" class="btn btn-primary btn-sm">Registrarse</a>
+                `;
+            }
+
+            loadNews();
+        });
+    </script>
+</body>
+</html>
