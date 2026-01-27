@@ -24,14 +24,13 @@ body {
    ============================================ */
 
 .header {
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: var(--sidebar-width);
+    left: 0;
     right: 0;
-    height: var(--header-height);
-    background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-    border-bottom: 2px solid var(--primary);
-    box-shadow: var(--shadow-lg), var(--glow-primary);
+    height: auto;
+    background: linear-gradient(180deg, rgba(15, 12, 25, 0.98) 0%, rgba(15, 12, 25, 0.95) 100%);
+    border-bottom: 1px solid rgba(168, 85, 247, 0.2);
     z-index: var(--z-sticky);
     backdrop-filter: blur(10px);
 }
@@ -41,31 +40,36 @@ body {
     align-items: center;
     justify-content: space-between;
     height: 100%;
-    max-width: 100%;
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
+    padding: 0.75rem 1.5rem;
 }
 
 /* Logo */
 .logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #fff;
+    text-decoration: none;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    color: var(--accent);
-    text-shadow: var(--glow-accent);
-    transition: all var(--transition-fast);
+    gap: 0.5rem;
+    letter-spacing: -0.5px;
+    transition: all 0.3s;
 }
 
 .logo:hover {
-    color: var(--accent-dark);
-    transform: scale(1.05);
-    filter: drop-shadow(var(--glow-accent));
+    opacity: 0.9;
+}
+
+.logo span {
+    color: #a855f7;
+    text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
 }
 
 .logo img {
-    height: 40px;
+    height: 28px;
+    width: auto;
 }
 
 /* Búsqueda en header */
@@ -77,19 +81,24 @@ body {
 
 .header-search input {
     width: 100%;
-    padding: var(--spacing-sm) var(--spacing-lg);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-xl);
-    color: var(--text-primary);
-    font-size: var(--font-size-base);
-    transition: all var(--transition-fast);
+    padding: 0.65rem 1.25rem;
+    border-radius: 25px;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    background: rgba(30, 30, 40, 0.8);
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.header-search input::placeholder {
+    color: #6b7280;
 }
 
 .header-search input:focus {
     outline: none;
-    border-color: var(--primary);
-    box-shadow: var(--glow-primary);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+    background: rgba(30, 30, 40, 0.95);
 }
 
 /* User menu en header */
@@ -142,10 +151,10 @@ body {
 
 .sidebar-nav {
     position: fixed;
-    top: var(--header-height);
+    top: calc(var(--header-height) + 15px);
     left: 0;
     width: var(--sidebar-width);
-    height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--header-height) - 15px);
     background: var(--bg-tertiary);
     border-right: 2px solid var(--primary);
     overflow-y: auto;
@@ -229,7 +238,7 @@ body {
    ============================================ */
 
 .main {
-    margin-top: var(--header-height);
+    margin-top: 0;
     margin-left: var(--sidebar-width);
     min-height: calc(100vh - var(--header-height));
     padding: var(--spacing-lg) var(--spacing-md);

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+    <!-- Header -->
+    <header class="header" id="main-header"></header>
+
+    <main class="main">
+        <div class="layout-sidebar">
+            <div class="content">
+                <!-- Header del perfil -->
+                <div class="profile-header" id="profile-header">
+                    <div class="profile-avatar" id="profile-avatar">👤</div>
+                    <div class="profile-info">
+                        <h1 id="profile-name">Cargando...</h1>
+                        <p id="profile-email"></p>
+                        <span class="profile-badge" id="profile-role"></span>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="profile-tabs">
+                    <button class="profile-tab active" data-tab="eventos" onclick="switchTab('eventos')">Mis Eventos</button>
+                    <button class="profile-tab" data-tab="datos" onclick="switchTab('datos')">Mis Datos</button>
+                    <button class="profile-tab" data-tab="seguridad" onclick="switchTab('seguridad')">Seguridad</button>
+                </div>
+
+                <!-- Seccion: Mis Eventos -->
+                <div class="profile-section active" id="section-eventos">
+                    <div id="events-list">
+                        <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
+                    </div>
+                </div>
+
+                <!-- Seccion: Mis Datos -->
+                <div class="profile-section" id="section-datos">
+                    <form id="profile-form" class="form-section">
+                        <div class="form-section-title"><span>📝</span> Informacion Personal</div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="input-name">Nombre completo</label>
+                                <input type="text" id="input-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-username">Usuario</label>
+                                <input type="text" id="input-username" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="input-email">Email</label>
+                                <input type="email" id="input-email" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="input-phone">Telefono</label>
+                                <input type="tel" id="input-phone">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="input-bio">Sobre mi</label>
+                            <textarea id="input-bio" rows="3" placeholder="Cuenta algo sobre ti..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-profile-primary">
+                            Guardar Cambios
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Seccion: Seguridad -->
+                <div class="profile-section" id="section-seguridad">
+                    <form id="password-form" class="form-section">
+                        <div class="form-section-title"><span>🔒</span> Cambiar Contrasena</div>
+                        <div class="form-group">
+                            <label for="input-current-password">Contrasena actual</label>
+                            <input type="password" id="input-current-password" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="input-new-password">Nueva contrasena</label>
+                                <input type="password" id="input-new-password" required minlength="8">
+                            </div>
+                            <div class="form-group">
+                                <label for="input-confirm-password">Confirmar contrasena</label>
+                                <input type="password" id="input-confirm-password" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-profile-primary">
+                            Cambiar Contrasena
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="widget">
+                    <div class="widget-title">Acciones</div>
+                    <button class="btn btn-block btn-profile-secondary mb-2" onclick="window.location.href='/eventos.html'">
+                        Explorar Eventos
+                    </button>
+                    <button class="btn btn-block btn-profile-danger" onclick="logout()">
+                        Cerrar Sesion
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="main-footer"></footer>
+
+    <!-- Scripts base -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+    <!-- Script de perfil -->
+    <script src="/js/perfil.js"></script>
+</body>
+</html>

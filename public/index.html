@@ -887,11 +887,11 @@
 
         // Render product card
         function renderProductCard(product) {
-            const imageUrl = product.image_url || product.imageUrl || '/images/placeholder.jpg';
+            const imageUrl = product.image_url || product.imageUrl || '/images/placeholder.svg';
             const price = product.price ? `$${Number(product.price).toLocaleString('es-AR')}` : 'Consultar';
             return `
                 <article class="product-card">
-                    <img src="${imageUrl}" alt="${escapeHtml(product.title || product.name)}" class="product-card-image" onerror="this.src='/images/placeholder.jpg'">
+                    <img src="${imageUrl}" alt="${escapeHtml(product.title || product.name)}" class="product-card-image" onerror="this.src='/images/placeholder.svg'">
                     <div class="product-card-body">
                         <h3 class="product-card-title">
                             <a href="/producto.html?id=${product.id}">${escapeHtml(product.title || product.name)}</a>
@@ -924,10 +924,10 @@
 
         // Render movie card
         function renderMovieCard(movie) {
-            const posterUrl = movie.poster_url || movie.image_url || '/images/movie-placeholder.jpg';
+            const posterUrl = movie.poster_url || movie.image_url || '/images/movie-placeholder.svg';
             return `
                 <article class="movie-card">
-                    <img src="${posterUrl}" alt="${escapeHtml(movie.title)}" class="movie-card-poster" onerror="this.src='/images/placeholder.jpg'">
+                    <img src="${posterUrl}" alt="${escapeHtml(movie.title)}" class="movie-card-poster" onerror="this.src='/images/placeholder.svg'">
                     <div class="movie-card-body">
                         <h3 class="movie-card-title">${escapeHtml(movie.title)}</h3>
                         <div class="movie-card-genre">${escapeHtml(movie.genre || '')}</div>
@@ -938,10 +938,10 @@
 
         // Render POI card
         function renderPoiCard(poi) {
-            const imageUrl = poi.image_url || '/images/placeholder.jpg';
+            const imageUrl = poi.image_url || '/images/placeholder.svg';
             return `
                 <article class="poi-card">
-                    <img src="${imageUrl}" alt="${escapeHtml(poi.name)}" class="poi-card-image" onerror="this.src='/images/placeholder.jpg'">
+                    <img src="${imageUrl}" alt="${escapeHtml(poi.name)}" class="poi-card-image" onerror="this.src='/images/placeholder.svg'">
                     <div class="poi-card-body">
                         ${poi.category_name ? `<span class="poi-card-category">${escapeHtml(poi.category_name)}</span>` : ''}
                         <h3 class="poi-card-title">${escapeHtml(poi.name)}</h3>
@@ -1027,9 +1027,12 @@
 
             // Load events (API returns data.events)
             try {
-                const eventsResponse = await api.getEvents({ limit: 4 });
+                console.log('index: loading events...');
+                const eventsResponse = await api.getEvents({ limit: 4, upcoming: 1 });
+                console.log('index: events response:', eventsResponse);
                 const eventsList = document.getElementById('events-list');
                 const eventsData = extractArray(eventsResponse, 'events', 'items');
+                console.log('index: eventsData:', eventsData);
 
                 if (eventsData.length > 0) {
                     eventsList.innerHTML = eventsData.map(e => renderEventCard(e)).join('');
@@ -1038,6 +1041,7 @@
                 }
             } catch (e) {
                 console.error('Error loading events:', e);
+                console.error('Error details:', e.message, e.stack);
                 showEmpty(document.getElementById('events-list'), 'Error cargando eventos', '❌');
             }
 

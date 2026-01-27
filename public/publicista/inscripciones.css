@@ -1,0 +1,314 @@
+/* =============================================
+   PUBLICISTA INSCRIPCIONES - Estilos
+   ============================================= */
+
+/* Stats cards for registrations */
+.registration-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+    .registration-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .registration-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Filter bar */
+.registrations-filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.registrations-filter-bar select,
+.registrations-filter-bar input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: #fff;
+    min-width: 150px;
+}
+
+.registrations-filter-bar select:focus,
+.registrations-filter-bar input:focus {
+    border-color: #a855f7;
+    outline: none;
+}
+
+/* Registration table */
+.registration-user {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.registration-user-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.registration-user-email {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.registration-user-phone {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.registration-code {
+    font-family: monospace;
+    background: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: #6366f1;
+}
+
+.registration-event {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.registration-event-title {
+    font-weight: 500;
+    color: #333;
+}
+
+.registration-event-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Status badges */
+.badge-pendiente {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.badge-confirmado {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.badge-rechazado {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-cancelado {
+    background: #e5e7eb;
+    color: #6b7280;
+}
+
+/* Action buttons */
+.btn-approve {
+    background: #10b981;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-approve:hover {
+    background: #059669;
+}
+
+.btn-reject {
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.btn-reject:hover {
+    background: #dc2626;
+}
+
+/* Verify code section */
+.verify-code-section {
+    background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+    border: 1px solid #c4b5fd;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.verify-code-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #7c3aed;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.verify-code-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.verify-code-input {
+    flex: 1;
+    max-width: 300px;
+    padding: 0.6rem 0.75rem;
+    border: 2px solid #c4b5fd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    text-transform: uppercase;
+}
+
+.verify-code-input:focus {
+    border-color: #7c3aed;
+    outline: none;
+}
+
+.btn-verify {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-verify:hover {
+    background: linear-gradient(135deg, #9333ea, #6d28d9);
+}
+
+.verify-result {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 8px;
+    display: none;
+}
+
+.verify-result.valid {
+    display: block;
+    background: #d1fae5;
+    border: 1px solid #10b981;
+}
+
+.verify-result.invalid {
+    display: block;
+    background: #fee2e2;
+    border: 1px solid #ef4444;
+}
+
+.verify-result-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.verify-result.valid .verify-result-title {
+    color: #059669;
+}
+
+.verify-result.invalid .verify-result-title {
+    color: #dc2626;
+}
+
+.verify-result-details {
+    font-size: 0.85rem;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* WhatsApp contact button */
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #25d366, #128c7e);
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.btn-whatsapp:hover {
+    background: linear-gradient(135deg, #128c7e, #075e54);
+    color: #fff;
+}
+
+/* Notes modal */
+.notes-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.notes-modal-overlay.active {
+    display: flex;
+}
+
+.notes-modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 1.5rem;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.notes-modal-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.notes-modal textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    resize: vertical;
+    min-height: 100px;
+    margin-bottom: 1rem;
+}
+
+.notes-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+}

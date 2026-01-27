@@ -1,3 +1,6 @@
+npx wrangler pages deploy public --project-name=excentrica
+
+
 ═══════════════════════════════════════════════════════════════
   CREDENCIALES DE PRUEBA - EXCENTRICA
 ═══════════════════════════════════════════════════════════════

@@ -25,6 +25,12 @@ import { handleGetZones, handleGetZoneById, handleAdminGetZones, handleAdminCrea
 // Events routes
 import { handleGetEvents, handleGetEventById, handleAdminGetEvents, handleAdminCreateEvent, handleAdminUpdateEvent, handleAdminDeleteEvent } from './routes/events.js';
 
+// Event Registrations routes
+import {
+    handleEventRegister, handleEventUnregister, handleGetMyEventRegistrations, handleCheckEventRegistration,
+    handleAdminGetEventRegistrations, handleAdminUpdateRegistrationStatus, handleAdminGetEventRegistrationStats, handleVerifyRegistrationCode
+} from './routes/event-registrations.js';
+
 // Videos routes
 import { handleGetVideos, handleGetVideoById, handleAdminGetVideos, handleAdminCreateVideo, handleAdminUpdateVideo, handleAdminDeleteVideo } from './routes/videos.js';
 
@@ -172,6 +178,12 @@ const routes = [
     { method: 'GET', path: '/api/events', handler: handleGetEvents },
     { method: 'GET', path: '/api/events/:id', handler: (req, env, params) => handleGetEventById(req, env, params.id) },
 
+    // Event Registrations (auth required)
+    { method: 'POST', path: '/api/events/:id/register', handler: (req, env, params) => handleEventRegister(req, env, params.id) },
+    { method: 'DELETE', path: '/api/events/:id/register', handler: (req, env, params) => handleEventUnregister(req, env, params.id) },
+    { method: 'GET', path: '/api/events/:id/registration', handler: (req, env, params) => handleCheckEventRegistration(req, env, params.id) },
+    { method: 'GET', path: '/api/user/events', handler: handleGetMyEventRegistrations },
+
     // Videos (public)
     { method: 'GET', path: '/api/videos', handler: handleGetVideos },
     { method: 'GET', path: '/api/videos/:id', handler: (req, env, params) => handleGetVideoById(req, env, params.id) },
@@ -237,6 +249,12 @@ const routes = [
     { method: 'POST', path: '/api/admin/events', handler: handleAdminCreateEvent },
     { method: 'PUT', path: '/api/admin/events/:id', handler: (req, env, params) => handleAdminUpdateEvent(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/events/:id', handler: (req, env, params) => handleAdminDeleteEvent(req, env, params.id) },
+
+    // Admin - Event Registrations
+    { method: 'GET', path: '/api/admin/event-registrations', handler: handleAdminGetEventRegistrations },
+    { method: 'PUT', path: '/api/admin/event-registrations/:id', handler: (req, env, params) => handleAdminUpdateRegistrationStatus(req, env, params.id) },
+    { method: 'GET', path: '/api/admin/events/:id/registrations/stats', handler: (req, env, params) => handleAdminGetEventRegistrationStats(req, env, params.id) },
+    { method: 'GET', path: '/api/admin/event-registrations/verify/:code', handler: (req, env, params) => handleVerifyRegistrationCode(req, env, params.code) },
 
     // Admin - Videos
     { method: 'GET', path: '/api/admin/videos', handler: handleAdminGetVideos },

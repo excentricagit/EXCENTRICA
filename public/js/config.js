@@ -19,7 +19,7 @@ const CONFIG = {
     STORAGE_USER: 'excentrica_user',
 
     // Image placeholders
-    PLACEHOLDER_IMAGE: '/images/placeholder.jpg',
+    PLACEHOLDER_IMAGE: '/images/placeholder.svg',
     PLACEHOLDER_AVATAR: '/images/avatar-placeholder.png',
 
     // Sections

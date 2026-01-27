@@ -717,9 +717,9 @@
                         section.style.display = 'block';
                         grid.innerHTML = related.map(news => `
                             <article class="related-card">
-                                <img src="${news.image_url || '/images/placeholder.jpg'}"
+                                <img src="${news.image_url || '/images/placeholder.svg'}"
                                      alt="${escapeHtml(news.title)}"
-                                     onerror="this.src='/images/placeholder.jpg'">
+                                     onerror="this.src='/images/placeholder.svg'">
                                 <div class="related-card-body">
                                     <h3 class="related-card-title">
                                         <a href="/noticia.html?id=${news.id}">${escapeHtml(news.title)}</a>

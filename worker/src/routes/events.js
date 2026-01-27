@@ -11,6 +11,8 @@ export async function handleGetEvents(request, env) {
         const category = url.searchParams.get('category') || '';
         const zone = url.searchParams.get('zone') || '';
         const upcoming = url.searchParams.get('upcoming');
+        const dateTo = url.searchParams.get('dateTo') || '';
+        const free = url.searchParams.get('free');
         const offset = (page - 1) * limit;
 
         let query = `
@@ -39,6 +41,17 @@ export async function handleGetEvents(request, env) {
         if (upcoming === '1') {
             query += " AND e.event_date >= date('now')";
             countQuery += " AND event_date >= date('now')";
+        }
+
+        if (dateTo) {
+            query += ' AND e.event_date <= ?';
+            countQuery += ' AND event_date <= ?';
+            params.push(dateTo);
+        }
+
+        if (free === '1') {
+            query += ' AND (e.price IS NULL OR e.price = 0)';
+            countQuery += ' AND (price IS NULL OR price = 0)';
         }
 
         query += ' ORDER BY e.event_date ASC, e.event_time ASC LIMIT ? OFFSET ?';

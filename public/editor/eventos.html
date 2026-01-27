@@ -1,18 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventos - Editor Excentrica [v2.3]</title>
-    <!-- v2.3 - Base64 upload - Build 2026-01-26-16:00 - FORCE REBUILD -->
+    <title>Eventos - Editor Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/editor/editor.css">
+    <link rel="stylesheet" href="/editor/eventos.css">
 </head>
 <body>
     <div class="admin-layout">
         <!-- Sidebar -->
         <aside class="admin-sidebar">
-                        <div class="admin-logo">
+            <div class="admin-logo">
                 <a href="/"><span>⚡</span> Excentrica</a>
                 <span class="admin-badge">EDITOR</span>
             </div>
@@ -30,7 +30,7 @@
                     <span class="icon">📅</span> Eventos
                 </a>
                 <a href="/editor/categorias.html" class="admin-nav-item">
-                    <span class="icon">📁</span> Categorías
+                    <span class="icon">📁</span> Categorias
                 </a>
                 <a href="/editor/zonas.html" class="admin-nav-item">
                     <span class="icon">📍</span> Zonas
@@ -39,7 +39,7 @@
                     <span class="icon">🎬</span> Cine
                 </a>
                 <a href="/editor/gastronomia.html" class="admin-nav-item">
-                    <span class="icon">🍽️</span> Gastronomía
+                    <span class="icon">🍽️</span> Gastronomia
                 </a>
                 <a href="/editor/alojamiento.html" class="admin-nav-item">
                     <span class="icon">🏨</span> Alojamiento
@@ -58,7 +58,7 @@
                     <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">🚪</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
@@ -66,7 +66,7 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>📅 Gestión de Eventos <small style="color: #28a745; font-size: 0.6em; background: #28a745; color: white; padding: 2px 8px; border-radius: 4px;">[v2.3]</small></h1>
+                <h1>📅 Gestion de Eventos</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
                     <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
@@ -103,7 +103,7 @@
                         <div class="stat-icon">🔜</div>
                         <div class="stat-info">
                             <span class="stat-value" id="upcoming-events">0</span>
-                            <span class="stat-label">Próximos</span>
+                            <span class="stat-label">Proximos</span>
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@
                     </select>
                     <select id="filter-date" class="form-control" style="max-width: 150px;">
                         <option value="">Todas las fechas</option>
-                        <option value="upcoming">Próximos</option>
+                        <option value="upcoming">Proximos</option>
                         <option value="past">Pasados</option>
                     </select>
                     <button class="btn btn-outline btn-sm" onclick="resetFilters()">
@@ -157,15 +157,15 @@
                 <input type="hidden" id="event-imagen">
 
                 <div class="modal-grid-3-compact">
-                    <!-- Column 1: Información Principal -->
+                    <!-- Column 1: Informacion Principal -->
                     <div class="form-column">
                         <div class="form-group">
-                            <label for="event-titulo">Título *</label>
+                            <label for="event-titulo">Titulo *</label>
                             <input type="text" id="event-titulo" class="form-control" placeholder="Nombre del evento" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="event-descripcion">Descripción *</label>
+                            <label for="event-descripcion">Descripcion *</label>
                             <textarea id="event-descripcion" class="form-control" rows="3" placeholder="Describe el evento..." required></textarea>
                         </div>
 
@@ -180,8 +180,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="event-direccion">🗺️ Dirección</label>
-                            <input type="text" id="event-direccion" class="form-control" placeholder="Dirección completa">
+                            <label for="event-direccion">🗺️ Direccion</label>
+                            <input type="text" id="event-direccion" class="form-control" placeholder="Direccion completa">
                         </div>
                     </div>
 
@@ -193,21 +193,21 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="event-categoria">📁 Categoría</label>
+                            <label for="event-categoria">📁 Categoria</label>
                             <select id="event-categoria" class="form-control">
-                                <option value="">Sin categoría</option>
+                                <option value="">Sin categoria</option>
                             </select>
                         </div>
 
                         <div class="form-group">
                             <label for="event-zona">🌎 Zona</label>
                             <select id="event-zona" class="form-control">
-                                <option value="">Sin zona específica</option>
+                                <option value="">Sin zona especifica</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="event-telefono">📞 Teléfono</label>
+                            <label for="event-telefono">📞 Telefono</label>
                             <input type="tel" id="event-telefono" class="form-control" placeholder="+54 9 385 123 4567">
                         </div>
 
@@ -244,610 +244,12 @@
         </div>
     </div>
 
-    <style>
-        /* Compact Modal Styling for Events */
-        #event-modal {
-            max-width: 1400px !important;
-            width: 95% !important;
-        }
-
-        #event-modal .modal-body {
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 1rem !important;
-        }
-
-        .modal-grid-3-compact {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
-            margin-bottom: 0;
-        }
-
-        .form-column {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        #event-modal .form-group {
-            margin-bottom: 0.5rem;
-        }
-
-        #event-modal .form-group label {
-            font-size: 0.75rem;
-            margin-bottom: 0.3rem;
-            color: #666;
-            font-weight: 500;
-        }
-
-        #event-modal .form-control {
-            padding: 0.5rem;
-            font-size: 0.8rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        #event-modal textarea.form-control {
-            min-height: 50px;
-            resize: vertical;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .modal-header-actions {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .image-preview-compact {
-            min-height: 150px;
-            max-height: 300px;
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: #f8f9fa;
-            padding: 0.75rem;
-            margin-top: 0.5rem;
-        }
-
-        .image-preview-compact img {
-            max-width: 100%;
-            max-height: 280px;
-            object-fit: contain;
-            border-radius: 8px;
-        }
-
-        @media (max-width: 1200px) {
-            .modal-grid-3-compact {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .modal-grid-3-compact {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-
+    <!-- Scripts -->
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
-    <script>
-        // Verificar admin
-        if (!auth.getUser()) {
-            // Se redirige automáticamente
-        }
-
-        document.getElementById('user-name').textContent = auth.getUser()?.name || 'Editor';
-
-        let allEvents = [];
-        let filteredEvents = [];
-        let categories = [];
-        let zones = [];
-
-        async function loadData() {
-            try {
-                const [eventsResponse, categoriesResponse, zonesResponse] = await Promise.all([
-                    api.getAdminEvents(),
-                    api.getAdminCategories('eventos'),
-                    api.getAdminZones()
-                ]);
-
-                console.log('Categories response:', categoriesResponse);
-                console.log('Zones response:', zonesResponse);
-
-                if (eventsResponse.success) {
-                    allEvents = eventsResponse.data.events || eventsResponse.data || [];
-                    applyFilters();
-                    updateStats();
-                }
-
-                if (categoriesResponse.success) {
-                    categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
-                    // Filter only active categories
-                    categories = categories.filter(cat => cat.is_active !== 0);
-                    console.log('Categories loaded:', categories.length);
-                    renderCategoryOptions();
-                }
-
-                if (zonesResponse.success) {
-                    zones = Array.isArray(zonesResponse.data) ? zonesResponse.data : [];
-                    // Filter only active zones
-                    zones = zones.filter(zone => zone.is_active !== 0);
-                    console.log('Zones loaded:', zones.length);
-                    renderZoneOptions();
-                }
-            } catch (e) {
-                console.error('Error loading data:', e);
-                Components.toast('Error cargando datos', 'error');
-            }
-        }
-
-        function renderCategoryOptions() {
-            const select = document.getElementById('event-categoria');
-            select.innerHTML = '<option value="">Sin categoría</option>' +
-                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
-        }
-
-        function renderZoneOptions() {
-            const select = document.getElementById('event-zona');
-            select.innerHTML = '<option value="">Sin zona específica</option>' +
-                zones.map(zone => `<option value="${zone.id}">${zone.name}</option>`).join('');
-        }
-
-        function applyFilters() {
-            const search = document.getElementById('search').value.toLowerCase();
-            const status = document.getElementById('filter-status').value;
-            const dateFilter = document.getElementById('filter-date').value;
-            const now = new Date();
-
-            filteredEvents = allEvents.filter(event => {
-                const matchSearch = !search ||
-                    event.title.toLowerCase().includes(search) ||
-                    (event.description && event.description.toLowerCase().includes(search));
-
-                const matchStatus = !status || event.status === status;
-
-                let matchDate = true;
-                if (dateFilter === 'upcoming') {
-                    matchDate = new Date(event.event_date) >= now;
-                } else if (dateFilter === 'past') {
-                    matchDate = new Date(event.event_date) < now;
-                }
-
-                return matchSearch && matchStatus && matchDate;
-            });
-
-            renderTable();
-        }
-
-        function renderTable() {
-            const container = document.getElementById('events-table-container');
-
-            if (filteredEvents.length === 0) {
-                container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron eventos</p>';
-                return;
-            }
-
-            container.innerHTML = `
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Evento</th>
-                            <th>Organizador</th>
-                            <th>Fecha</th>
-                            <th>Lugar</th>
-                            <th>Estado</th>
-                            <th>Creado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filteredEvents.map(event => `
-                            <tr>
-                                <td>
-                                    <div class="event-info">
-                                        <strong>${event.title}</strong>
-                                        ${event.description ? `<br><small class="text-muted">${truncate(event.description, 60)}</small>` : ''}
-                                    </div>
-                                </td>
-                                <td>${event.author_name || '-'}</td>
-                                <td>
-                                    <strong>${formatEventDate(event.event_date)}</strong>
-                                    ${isUpcoming(event.event_date) ? '<br><span class="badge badge-info">Próximo</span>' : ''}
-                                </td>
-                                <td>${event.location || '-'}</td>
-                                <td>
-                                    <span class="badge badge-${getStatusBadgeClass(event.status)}">
-                                        ${getStatusLabel(event.status)}
-                                    </span>
-                                </td>
-                                <td>${formatDate(event.created_at)}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        ${event.status === 'pending' ? `
-                                            <button class="btn btn-sm btn-success" onclick="approveEvent(${event.id})" title="Aprobar">
-                                                ✅
-                                            </button>
-                                            <button class="btn btn-sm btn-danger" onclick="rejectEvent(${event.id})" title="Rechazar">
-                                                ❌
-                                            </button>
-                                        ` : ''}
-                                        <button class="btn btn-sm btn-outline" onclick="editEvent(${event.id})" title="Editar">
-                                            ✏️
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteEvent(${event.id})" title="Eliminar">
-                                            🗑️
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        function updateStats() {
-            const now = new Date();
-            document.getElementById('total-events').textContent = allEvents.length;
-            document.getElementById('pending-events').textContent = allEvents.filter(e => e.status === 'pending').length;
-            document.getElementById('approved-events').textContent = allEvents.filter(e => e.status === 'approved').length;
-            document.getElementById('upcoming-events').textContent = allEvents.filter(e => new Date(e.event_date) >= now).length;
-        }
-
-        function getStatusBadgeClass(status) {
-            const classes = {
-                pending: 'warning',
-                approved: 'success',
-                rejected: 'danger'
-            };
-            return classes[status] || 'secondary';
-        }
-
-        function getStatusLabel(status) {
-            const labels = {
-                pending: 'Pendiente',
-                approved: 'Aprobado',
-                rejected: 'Rechazado'
-            };
-            return labels[status] || status;
-        }
-
-        function truncate(text, maxLength) {
-            if (!text) return '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
-        function formatEventDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-
-        function isUpcoming(dateString) {
-            return new Date(dateString) >= new Date();
-        }
-
-        function resetFilters() {
-            document.getElementById('search').value = '';
-            document.getElementById('filter-status').value = '';
-            document.getElementById('filter-date').value = '';
-            applyFilters();
-        }
-
-        async function approveEvent(eventId) {
-            if (!confirm('¿Aprobar este evento?')) return;
-
-            try {
-                const response = await api.updateEvent(eventId, { status: 'approved' });
-                if (response.success) {
-                    Components.toast('Evento aprobado exitosamente', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error approving event:', e);
-                Components.toast('Error aprobando evento', 'error');
-            }
-        }
-
-        async function rejectEvent(eventId) {
-            if (!confirm('¿Rechazar este evento?')) return;
-
-            try {
-                const response = await api.updateEvent(eventId, { status: 'rejected' });
-                if (response.success) {
-                    Components.toast('Evento rechazado', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error rejecting event:', e);
-                Components.toast('Error rechazando evento', 'error');
-            }
-        }
-
-        async function deleteEvent(eventId) {
-            if (!confirm('¿Eliminar este evento? Esta acción no se puede deshacer.')) return;
-
-            try {
-                const response = await api.deleteEvent(eventId);
-                if (response.success) {
-                    Components.toast('Evento eliminado exitosamente', 'success');
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error deleting event:', e);
-                Components.toast('Error eliminando evento', 'error');
-            }
-        }
-
-        // Compress image before converting to base64
-        function compressImage(file, maxWidth = 800, quality = 0.7) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > maxWidth) {
-                            height = (height * maxWidth) / width;
-                            width = maxWidth;
-                        }
-
-                        canvas.width = width;
-                        canvas.height = height;
-
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        const base64 = canvas.toDataURL('image/jpeg', quality);
-                        resolve(base64);
-                    };
-                    img.onerror = reject;
-                    img.src = e.target.result;
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // Image Upload - Convert to base64 directly in browser with compression
-        async function uploadEventImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Validate file type
-            const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-            if (!allowedTypes.includes(file.type)) {
-                Components.toast('Tipo de archivo no permitido. Usa JPG, PNG, GIF o WebP', 'error');
-                event.target.value = '';
-                return;
-            }
-
-            // Validate file size (10MB)
-            if (file.size > 10 * 1024 * 1024) {
-                Components.toast('El archivo excede el tamaño máximo de 10MB', 'error');
-                event.target.value = '';
-                return;
-            }
-
-            try {
-                Components.toast('Procesando imagen...', 'info');
-
-                // Compress and convert to base64
-                const base64String = await compressImage(file, 800, 0.7);
-                document.getElementById('event-imagen').value = base64String;
-                showImagePreview('event-image-preview', base64String);
-                // Once uploaded, no longer required
-                event.target.required = false;
-                Components.toast('Imagen cargada correctamente', 'success');
-
-            } catch (e) {
-                console.error('Error uploading image:', e);
-                Components.toast('Error procesando imagen: ' + e.message, 'error');
-                event.target.value = '';
-            }
-        }
-
-        function showImagePreview(containerId, url) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-
-            // Hide the file input when showing preview
-            const inputId = containerId.replace('-preview', '-file');
-            const fileInput = document.getElementById(inputId);
-            if (fileInput) {
-                fileInput.style.display = 'none';
-            }
-
-            container.innerHTML = '';
-            container.style.display = 'flex';
-
-            const img = document.createElement('img');
-            img.src = url;
-            img.style.maxWidth = '100%';
-            img.style.maxHeight = '280px';
-            img.style.objectFit = 'contain';
-
-            container.appendChild(img);
-        }
-
-        function showCreateModal() {
-            document.getElementById('modal-title').textContent = 'Nuevo Evento';
-            document.getElementById('event-form').reset();
-            document.getElementById('event-id').value = '';
-            document.getElementById('event-imagen').value = '';
-            document.getElementById('event-precio').value = '0';
-            document.getElementById('event-estado').value = 'pending';
-
-            // Clear image preview
-            const previewContainer = document.getElementById('event-image-preview');
-            previewContainer.innerHTML = '';
-            previewContainer.style.display = 'flex';
-
-            // Show file input again and make it required for new events
-            const fileInput = document.getElementById('event-imagen-file');
-            fileInput.style.display = 'block';
-            fileInput.value = '';
-            fileInput.required = true;
-
-            openModal();
-        }
-
-        function editEvent(eventId) {
-            const event = allEvents.find(e => e.id === eventId);
-            if (!event) return;
-
-            document.getElementById('modal-title').textContent = 'Editar Evento';
-            document.getElementById('event-id').value = event.id;
-            document.getElementById('event-titulo').value = event.title || '';
-            document.getElementById('event-descripcion').value = event.description || '';
-
-            // Format datetime for input
-            if (event.event_date) {
-                const date = new Date(event.event_date);
-                const formattedDate = date.toISOString().slice(0, 16);
-                document.getElementById('event-fecha').value = formattedDate;
-            }
-
-            document.getElementById('event-lugar').value = event.location || '';
-            document.getElementById('event-direccion').value = event.address || '';
-            document.getElementById('event-precio').value = event.price || '0';
-            document.getElementById('event-imagen').value = event.image_url || '';
-            document.getElementById('event-categoria').value = event.category_id || '';
-            document.getElementById('event-zona').value = event.zone_id || '';
-            document.getElementById('event-telefono').value = event.phone || '';
-            document.getElementById('event-whatsapp').value = event.whatsapp || '';
-            document.getElementById('event-web').value = event.website || '';
-            document.getElementById('event-estado').value = event.status || 'pending';
-
-            const fileInput = document.getElementById('event-imagen-file');
-
-            // Show image preview if exists
-            if (event.image_url) {
-                showImagePreview('event-image-preview', event.image_url);
-                // Don't require new image if one already exists
-                fileInput.required = false;
-            } else {
-                const previewContainer = document.getElementById('event-image-preview');
-                previewContainer.innerHTML = '';
-                previewContainer.style.display = 'flex';
-                fileInput.style.display = 'block';
-                fileInput.required = true;
-            }
-
-            openModal();
-        }
-
-        async function saveEvent(event) {
-            event.preventDefault();
-
-            const eventId = document.getElementById('event-id').value;
-            const imagenUrl = document.getElementById('event-imagen').value;
-
-            // Validate image for new events
-            if (!eventId && !imagenUrl) {
-                Components.toast('Debe subir una imagen del evento', 'error');
-                return;
-            }
-
-            // Get datetime-local value and split it
-            const fechaEvento = document.getElementById('event-fecha').value;
-            let eventDate = null;
-            let eventTime = null;
-
-            if (fechaEvento) {
-                const dateObj = new Date(fechaEvento);
-                eventDate = dateObj.toISOString().split('T')[0]; // YYYY-MM-DD
-                eventTime = dateObj.toTimeString().split(' ')[0].substring(0, 5); // HH:MM
-            }
-
-            const data = {
-                title: document.getElementById('event-titulo').value,
-                description: document.getElementById('event-descripcion').value,
-                event_date: eventDate,
-                event_time: eventTime,
-                location: document.getElementById('event-lugar').value,
-                address: document.getElementById('event-direccion').value || null,
-                price: parseFloat(document.getElementById('event-precio').value) || 0,
-                image_url: imagenUrl || null,
-                category_id: document.getElementById('event-categoria').value || null,
-                zone_id: document.getElementById('event-zona').value || null,
-                phone: document.getElementById('event-telefono').value || null,
-                whatsapp: document.getElementById('event-whatsapp').value || null,
-                website: document.getElementById('event-web').value || null,
-                status: document.getElementById('event-estado').value
-            };
-
-            try {
-                let response;
-                if (eventId) {
-                    response = await api.updateEvent(eventId, data);
-                } else {
-                    response = await api.createEvent(data);
-                }
-
-                if (response.success) {
-                    Components.toast(eventId ? 'Evento actualizado exitosamente' : 'Evento creado exitosamente', 'success');
-                    closeModal();
-                    loadData();
-                }
-            } catch (e) {
-                console.error('Error saving event:', e);
-                Components.toast(e.message || 'Error guardando evento', 'error');
-            }
-        }
-
-        function openModal() {
-            document.getElementById('event-modal').classList.add('active');
-            document.getElementById('event-modal-backdrop').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal() {
-            document.getElementById('event-modal').classList.remove('active');
-            document.getElementById('event-modal-backdrop').classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // Event listeners
-        document.getElementById('search').addEventListener('input', applyFilters);
-        document.getElementById('filter-status').addEventListener('change', applyFilters);
-        document.getElementById('filter-date').addEventListener('change', applyFilters);
-
-        // Load initial data
-        loadData();
-    </script>
+    <script src="/editor/eventos.js"></script>
 </body>
 </html>

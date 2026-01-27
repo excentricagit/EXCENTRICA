@@ -146,6 +146,47 @@ class ApiService {
         return this.get(`/api/events/${id}`);
     }
 
+    // ========== EVENT REGISTRATIONS ==========
+    // Registrarse a un evento
+    async registerToEvent(eventId) {
+        return this.post(`/api/events/${eventId}/register`);
+    }
+
+    // Cancelar registro a un evento
+    async unregisterFromEvent(eventId) {
+        return this.delete(`/api/events/${eventId}/register`);
+    }
+
+    // Verificar si estoy registrado a un evento
+    async checkEventRegistration(eventId) {
+        return this.get(`/api/events/${eventId}/registration`);
+    }
+
+    // Obtener mis eventos registrados
+    async getMyEventRegistrations(params = {}) {
+        return this.get('/api/user/events', params);
+    }
+
+    // Admin - Obtener registros de eventos
+    async getAdminEventRegistrations(params = {}) {
+        return this.get('/api/admin/event-registrations', params);
+    }
+
+    // Admin - Actualizar estado de registro
+    async updateEventRegistrationStatus(registrationId, status, notes = null) {
+        return this.put(`/api/admin/event-registrations/${registrationId}`, { status, notes });
+    }
+
+    // Admin - Obtener estadisticas de registros de un evento
+    async getEventRegistrationStats(eventId) {
+        return this.get(`/api/admin/events/${eventId}/registrations/stats`);
+    }
+
+    // Admin - Verificar codigo de registro
+    async verifyRegistrationCode(code) {
+        return this.get(`/api/admin/event-registrations/verify/${code}`);
+    }
+
     // ========== VIDEOS ==========
     async getVideos(params = {}) {
         return this.get('/api/videos', params);

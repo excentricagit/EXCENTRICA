@@ -22,9 +22,9 @@ export async function handleGetProducts(request, env) {
             LEFT JOIN categories c ON p.category_id = c.id
             LEFT JOIN zones z ON p.zone_id = z.id
             LEFT JOIN users u ON p.author_id = u.id
-            WHERE p.status = 'approved'
+            WHERE (p.status = 'approved' OR p.status = 'aprobado' OR p.status = 'published')
         `;
-        let countQuery = "SELECT COUNT(*) as total FROM products WHERE status = 'approved'";
+        let countQuery = "SELECT COUNT(*) as total FROM products WHERE (status = 'approved' OR status = 'aprobado' OR status = 'published')";
         const params = [];
 
         if (category) {

@@ -470,6 +470,209 @@ toastStyles.textContent = `
 `;
 document.head.appendChild(toastStyles);
 
+// =============================================
+// LAYOUT COMPONENTS - Dinamicos
+// =============================================
+
+// Definicion de navegacion
+const NAV_ITEMS = {
+    main: [
+        { href: '/', icon: '🏠', label: 'Inicio' }
+    ],
+    explore: [
+        { href: '/noticias.html', icon: '📰', label: 'Noticias' },
+        { href: '/mercaderia.html', icon: '🛒', label: 'Mercaderia' },
+        { href: '/eventos.html', icon: '📅', label: 'Eventos' },
+        { href: '/videos.html', icon: '🎥', label: 'Videos' }
+    ],
+    services: [
+        { href: '/gastronomia.html', icon: '🍽️', label: 'Gastronomia' },
+        { href: '/alojamiento.html', icon: '🏨', label: 'Alojamiento' },
+        { href: '/transporte.html', icon: '🚌', label: 'Transporte' },
+        { href: '/servicios.html', icon: '🔧', label: 'Servicios' },
+        { href: '/puntos-interes.html', icon: '📍', label: 'Turismo' }
+    ],
+    extra: [
+        { href: '/cine.html', icon: '🎬', label: 'Cine' },
+        { href: '/contacto.html', icon: '📞', label: 'Contacto' }
+    ]
+};
+
+// Obtener pagina actual
+function getCurrentPage() {
+    return window.location.pathname;
+}
+
+// Renderizar sidebar de navegacion
+Components.renderSidebar = function(containerId = 'sidebar-nav') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const currentPath = getCurrentPage();
+
+    const renderItems = (items) => items.map(item => `
+        <a href="${item.href}" class="sidebar-nav-item ${currentPath === item.href ? 'active' : ''}">
+            <span class="icon">${item.icon}</span>
+            <span>${item.label}</span>
+        </a>
+    `).join('');
+
+    container.innerHTML = `
+        ${renderItems(NAV_ITEMS.main)}
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Explorar</div>
+
+        ${renderItems(NAV_ITEMS.explore)}
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Servicios</div>
+
+        ${renderItems(NAV_ITEMS.services)}
+
+        <div class="sidebar-divider"></div>
+
+        ${renderItems(NAV_ITEMS.extra)}
+    `;
+};
+
+// Renderizar header
+Components.renderHeader = function(containerId = 'main-header', options = {}) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const {
+        searchPlaceholder = 'Buscar...',
+        showSearch = true,
+        searchId = 'search-input'
+    } = options;
+
+    container.innerHTML = `
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <img src="/assets/logo.png" alt="Logo" style="height: 28px; width: auto;"> Excentrica
+            </a>
+            ${showSearch ? `
+                <div class="header-search">
+                    <input type="search" id="${searchId}" placeholder="${searchPlaceholder}" />
+                </div>
+            ` : ''}
+            <button class="menu-toggle"><span></span><span></span><span></span></button>
+        </div>
+    `;
+};
+
+// Renderizar footer
+Components.renderFooter = function(containerId = 'main-footer') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const year = new Date().getFullYear();
+
+    container.innerHTML = `
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4 class="footer-title">Excentrica</h4>
+                    <p class="text-muted">Red social y marketplace de Santiago del Estero, Argentina.</p>
+                </div>
+                <div>
+                    <h4 class="footer-title">Secciones</h4>
+                    <div class="footer-links">
+                        <a href="/noticias.html" class="footer-link">Noticias</a>
+                        <a href="/mercaderia.html" class="footer-link">Mercaderia</a>
+                        <a href="/eventos.html" class="footer-link">Eventos</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Servicios</h4>
+                    <div class="footer-links">
+                        <a href="/gastronomia.html" class="footer-link">Gastronomia</a>
+                        <a href="/alojamiento.html" class="footer-link">Alojamiento</a>
+                        <a href="/transporte.html" class="footer-link">Transporte</a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title">Contacto</h4>
+                    <div class="footer-links">
+                        <span class="footer-link">contacto@excentrica.com.ar</span>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; ${year} Excentrica. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    `;
+};
+
+// Widget de usuario para sidebar
+Components.renderUserWidget = function(containerId = 'user-widget-content') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const user = typeof auth !== 'undefined' ? auth.getUser() : null;
+
+    if (user) {
+        let panelButton = '';
+        if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
+            panelButton = `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+        }
+
+        container.innerHTML = `
+            <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+            <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
+            ${panelButton}
+            <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
+        `;
+    } else {
+        container.innerHTML = `
+            <p style="color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem;">Inicia sesion para acceder a todas las funciones.</p>
+            <button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
+            <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
+        `;
+    }
+};
+
+// Widget de publicidad
+Components.renderAdWidget = function(containerId = 'ad-widget-content') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    container.innerHTML = `
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; text-align: center; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+            <div style="width: 70px; height: 70px; margin-bottom: 1rem; background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);">📣</div>
+            <p style="color: #fff; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Promociona tu Negocio</p>
+            <p style="color: #c4b5fd; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">Llega a miles de personas en Santiago del Estero</p>
+            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">Alto alcance</span>
+                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">Videos promocionales</span>
+            </div>
+        </div>
+        <a href="/contacto.html" class="btn btn-block" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; color: #1f2937; font-weight: 700; padding: 0.75rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+            Quiero Anunciar
+        </a>
+    `;
+};
+
+// Inicializar layout completo
+Components.initLayout = function(options = {}) {
+    const {
+        sidebar = true,
+        header = true,
+        footer = true,
+        userWidget = true,
+        adWidget = true,
+        headerOptions = {}
+    } = options;
+
+    if (sidebar) this.renderSidebar();
+    if (header) this.renderHeader('main-header', headerOptions);
+    if (footer) this.renderFooter();
+    if (userWidget) this.renderUserWidget();
+    if (adWidget) this.renderAdWidget();
+};
+
 // Export
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Components;

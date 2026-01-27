@@ -6,475 +6,14 @@
     <title>Mercaderia - Excentrica</title>
     <meta name="description" content="Compra y vende productos en Santiago del Estero. Mercaderia, electronica, ropa y mas.">
     <link rel="stylesheet" href="/css/main.css">
-    <style>
-        /* Header profesional */
-        .header {
-            background: linear-gradient(180deg, rgba(15, 12, 25, 0.98) 0%, rgba(15, 12, 25, 0.95) 100%);
-            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            height: auto;
-        }
-        .main {
-            margin-top: 0;
-        }
-        .header-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.75rem 1.5rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: #fff;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            letter-spacing: -0.5px;
-        }
-        .logo img {
-            height: 28px;
-            width: auto;
-        }
-        .header-search {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 2rem;
-        }
-        .header-search input {
-            width: 100%;
-            padding: 0.65rem 1.25rem;
-            border-radius: 25px;
-            border: 1px solid rgba(168, 85, 247, 0.25);
-            background: rgba(30, 30, 40, 0.8);
-            color: #e2e8f0;
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        .header-search input::placeholder {
-            color: #6b7280;
-        }
-        .header-search input:focus {
-            outline: none;
-            border-color: rgba(168, 85, 247, 0.6);
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
-            background: rgba(30, 30, 40, 0.95);
-        }
-        @media (max-width: 768px) {
-            .header-search {
-                display: none;
-            }
-            .header-inner {
-                padding: 0.6rem 1rem;
-            }
-        }
-
-        /* Section header */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-        }
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Filter bar */
-        .filter-bar {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .filter-bar select, .filter-bar input {
-            background: rgba(30, 30, 40, 0.9);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 10px;
-            padding: 0.6rem 1rem;
-            color: #e2e8f0;
-            font-size: 0.9rem;
-            min-width: 150px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .filter-bar select:hover, .filter-bar select:focus,
-        .filter-bar input:hover, .filter-bar input:focus {
-            border-color: rgba(168, 85, 247, 0.6);
-            outline: none;
-        }
-        .filter-results {
-            color: #94a3b8;
-            font-size: 0.85rem;
-            margin-left: auto;
-        }
-
-        /* Products grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-        }
-        @media (max-width: 1200px) {
-            .products-grid {
-                grid-template-columns: repeat(3, 1fr);
-            }
-        }
-        @media (max-width: 900px) {
-            .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 500px) {
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Product card */
-        .product-card {
-            background: linear-gradient(145deg, rgba(25, 20, 35, 0.98), rgba(15, 12, 25, 0.99));
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(168, 85, 247, 0.05);
-            cursor: pointer;
-        }
-        .product-card:hover {
-            border-color: rgba(168, 85, 247, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 60px rgba(168, 85, 247, 0.15);
-        }
-        .product-card-image {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-        .product-card:hover .product-card-image {
-            transform: scale(1.05);
-        }
-        .product-card-body {
-            padding: 1rem;
-        }
-        .product-card-category {
-            display: inline-block;
-            background: rgba(168, 85, 247, 0.15);
-            color: #c4b5fd;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.65rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-        }
-        .product-card-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 0.5rem;
-            line-height: 1.3;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .product-card-price {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #22c55e;
-            margin-bottom: 0.5rem;
-        }
-        .product-card-location {
-            font-size: 0.75rem;
-            color: #6b7280;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .product-card-condition {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: #fff;
-            padding: 0.2rem 0.5rem;
-            border-radius: 8px;
-            font-size: 0.65rem;
-            font-weight: 500;
-        }
-        .product-card-image-container {
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-        }
-        .modal-overlay.active {
-            display: flex;
-        }
-        .modal {
-            background: linear-gradient(145deg, rgba(25, 20, 35, 0.99), rgba(15, 12, 25, 1));
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 20px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(168, 85, 247, 0.2);
-        }
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            z-index: 10;
-        }
-        .modal-close:hover {
-            background: rgba(239, 68, 68, 0.5);
-        }
-        .modal-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-        }
-        .modal-body {
-            padding: 1.5rem;
-        }
-        .modal-category {
-            display: inline-block;
-            background: rgba(168, 85, 247, 0.2);
-            color: #c4b5fd;
-            padding: 0.3rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-            text-transform: uppercase;
-        }
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 0.75rem;
-            line-height: 1.3;
-        }
-        .modal-price {
-            font-size: 2rem;
-            font-weight: 800;
-            color: #22c55e;
-            margin-bottom: 1rem;
-        }
-        .modal-description {
-            color: #9ca3af;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-        .modal-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .modal-detail {
-            background: rgba(168, 85, 247, 0.1);
-            border-radius: 10px;
-            padding: 0.75rem;
-        }
-        .modal-detail-label {
-            font-size: 0.7rem;
-            color: #6b7280;
-            text-transform: uppercase;
-            margin-bottom: 0.25rem;
-        }
-        .modal-detail-value {
-            font-size: 0.9rem;
-            color: #e2e8f0;
-            font-weight: 500;
-        }
-        .modal-contact {
-            display: flex;
-            gap: 1rem;
-        }
-        .modal-contact .btn {
-            flex: 1;
-            padding: 0.85rem;
-            font-weight: 600;
-            border-radius: 12px;
-        }
-        .btn-whatsapp {
-            background: linear-gradient(135deg, #25d366, #128c7e);
-            border: none;
-            color: #fff;
-        }
-        .btn-whatsapp:hover {
-            background: linear-gradient(135deg, #128c7e, #075e54);
-        }
-
-        /* Sidebar widgets */
-        .widget {
-            background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95));
-            border: 1px solid rgba(168, 85, 247, 0.25);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-        }
-        .widget-title {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #a855f7;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
-        }
-        .pagination-btn {
-            padding: 0.6rem 1rem;
-            background: rgba(168, 85, 247, 0.15);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 10px;
-            color: #e2e8f0;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .pagination-btn:hover {
-            background: rgba(168, 85, 247, 0.3);
-            border-color: rgba(168, 85, 247, 0.5);
-        }
-        .pagination-btn.active {
-            background: linear-gradient(135deg, #a855f7, #7c3aed);
-            border-color: transparent;
-        }
-        .pagination-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/mercaderia.css">
 </head>
 <body>
     <!-- Sidebar de Navegacion Lateral Fijo -->
-    <nav class="sidebar-nav">
-        <a href="/" class="sidebar-nav-item">
-            <span class="icon">🏠</span>
-            <span>Inicio</span>
-        </a>
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
 
-        <div class="sidebar-divider"></div>
-        <div class="sidebar-section-title">Explorar</div>
-
-        <a href="/noticias.html" class="sidebar-nav-item">
-            <span class="icon">📰</span>
-            <span>Noticias</span>
-        </a>
-        <a href="/mercaderia.html" class="sidebar-nav-item active">
-            <span class="icon">🛒</span>
-            <span>Mercaderia</span>
-        </a>
-        <a href="/eventos.html" class="sidebar-nav-item">
-            <span class="icon">📅</span>
-            <span>Eventos</span>
-        </a>
-        <a href="/videos.html" class="sidebar-nav-item">
-            <span class="icon">🎥</span>
-            <span>Videos</span>
-        </a>
-
-        <div class="sidebar-divider"></div>
-        <div class="sidebar-section-title">Servicios</div>
-
-        <a href="/gastronomia.html" class="sidebar-nav-item">
-            <span class="icon">🍽️</span>
-            <span>Gastronomia</span>
-        </a>
-        <a href="/alojamiento.html" class="sidebar-nav-item">
-            <span class="icon">🏨</span>
-            <span>Alojamiento</span>
-        </a>
-        <a href="/transporte.html" class="sidebar-nav-item">
-            <span class="icon">🚌</span>
-            <span>Transporte</span>
-        </a>
-        <a href="/servicios.html" class="sidebar-nav-item">
-            <span class="icon">🔧</span>
-            <span>Servicios</span>
-        </a>
-        <a href="/puntos-interes.html" class="sidebar-nav-item">
-            <span class="icon">📍</span>
-            <span>Turismo</span>
-        </a>
-
-        <div class="sidebar-divider"></div>
-
-        <a href="/cine.html" class="sidebar-nav-item">
-            <span class="icon">🎬</span>
-            <span>Cine</span>
-        </a>
-        <a href="/contacto.html" class="sidebar-nav-item">
-            <span class="icon">📞</span>
-            <span>Contacto</span>
-        </a>
-    </nav>
-
-    <header class="header">
-        <div class="header-inner">
-            <a href="/" class="logo">
-                <img src="/assets/logo.png" alt="Logo" style="height: 28px; width: auto;"> Excentrica
-            </a>
-            <div class="header-search">
-                <input type="search" id="search-input" placeholder="Buscar productos..." />
-            </div>
-            <button class="menu-toggle"><span></span><span></span><span></span></button>
-        </div>
-    </header>
+    <!-- Header -->
+    <header class="header" id="main-header"></header>
 
     <main class="main">
         <div class="layout-sidebar">
@@ -483,22 +22,22 @@
                 <!-- Header de seccion -->
                 <div class="section-header">
                     <h2 class="section-title"><span>🛒</span> Mercaderia</h2>
-                    <span class="filter-results" id="results-count"></span>
                 </div>
 
-                <!-- Barra de filtros -->
+                <!-- Filtros inline -->
                 <div class="filter-bar">
                     <select id="category-filter">
-                        <option value="">Todas las categorias</option>
+                        <option value="">Categoria</option>
                     </select>
                     <select id="zone-filter">
-                        <option value="">Todas las zonas</option>
+                        <option value="">Zona</option>
                     </select>
                     <select id="condition-filter">
-                        <option value="">Cualquier condicion</option>
-                        <option value="new">Nuevo</option>
-                        <option value="used">Usado</option>
+                        <option value="">Condicion</option>
+                        <option value="nuevo">Nuevo</option>
+                        <option value="usado">Usado</option>
                     </select>
+                    <span class="filter-results" id="results-count"></span>
                 </div>
 
                 <!-- Grid de productos -->
@@ -515,37 +54,18 @@
                 <!-- Widget de usuario -->
                 <div class="widget" id="user-widget">
                     <div class="widget-title">Mi Cuenta</div>
-                    <div id="user-widget-content">
-                        <p style="color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem;">Inicia sesion para publicar productos.</p>
-                        <button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
-                        <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
-                    </div>
+                    <div id="user-widget-content"></div>
                 </div>
 
-                <!-- Widget de contenido patrocinado - DESTACADO -->
+                <!-- Widget de contenido patrocinado -->
                 <div class="widget" id="ad-widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(124, 58, 237, 0.15)); border: 2px solid rgba(168, 85, 247, 0.5); position: relative; overflow: hidden; min-height: 320px;">
                     <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%); animation: shimmer 3s infinite;"></div>
-                    <style>@keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }</style>
-
                     <div style="position: relative; z-index: 1;">
                         <div class="widget-title" style="color: #e9d5ff; font-size: 1rem;">
                             <span style="font-size: 1.1rem;">⭐</span>
                             Espacio Publicitario
                         </div>
-
-                        <div id="ad-content" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; text-align: center; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div style="width: 70px; height: 70px; margin-bottom: 1rem; background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);">📣</div>
-                            <p style="color: #fff; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Promociona tu Negocio</p>
-                            <p style="color: #c4b5fd; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">Llega a miles de personas en Santiago del Estero</p>
-                            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                                <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">✓ Alto alcance</span>
-                                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">✓ Videos promocionales</span>
-                            </div>
-                        </div>
-
-                        <a href="/contacto.html" class="btn btn-block" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; color: #1f2937; font-weight: 700; padding: 0.75rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
-                            Quiero Anunciar
-                        </a>
+                        <div id="ad-widget-content"></div>
                     </div>
                 </div>
 
@@ -564,12 +84,27 @@
     <div class="modal-overlay" id="product-modal">
         <div class="modal">
             <button class="modal-close" onclick="closeModal()">&times;</button>
-            <img src="" alt="" class="modal-image" id="modal-image">
+
+            <!-- Galeria de imagenes -->
+            <div class="modal-gallery">
+                <img src="" alt="" class="modal-gallery-main" id="modal-main-image">
+                <button class="modal-gallery-nav prev" onclick="prevImage()">&#10094;</button>
+                <button class="modal-gallery-nav next" onclick="nextImage()">&#10095;</button>
+                <div class="modal-gallery-thumbs" id="modal-thumbs"></div>
+            </div>
+
             <div class="modal-body">
                 <span class="modal-category" id="modal-category"></span>
                 <h2 class="modal-title" id="modal-title"></h2>
-                <div class="modal-price" id="modal-price"></div>
+
+                <div class="modal-price-container">
+                    <div class="modal-price" id="modal-price"></div>
+                    <div class="modal-price-original" id="modal-price-original"></div>
+                    <span class="modal-discount" id="modal-discount" style="display: none;"></span>
+                </div>
+
                 <p class="modal-description" id="modal-description"></p>
+
                 <div class="modal-details">
                     <div class="modal-detail">
                         <div class="modal-detail-label">Condicion</div>
@@ -588,322 +123,56 @@
                         <div class="modal-detail-value" id="modal-seller"></div>
                     </div>
                 </div>
-                <div class="modal-contact">
-                    <a href="#" class="btn btn-whatsapp" id="modal-whatsapp">WhatsApp</a>
+
+                <!-- Seccion de compra -->
+                <div class="modal-purchase">
+                    <div class="modal-purchase-title">
+                        <span>🛒</span> Como comprar este producto
+                    </div>
+                    <div class="modal-purchase-steps">
+                        <div class="modal-purchase-step">
+                            <span>1</span>
+                            <span>Hace click en el boton de WhatsApp para contactarnos</span>
+                        </div>
+                        <div class="modal-purchase-step">
+                            <span>2</span>
+                            <span>Realiza la transferencia al CBU indicado en el mensaje</span>
+                        </div>
+                        <div class="modal-purchase-step">
+                            <span>3</span>
+                            <span>Envia el comprobante por WhatsApp y coordinamos el envio</span>
+                        </div>
+                    </div>
+                    <a href="#" class="btn-whatsapp-buy" id="modal-whatsapp">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                        Comprar por WhatsApp
+                    </a>
+                </div>
+
+                <div class="modal-contact-alt">
+                    <p>Tambien podes llamarnos o enviarnos un mensaje directo</p>
+                    <span class="modal-contact-phone" id="modal-phone"></span>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <h4 class="footer-title">Excentrica</h4>
-                    <p class="text-muted">Red social y marketplace de Santiago del Estero, Argentina.</p>
-                </div>
-                <div>
-                    <h4 class="footer-title">Secciones</h4>
-                    <div class="footer-links">
-                        <a href="/noticias.html" class="footer-link">Noticias</a>
-                        <a href="/mercaderia.html" class="footer-link">Mercaderia</a>
-                        <a href="/eventos.html" class="footer-link">Eventos</a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="footer-title">Servicios</h4>
-                    <div class="footer-links">
-                        <a href="/gastronomia.html" class="footer-link">Gastronomia</a>
-                        <a href="/alojamiento.html" class="footer-link">Alojamiento</a>
-                        <a href="/transporte.html" class="footer-link">Transporte</a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="footer-title">Contacto</h4>
-                    <div class="footer-links">
-                        <span class="footer-link">contacto@excentrica.com.ar</span>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2026 Excentrica. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
+    <!-- Footer -->
+    <footer class="footer" id="main-footer"></footer>
 
+    <!-- Scripts base -->
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
+    <!-- Script de mercaderia -->
+    <script src="/js/mercaderia.js"></script>
     <script>
-        let currentPage = 1;
-        let categories = [];
-        let currentProduct = null;
-
-        // Escape HTML
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>"']/g, (m) => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-            }[m]));
-        }
-
-        // Format price
-        function formatPrice(price) {
-            if (!price) return 'Consultar';
-            return '$' + Number(price).toLocaleString('es-AR');
-        }
-
-        // Format date
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
-
-        // Format condition
-        function formatCondition(condition) {
-            const conditions = {
-                'new': 'Nuevo',
-                'used': 'Usado',
-                'refurbished': 'Reacondicionado'
-            };
-            return conditions[condition] || condition || 'Sin especificar';
-        }
-
-        // Render product card
-        function renderProductCard(product) {
-            const imageUrl = product.image_url || '/images/placeholder.jpg';
-            return `
-                <article class="product-card" onclick="openModal(${product.id})">
-                    <div class="product-card-image-container">
-                        <img src="${imageUrl}" alt="${escapeHtml(product.title)}" class="product-card-image" onerror="this.src='/images/placeholder.jpg'">
-                        ${product.condition ? `<span class="product-card-condition">${formatCondition(product.condition)}</span>` : ''}
-                    </div>
-                    <div class="product-card-body">
-                        ${product.category_name ? `<span class="product-card-category">${escapeHtml(product.category_name)}</span>` : ''}
-                        <h3 class="product-card-title">${escapeHtml(product.title)}</h3>
-                        <div class="product-card-price">${formatPrice(product.price)}</div>
-                        ${product.zone_name ? `<div class="product-card-location"><span>📍</span> ${escapeHtml(product.zone_name)}</div>` : ''}
-                    </div>
-                </article>
-            `;
-        }
-
-        // Render pagination
-        function renderPagination(current, total) {
-            if (total <= 1) {
-                document.getElementById('pagination').innerHTML = '';
-                return;
-            }
-
-            let html = '<div class="pagination">';
-            html += `<button class="pagination-btn" onclick="loadProducts(${current - 1})" ${current <= 1 ? 'disabled' : ''}>Anterior</button>`;
-
-            for (let i = 1; i <= total; i++) {
-                if (i === 1 || i === total || (i >= current - 1 && i <= current + 1)) {
-                    html += `<button class="pagination-btn ${i === current ? 'active' : ''}" onclick="loadProducts(${i})">${i}</button>`;
-                } else if (i === current - 2 || i === current + 2) {
-                    html += '<span style="color: #6b7280; padding: 0.5rem;">...</span>';
-                }
-            }
-
-            html += `<button class="pagination-btn" onclick="loadProducts(${current + 1})" ${current >= total ? 'disabled' : ''}>Siguiente</button>`;
-            html += '</div>';
-
-            document.getElementById('pagination').innerHTML = html;
-        }
-
-        // Open modal
-        async function openModal(productId) {
-            try {
-                const response = await api.getProductById(productId);
-                if (response.success && response.data) {
-                    const product = response.data;
-                    currentProduct = product;
-
-                    document.getElementById('modal-image').src = product.image_url || '/images/placeholder.jpg';
-                    document.getElementById('modal-category').textContent = product.category_name || 'Producto';
-                    document.getElementById('modal-title').textContent = product.title;
-                    document.getElementById('modal-price').textContent = formatPrice(product.price);
-                    document.getElementById('modal-description').textContent = product.description || 'Sin descripcion disponible.';
-                    document.getElementById('modal-condition').textContent = formatCondition(product.condition);
-                    document.getElementById('modal-location').textContent = product.zone_name || 'Santiago del Estero';
-                    document.getElementById('modal-date').textContent = formatDate(product.created_at);
-                    document.getElementById('modal-seller').textContent = product.seller_name || 'Vendedor';
-
-                    // WhatsApp link
-                    const phone = product.contact_phone || '';
-                    const message = encodeURIComponent(`Hola! Vi tu producto "${product.title}" en Excentrica y me interesa.`);
-                    document.getElementById('modal-whatsapp').href = phone ? `https://wa.me/${phone.replace(/\D/g, '')}?text=${message}` : '#';
-
-                    document.getElementById('product-modal').classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                }
-            } catch (e) {
-                console.error('Error loading product:', e);
-            }
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('product-modal').classList.remove('active');
-            document.body.style.overflow = '';
-            currentProduct = null;
-        }
-
-        // Close modal on overlay click
-        document.getElementById('product-modal').addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal-overlay')) {
-                closeModal();
-            }
-        });
-
-        // Close modal on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
-
-        // Load products
-        async function loadProducts(page = 1) {
-            currentPage = page;
-            const search = document.getElementById('search-input').value;
-            const category = document.getElementById('category-filter').value;
-            const zone = document.getElementById('zone-filter').value;
-            const condition = document.getElementById('condition-filter').value;
-            const productsGrid = document.getElementById('products-grid');
-
-            productsGrid.innerHTML = '<div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>';
-
-            try {
-                const response = await api.getProducts({ page, limit: 12, search, category, zone, condition });
-
-                if (response.success && response.data.products && response.data.products.length > 0) {
-                    const products = response.data.products;
-                    productsGrid.innerHTML = products.map(p => renderProductCard(p)).join('');
-
-                    const total = response.data.pagination.total;
-                    document.getElementById('results-count').textContent = `${total} producto${total !== 1 ? 's' : ''}`;
-
-                    renderPagination(response.data.pagination.page, response.data.pagination.pages);
-                } else {
-                    productsGrid.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #94a3b8;">
-                            <div style="font-size: 3rem; margin-bottom: 1rem;">🛒</div>
-                            <h3 style="color: #e2e8f0; margin-bottom: 0.5rem;">No hay productos</h3>
-                            <p>No se encontraron productos con los filtros seleccionados.</p>
-                        </div>
-                    `;
-                    document.getElementById('results-count').textContent = '0 productos';
-                    document.getElementById('pagination').innerHTML = '';
-                }
-            } catch (e) {
-                console.error('Error loading products:', e);
-                productsGrid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #ef4444;">
-                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
-                        <h3 style="margin-bottom: 0.5rem;">Error cargando productos</h3>
-                        <p>Por favor, intenta de nuevo mas tarde.</p>
-                    </div>
-                `;
-            }
-
-            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null, zone: zone || null });
-        }
-
-        // Load categories
-        async function loadCategories() {
-            try {
-                const response = await api.getCategories('mercaderia');
-                if (response.success && response.data) {
-                    categories = response.data;
-
-                    const select = document.getElementById('category-filter');
-                    select.innerHTML = '<option value="">Todas las categorias</option>';
-                    categories.forEach(cat => {
-                        select.innerHTML += `<option value="${cat.slug}">${cat.icon || ''} ${cat.name}</option>`;
-                    });
-
-                    const widget = document.getElementById('categories-widget');
-                    const currentCategory = new URLSearchParams(window.location.search).get('category') || '';
-
-                    widget.innerHTML = categories.map(cat => `
-                        <a href="#" class="widget-item ${currentCategory === cat.slug ? 'active' : ''}" onclick="filterByCategory('${cat.slug}'); return false;" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: 8px; color: #94a3b8; text-decoration: none; transition: all 0.2s;">
-                            <span>${cat.icon || '📦'}</span>
-                            <span>${escapeHtml(cat.name)}</span>
-                        </a>
-                    `).join('');
-                }
-            } catch (e) {
-                console.error('Error loading categories:', e);
-            }
-        }
-
-        // Load zones
-        async function loadZones() {
-            try {
-                const response = await api.getZones();
-                if (response.success && response.data) {
-                    const select = document.getElementById('zone-filter');
-                    select.innerHTML = '<option value="">Todas las zonas</option>';
-                    response.data.forEach(zone => {
-                        select.innerHTML += `<option value="${zone.slug}">${zone.name}</option>`;
-                    });
-                }
-            } catch (e) {
-                console.error('Error loading zones:', e);
-            }
-        }
-
-        // Filter by category
-        function filterByCategory(slug) {
-            document.getElementById('category-filter').value = slug;
-            loadProducts(1);
-        }
-
-        // Update user widget
-        function updateUserWidget() {
-            const user = auth.getUser();
-            const widget = document.getElementById('user-widget-content');
-
-            if (user) {
-                let panelButton = '';
-                if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
-                    panelButton = `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
-                }
-
-                widget.innerHTML = `
-                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
-                    <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
-                    ${panelButton}
-                    <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
-                `;
-            }
-        }
-
-        // Debounced search
-        let searchTimeout;
-        document.getElementById('search-input').addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => loadProducts(1), 500);
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await Promise.all([loadCategories(), loadZones()]);
-
-            const params = Utils.getUrlParams();
-            if (params.category) document.getElementById('category-filter').value = params.category;
-            if (params.zone) document.getElementById('zone-filter').value = params.zone;
-
-            loadProducts(parseInt(params.page) || 1);
-            updateUserWidget();
-
-            document.getElementById('category-filter').addEventListener('change', () => loadProducts(1));
-            document.getElementById('zone-filter').addEventListener('change', () => loadProducts(1));
-            document.getElementById('condition-filter').addEventListener('change', () => loadProducts(1));
+        // Inicializar componentes de layout
+        Components.initLayout({
+            headerOptions: { searchPlaceholder: 'Buscar productos...' }
         });
     </script>
 </body>

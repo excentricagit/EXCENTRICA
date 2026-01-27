@@ -571,9 +571,9 @@
 
         function updateStats() {
             document.getElementById('total-products').textContent = allProducts.length;
-            document.getElementById('pending-products').textContent = allProducts.filter(p => p.estado === 'pendiente').length;
-            document.getElementById('approved-products').textContent = allProducts.filter(p => p.estado === 'aprobado').length;
-            document.getElementById('rejected-products').textContent = allProducts.filter(p => p.estado === 'rechazado').length;
+            document.getElementById('pending-products').textContent = allProducts.filter(p => p.status === 'pendiente').length;
+            document.getElementById('approved-products').textContent = allProducts.filter(p => p.status === 'aprobado').length;
+            document.getElementById('rejected-products').textContent = allProducts.filter(p => p.status === 'rechazado').length;
         }
 
         function getStatusBadgeClass(status) {
@@ -619,7 +619,7 @@
             if (!confirm('¿Aprobar este producto?')) return;
 
             try {
-                const response = await api.adminUpdateProduct(productId, { estado: 'aprobado' });
+                const response = await api.adminUpdateProduct(productId, { status: 'aprobado' });
                 if (response.success) {
                     Components.toast('Producto aprobado exitosamente', 'success');
                     loadData();
@@ -634,7 +634,7 @@
             if (!confirm('¿Rechazar este producto?')) return;
 
             try {
-                const response = await api.adminUpdateProduct(productId, { estado: 'rechazado' });
+                const response = await api.adminUpdateProduct(productId, { status: 'rechazado' });
                 if (response.success) {
                     Components.toast('Producto rechazado', 'success');
                     loadData();

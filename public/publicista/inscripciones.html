@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripciones a Eventos - Publicista Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/publicista/publicista.css">
+    <link rel="stylesheet" href="/publicista/inscripciones.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">PUBLICISTA</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/publicista/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/publicista/mis-anuncios.html" class="admin-nav-item">
+                    <span class="icon">📺</span> Mis Anuncios
+                </a>
+                <a href="/publicista/inscripciones.html" class="admin-nav-item active">
+                    <span class="icon">📝</span> Inscripciones
+                </a>
+                <a href="/publicista/estadisticas.html" class="admin-nav-item">
+                    <span class="icon">📈</span> Estadisticas
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>📝 Inscripciones a Eventos</h1>
+                <div class="admin-user">
+                    <span id="user-name">Publicista</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats -->
+                <div class="registration-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-total">0</span>
+                            <span class="stat-label">Total inscripciones</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-pending">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-confirmed">0</span>
+                            <span class="stat-label">Confirmados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-rejected">0</span>
+                            <span class="stat-label">Rechazados</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Verify code section -->
+                <div class="verify-code-section">
+                    <div class="verify-code-title">
+                        <span>🔍</span> Verificar codigo de entrada
+                    </div>
+                    <form class="verify-code-form" onsubmit="verifyCode(event)">
+                        <input type="text" id="verify-code-input" class="verify-code-input"
+                               placeholder="Ingresa el codigo (ej: EVT-1-ABC123)" maxlength="20">
+                        <button type="submit" class="btn-verify">Verificar</button>
+                    </form>
+                    <div id="verify-result" class="verify-result"></div>
+                </div>
+
+                <!-- Filters -->
+                <div class="registrations-filter-bar">
+                    <select id="filter-event">
+                        <option value="">Todos los eventos</option>
+                    </select>
+                    <select id="filter-status">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="confirmado">Confirmado</option>
+                        <option value="rechazado">Rechazado</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                    <input type="text" id="filter-search" placeholder="Buscar usuario...">
+                </div>
+
+                <!-- Registrations table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="registrations-table-container">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para notas -->
+    <div class="notes-modal-overlay" id="notes-modal">
+        <div class="notes-modal">
+            <div class="notes-modal-title" id="notes-modal-title">Rechazar inscripcion</div>
+            <form id="notes-form" onsubmit="submitNotes(event)">
+                <textarea id="notes-textarea" placeholder="Motivo del rechazo (opcional)..."></textarea>
+                <div class="notes-modal-actions">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="closeNotesModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-danger btn-sm">Rechazar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/publicista/inscripciones.js"></script>
+</body>
+</html>

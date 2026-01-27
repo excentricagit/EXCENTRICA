@@ -408,6 +408,26 @@ CREATE TABLE IF NOT EXISTS points_of_interest (
 );
 
 -- =============================================
+-- TABLA: event_registrations
+-- Inscripciones/suscripciones a eventos
+-- =============================================
+CREATE TABLE IF NOT EXISTS event_registrations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    event_id INTEGER NOT NULL,
+    registration_code TEXT UNIQUE NOT NULL,
+    status TEXT DEFAULT 'pendiente',
+    registered_at TEXT DEFAULT (datetime('now')),
+    approved_at TEXT,
+    approved_by INTEGER,
+    notes TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY (approved_by) REFERENCES users(id),
+    UNIQUE(user_id, event_id)
+);
+
+-- =============================================
 -- TABLA: likes
 -- Sistema de likes polimórfico
 -- =============================================
@@ -555,6 +575,9 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_events_date ON events(event_date);
 CREATE INDEX IF NOT EXISTS idx_categories_section ON categories(section);
 CREATE INDEX IF NOT EXISTS idx_likes_content ON likes(content_type, content_id);
+CREATE INDEX IF NOT EXISTS idx_event_registrations_user ON event_registrations(user_id);
+CREATE INDEX IF NOT EXISTS idx_event_registrations_event ON event_registrations(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_registrations_status ON event_registrations(status);
 
 -- =============================================
 -- DATOS INICIALES
