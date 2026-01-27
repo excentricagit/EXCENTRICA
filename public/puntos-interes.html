@@ -142,8 +142,9 @@
                 const response = await api.getPointsOfInterest({ page, limit: 12, search, category, zone });
                 const container = document.getElementById('poi-grid');
 
-                if (response.success && response.data.pointsOfInterest.length > 0) {
-                    container.innerHTML = response.data.pointsOfInterest.map(p => Components.poiCard(p)).join('');
+                const items = response.data?.items || [];
+                if (response.success && items.length > 0) {
+                    container.innerHTML = items.map(p => Components.poiCard(p)).join('');
                     document.getElementById('pagination').innerHTML = Components.pagination(
                         response.data.pagination.page,
                         response.data.pagination.pages,

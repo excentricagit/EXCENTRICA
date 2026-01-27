@@ -49,7 +49,7 @@ export async function handleGetGastronomy(request, env) {
             FROM gastronomy g
             LEFT JOIN zones z ON g.zone_id = z.id
             LEFT JOIN categories c ON g.category_id = c.id
-            WHERE g.status = 'approved' AND g.is_active = 1
+            WHERE g.status = 'approved'
         `;
         const params = [];
 

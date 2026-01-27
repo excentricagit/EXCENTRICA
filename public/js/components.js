@@ -1,33 +1,69 @@
 // EXCENTRICA - Componentes UI
 
 const Components = {
-    // Crear card de noticia
+    // Helper para verificar si es noticia reciente (48 horas)
+    isRecentNews(dateStr) {
+        if (!dateStr) return false;
+        const newsDate = new Date(dateStr);
+        const now = new Date();
+        const diffHours = (now - newsDate) / (1000 * 60 * 60);
+        return diffHours < 48;
+    },
+
+    // Crear card de noticia - Estilo Excentrica mejorado
     newsCard(news) {
-        const imageUrl = news.image_url || CONFIG.PLACEHOLDER_IMAGE;
-        const categoryBadge = news.category_name ?
-            `<span class="badge badge-primary">${news.category_name}</span>` : '';
+        const imageUrl = news.image_url || '';
+        const isNew = this.isRecentNews(news.published_at || news.created_at);
+        const views = news.view_count || 0;
+        const likes = news.like_count || 0;
+        const summary = news.summary || '';
 
         return `
-            <article class="post">
-                <a href="/noticia.html?id=${news.id}">
-                    <img src="${imageUrl}" alt="${Utils.escapeHtml(news.title)}" class="post-image"
-                         onerror="Utils.handleImageError(this)">
-                </a>
-                <div class="post-content">
-                    ${categoryBadge}
-                    <h3 class="post-title">
+            <article class="news-card-ex">
+                ${imageUrl ? `
+                    <div class="news-card-ex-image">
+                        <a href="/noticia.html?id=${news.id}">
+                            <img src="${imageUrl}" alt="${Utils.escapeHtml(news.title)}"
+                                 onerror="this.parentElement.parentElement.style.display='none'">
+                        </a>
+                        <div class="news-card-ex-overlay"></div>
+                        ${isNew ? '<span class="news-card-ex-badge">Nueva</span>' : ''}
+                    </div>
+                ` : ''}
+                <div class="news-card-ex-body">
+                    ${news.category_name ? `<span class="news-card-ex-category">${Utils.escapeHtml(news.category_name)}</span>` : ''}
+                    <h3 class="news-card-ex-title">
                         <a href="/noticia.html?id=${news.id}">${Utils.escapeHtml(news.title)}</a>
                     </h3>
-                    <p class="post-excerpt">${Utils.escapeHtml(news.summary || '')}</p>
-                </div>
-                <div class="post-footer">
-                    <div class="post-actions">
-                        <span class="post-action" data-like="news" data-id="${news.id}">
-                            ❤️ ${news.like_count || 0}
-                        </span>
-                        <span class="post-action">👁️ ${news.view_count || 0}</span>
+                    ${summary ? `<p class="news-card-ex-excerpt">${Utils.escapeHtml(summary).substring(0, 160)}${summary.length > 160 ? '...' : ''}</p>` : ''}
+                    <div class="news-card-ex-footer">
+                        <div class="news-card-ex-meta">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span>${Utils.timeAgo(news.published_at || news.created_at)}</span>
+                        </div>
+                        <div class="news-card-ex-stats">
+                            <span class="news-card-ex-stat">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                ${views}
+                            </span>
+                            ${likes > 0 ? `
+                                <span class="news-card-ex-stat">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                    ${likes}
+                                </span>
+                            ` : ''}
+                        </div>
                     </div>
-                    <span class="text-muted text-sm">${Utils.timeAgo(news.published_at || news.created_at)}</span>
                 </div>
             </article>
         `;
@@ -145,6 +181,107 @@ const Components = {
                     </div>
                     ${services.length > 0 ? `<div class="accommodation-services">${services.join(' ')}</div>` : ''}
                     ${accommodation.price_from ? `<div class="accommodation-price-from">Desde ${Utils.formatPrice(accommodation.price_from)}</div>` : ''}
+                </div>
+            </article>
+        `;
+    },
+
+    // Crear card de gastronomía/restaurante
+    gastronomyCard(restaurant) {
+        const imageUrl = restaurant.image_url || CONFIG.PLACEHOLDER_IMAGE;
+
+        // Iconos de servicios
+        const services = [];
+        if (restaurant.has_delivery) services.push('🛵 Delivery');
+        if (restaurant.has_takeaway) services.push('🥡 Takeaway');
+
+        // Rango de precio
+        const priceRanges = {
+            '$': '💵',
+            '$$': '💵💵',
+            '$$$': '💵💵💵',
+            '$$$$': '💵💵💵💵'
+        };
+        const priceIcon = priceRanges[restaurant.price_range] || '';
+
+        return `
+            <article class="gastronomy-card">
+                <div class="gastronomy-image">
+                    <a href="/restaurante.html?id=${restaurant.id}">
+                        <img src="${imageUrl}" alt="${Utils.escapeHtml(restaurant.name)}"
+                             onerror="Utils.handleImageError(this)">
+                    </a>
+                    ${restaurant.featured ? '<span class="gastronomy-featured">⭐ Destacado</span>' : ''}
+                    ${restaurant.category_name ? `<span class="gastronomy-badge badge badge-primary">${Utils.escapeHtml(restaurant.category_name)}</span>` : ''}
+                </div>
+                <div class="gastronomy-info">
+                    <h3 class="gastronomy-title">
+                        <a href="/restaurante.html?id=${restaurant.id}">${Utils.escapeHtml(restaurant.name)}</a>
+                    </h3>
+                    ${restaurant.specialties ? `<p class="gastronomy-specialties">${Utils.escapeHtml(restaurant.specialties)}</p>` : ''}
+                    <div class="gastronomy-meta">
+                        ${restaurant.zone_name ? `<span>📍 ${Utils.escapeHtml(restaurant.zone_name)}</span>` : ''}
+                        ${priceIcon ? `<span>${priceIcon}</span>` : ''}
+                    </div>
+                    ${services.length > 0 ? `<div class="gastronomy-services">${services.join(' • ')}</div>` : ''}
+                    ${restaurant.phone ? `<div class="gastronomy-contact">📞 ${Utils.escapeHtml(restaurant.phone)}</div>` : ''}
+                </div>
+            </article>
+        `;
+    },
+
+    // Crear card de servicio profesional
+    serviceCard(service) {
+        const imageUrl = service.image_url || CONFIG.PLACEHOLDER_IMAGE;
+
+        return `
+            <article class="service-card">
+                <div class="service-image">
+                    <a href="/servicio.html?id=${service.id}">
+                        <img src="${imageUrl}" alt="${Utils.escapeHtml(service.title)}"
+                             onerror="Utils.handleImageError(this)">
+                    </a>
+                    ${service.featured ? '<span class="service-featured">⭐ Destacado</span>' : ''}
+                    ${service.category_name ? `<span class="service-badge badge badge-info">${Utils.escapeHtml(service.category_name)}</span>` : ''}
+                </div>
+                <div class="service-info">
+                    <h3 class="service-title">
+                        <a href="/servicio.html?id=${service.id}">${Utils.escapeHtml(service.title)}</a>
+                    </h3>
+                    ${service.description ? `<p class="service-description">${Utils.escapeHtml(service.description).substring(0, 100)}...</p>` : ''}
+                    <div class="service-meta">
+                        ${service.zone_name ? `<span>📍 ${Utils.escapeHtml(service.zone_name)}</span>` : ''}
+                        ${service.price_from ? `<span>Desde ${Utils.formatPrice(service.price_from)}</span>` : ''}
+                    </div>
+                    ${service.phone ? `<div class="service-contact">📞 ${Utils.escapeHtml(service.phone)}</div>` : ''}
+                </div>
+            </article>
+        `;
+    },
+
+    // Crear card de punto de interés turístico
+    poiCard(poi) {
+        const imageUrl = poi.image_url || CONFIG.PLACEHOLDER_IMAGE;
+
+        return `
+            <article class="poi-card">
+                <div class="poi-image">
+                    <a href="/punto-interes.html?id=${poi.id}">
+                        <img src="${imageUrl}" alt="${Utils.escapeHtml(poi.name)}"
+                             onerror="Utils.handleImageError(this)">
+                    </a>
+                    ${poi.featured ? '<span class="poi-featured">⭐ Destacado</span>' : ''}
+                    ${poi.category_name ? `<span class="poi-badge badge badge-success">${Utils.escapeHtml(poi.category_name)}</span>` : ''}
+                </div>
+                <div class="poi-info">
+                    <h3 class="poi-title">
+                        <a href="/punto-interes.html?id=${poi.id}">${Utils.escapeHtml(poi.name)}</a>
+                    </h3>
+                    ${poi.description ? `<p class="poi-description">${Utils.escapeHtml(poi.description).substring(0, 100)}...</p>` : ''}
+                    <div class="poi-meta">
+                        ${poi.zone_name ? `<span>📍 ${Utils.escapeHtml(poi.zone_name)}</span>` : ''}
+                        ${poi.entry_fee ? `<span>🎫 ${Utils.formatPrice(poi.entry_fee)}</span>` : '<span>🎫 Gratis</span>'}
+                    </div>
                 </div>
             </article>
         `;

@@ -142,8 +142,9 @@
                 const response = await api.getAccommodations({ page, limit: 12, search, category, zone });
                 const container = document.getElementById('accommodation-grid');
 
-                if (response.success && response.data.accommodations.length > 0) {
-                    container.innerHTML = response.data.accommodations.map(a => Components.accommodationCard(a)).join('');
+                const items = response.data?.items || [];
+                if (response.success && items.length > 0) {
+                    container.innerHTML = items.map(a => Components.accommodationCard(a)).join('');
                     document.getElementById('pagination').innerHTML = Components.pagination(
                         response.data.pagination.page,
                         response.data.pagination.pages,

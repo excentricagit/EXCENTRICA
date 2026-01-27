@@ -32,66 +32,175 @@
             font-size: 1.3rem;
         }
 
-        /* News feed cards */
+        /* News feed cards - Estilo Excentrica */
         .news-feed {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.25rem;
         }
         .news-card {
-            background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
-            border: 1px solid rgba(168, 85, 247, 0.15);
-            border-radius: 12px;
+            background: linear-gradient(145deg, rgba(25, 20, 35, 0.98), rgba(15, 12, 25, 0.99));
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
             overflow: hidden;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(168, 85, 247, 0.05);
+            position: relative;
+        }
+        .news-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #a855f7, #7c3aed, #a855f7);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         .news-card:hover {
-            border-color: rgba(168, 85, 247, 0.4);
-            transform: translateY(-2px);
+            border-color: rgba(168, 85, 247, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), 0 0 60px rgba(168, 85, 247, 0.15);
+        }
+        .news-card:hover::before {
+            opacity: 1;
+        }
+        .news-card-image-container {
+            position: relative;
+            overflow: hidden;
         }
         .news-card-image {
             width: 100%;
-            height: 200px;
+            height: 220px;
             object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .news-card:hover .news-card-image {
+            transform: scale(1.05);
+        }
+        .news-card-image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(to top, rgba(15, 12, 25, 0.95), transparent);
+            pointer-events: none;
+        }
+        .news-card-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: #fff;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4);
         }
         .news-card-body {
-            padding: 1rem;
+            padding: 1.25rem;
         }
         .news-card-category {
             display: inline-block;
-            background: rgba(168, 85, 247, 0.2);
-            color: #a855f7;
-            padding: 0.25rem 0.75rem;
+            background: rgba(168, 85, 247, 0.15);
+            color: #c4b5fd;
+            padding: 0.3rem 0.85rem;
             border-radius: 20px;
-            font-size: 0.75rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.72rem;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
         .news-card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1.15rem;
+            font-weight: 700;
             color: #fff;
-            margin-bottom: 0.5rem;
-            line-height: 1.4;
+            margin-bottom: 0.6rem;
+            line-height: 1.45;
+            letter-spacing: -0.2px;
         }
         .news-card-title a {
             color: inherit;
             text-decoration: none;
+            transition: color 0.2s;
         }
         .news-card-title a:hover {
-            color: #a855f7;
+            color: #c4b5fd;
         }
         .news-card-excerpt {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin-bottom: 0.75rem;
+            color: #9ca3af;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .news-card-meta {
+        .news-card-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: #64748b;
-            font-size: 0.8rem;
+            padding-top: 0.85rem;
+            border-top: 1px solid rgba(168, 85, 247, 0.1);
+        }
+        .news-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            font-size: 0.78rem;
+        }
+        .news-card-meta svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+        .news-card-stats {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .news-card-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            color: #6b7280;
+            font-size: 0.78rem;
+        }
+        .news-card-stat svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.6;
+        }
+        .news-card-read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: #a855f7;
+            font-size: 0.82rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .news-card-read-more:hover {
+            color: #c4b5fd;
+            gap: 0.6rem;
+        }
+        .news-card-read-more svg {
+            width: 14px;
+            height: 14px;
+            transition: transform 0.2s;
+        }
+        .news-card:hover .news-card-read-more svg {
+            transform: translateX(3px);
         }
 
         /* Product cards grid */
@@ -566,45 +675,44 @@
             <!-- Sidebar derecho -->
             <aside class="sidebar">
                 <!-- Widget de usuario -->
-                <div class="widget" id="user-widget">
-                    <div class="widget-title">👤 Mi Cuenta</div>
+                <div class="widget" id="user-widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
+                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Mi Cuenta</div>
                     <div id="user-widget-content">
-                        <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.75rem;">Inicia sesion para acceder a todas las funciones.</p>
-                        <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
-                        <button class="btn btn-outline btn-block" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
+                        <p style="color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem;">Inicia sesion para acceder a todas las funciones.</p>
+                        <button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
+                        <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
                     </div>
                 </div>
 
-                <!-- Widget de categorias -->
-                <div class="widget">
-                    <div class="widget-title">📁 Categorias</div>
-                    <div id="categories-widget" class="widget-list">
-                        <div class="loading"><div class="spinner"></div></div>
-                    </div>
-                </div>
-
-                <!-- Widget de zonas -->
-                <div class="widget">
-                    <div class="widget-title">📍 Zonas</div>
-                    <div id="zones-widget" class="widget-list">
-                        <div class="loading"><div class="spinner"></div></div>
+                <!-- Widget de contenido patrocinado -->
+                <div class="widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
+                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Contenido Patrocinado</div>
+                    <div id="sponsored-widget">
+                        <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem;">
+                            <p style="color: #f1f5f9; font-size: 0.9rem; margin-bottom: 0.25rem; font-weight: 600;">Tu negocio puede estar aqui</p>
+                            <p style="color: #cbd5e1; font-size: 0.8rem;">Contactanos para promocionar tu empresa</p>
+                        </div>
+                        <a href="/contacto.html" class="btn btn-sm btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;">Quiero anunciar</a>
                     </div>
                 </div>
 
                 <!-- Widget de redes sociales -->
-                <div class="widget">
-                    <div class="widget-title">🔗 Seguinos</div>
-                    <div class="social-icons-grid" style="display: flex; gap: 0.75rem; justify-content: center;">
-                        <a href="https://facebook.com/excentrica" class="social-icon" target="_blank" rel="noopener" title="Facebook" style="font-size: 1.5rem;">📘</a>
-                        <a href="https://instagram.com/excentricaok" class="social-icon" target="_blank" rel="noopener" title="Instagram" style="font-size: 1.5rem;">📸</a>
-                        <a href="https://youtube.com/revistaexcentrica" class="social-icon" target="_blank" rel="noopener" title="YouTube" style="font-size: 1.5rem;">📺</a>
+                <div class="widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
+                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Seguinos</div>
+                    <div style="display: flex; gap: 1rem; justify-content: center; padding: 0.5rem 0;">
+                        <a href="https://facebook.com/excentrica" target="_blank" rel="noopener" title="Facebook" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="https://instagram.com/excentricaok" target="_blank" rel="noopener" title="Instagram" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="https://open.spotify.com/user/excentrica" target="_blank" rel="noopener" title="Spotify" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+                        </a>
+                        <a href="https://youtube.com/revistaexcentrica" target="_blank" rel="noopener" title="YouTube" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
                     </div>
-                </div>
-
-                <!-- Footer widget -->
-                <div class="widget" style="text-align: center;">
-                    <p style="color: #64748b; font-size: 0.8rem;">© 2026 Excentrica</p>
-                    <p style="color: #64748b; font-size: 0.75rem;">Santiago del Estero, Argentina</p>
                 </div>
             </aside>
         </div>
@@ -689,25 +797,68 @@
             return str.length > len ? str.substring(0, len) + '...' : str;
         }
 
-        // Render news card
+        // Render news card - Estilo Excentrica mejorado
         function renderNewsCard(news) {
-            const imageUrl = news.image_url || news.imageUrl || '/images/placeholder.jpg';
+            const imageUrl = news.image_url || news.imageUrl || '';
+            const isNew = isRecentNews(news.created_at);
+            const views = news.views || news.view_count || 0;
+            const likes = news.likes || news.like_count || 0;
+
             return `
                 <article class="news-card">
-                    ${imageUrl ? `<img src="${imageUrl}" alt="${escapeHtml(news.title)}" class="news-card-image" onerror="this.style.display='none'">` : ''}
+                    ${imageUrl ? `
+                        <div class="news-card-image-container">
+                            <img src="${imageUrl}" alt="${escapeHtml(news.title)}" class="news-card-image" onerror="this.parentElement.style.display='none'">
+                            <div class="news-card-image-overlay"></div>
+                            ${isNew ? '<span class="news-card-badge">Nueva</span>' : ''}
+                        </div>
+                    ` : ''}
                     <div class="news-card-body">
                         ${news.category_name ? `<span class="news-card-category">${escapeHtml(news.category_name)}</span>` : ''}
                         <h3 class="news-card-title">
                             <a href="/noticia.html?id=${news.id}">${escapeHtml(news.title)}</a>
                         </h3>
-                        <p class="news-card-excerpt">${escapeHtml(truncate(news.excerpt || news.content, 150))}</p>
-                        <div class="news-card-meta">
-                            <span>${formatDate(news.created_at)}</span>
-                            <span>${news.views || 0} vistas</span>
+                        <p class="news-card-excerpt">${escapeHtml(truncate(news.summary || news.excerpt || news.content, 160))}</p>
+                        <div class="news-card-footer">
+                            <div class="news-card-meta">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <span>${formatDate(news.created_at)}</span>
+                            </div>
+                            <div class="news-card-stats">
+                                <span class="news-card-stat">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                    ${views}
+                                </span>
+                                ${likes > 0 ? `
+                                    <span class="news-card-stat">
+                                        <svg viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                        </svg>
+                                        ${likes}
+                                    </span>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                 </article>
             `;
+        }
+
+        // Helper to check if news is recent (within 24 hours)
+        function isRecentNews(dateStr) {
+            if (!dateStr) return false;
+            const newsDate = new Date(dateStr);
+            const now = new Date();
+            const diffHours = (now - newsDate) / (1000 * 60 * 60);
+            return diffHours < 48;
         }
 
         // Render product card
@@ -800,10 +951,10 @@
                     <button class="btn btn-outline btn-sm" onclick="auth.logout()">Salir</button>
                 `;
                 userWidget.innerHTML = `
-                    <p style="color: #e2e8f0; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${escapeHtml(user.name || 'Usuario')}</p>
-                    <p style="color: #64748b; font-size: 0.8rem; margin-bottom: 0.75rem;">${escapeHtml(user.email)}</p>
-                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-primary btn-block mb-2">Panel de Editor</a>' : ''}
-                    <button class="btn btn-outline btn-block" onclick="auth.logout()">Cerrar Sesion</button>
+                    <p style="color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${escapeHtml(user.name || 'Usuario')}</p>
+                    <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 0.75rem;">${escapeHtml(user.email)}</p>
+                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;">Panel de Editor</a>' : ''}
+                    <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="auth.logout()">Cerrar Sesion</button>
                 `;
             } else {
                 userMenu.innerHTML = `
@@ -903,47 +1054,6 @@
                 showEmpty(document.getElementById('poi-grid'), 'No hay lugares disponibles', '🗺️');
             }
 
-            // Load categories widget (API returns data as array)
-            try {
-                const catResponse = await api.getCategories('noticias');
-                const catWidget = document.getElementById('categories-widget');
-                const catData = extractArray(catResponse, 'categories', 'items');
-
-                if (catData.length > 0) {
-                    catWidget.innerHTML = catData.slice(0, 6).map(c => `
-                        <a href="/noticias.html?category=${c.slug || c.id}" class="widget-item">
-                            <span>${c.icon || '📁'}</span>
-                            <span>${escapeHtml(c.name)}</span>
-                        </a>
-                    `).join('');
-                } else {
-                    catWidget.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay categorias</p>';
-                }
-            } catch (e) {
-                console.error('Error loading categories:', e);
-                document.getElementById('categories-widget').innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay categorias</p>';
-            }
-
-            // Load zones widget (API returns data as array)
-            try {
-                const zonesResponse = await api.getZones();
-                const zonesWidget = document.getElementById('zones-widget');
-                const zonesData = extractArray(zonesResponse, 'zones', 'items');
-
-                if (zonesData.length > 0) {
-                    zonesWidget.innerHTML = zonesData.slice(0, 8).map(z => `
-                        <a href="/mercaderia.html?zone=${z.slug || z.id}" class="widget-item">
-                            <span>📍</span>
-                            <span>${escapeHtml(z.name)}</span>
-                        </a>
-                    `).join('');
-                } else {
-                    zonesWidget.innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay zonas</p>';
-                }
-            } catch (e) {
-                console.error('Error loading zones:', e);
-                document.getElementById('zones-widget').innerHTML = '<p style="color: #64748b; font-size: 0.85rem;">No hay zonas</p>';
-            }
         }
 
         // Run on load

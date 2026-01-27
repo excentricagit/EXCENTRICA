@@ -142,8 +142,9 @@
                 const response = await api.getServices({ page, limit: 12, search, category, zone });
                 const container = document.getElementById('services-grid');
 
-                if (response.success && response.data.services.length > 0) {
-                    container.innerHTML = response.data.services.map(s => Components.serviceCard(s)).join('');
+                const items = response.data?.items || [];
+                if (response.success && items.length > 0) {
+                    container.innerHTML = items.map(s => Components.serviceCard(s)).join('');
                     document.getElementById('pagination').innerHTML = Components.pagination(
                         response.data.pagination.page,
                         response.data.pagination.pages,
