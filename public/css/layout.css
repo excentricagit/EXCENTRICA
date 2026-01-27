@@ -56,7 +56,6 @@ body {
     color: var(--accent);
     text-shadow: var(--glow-accent);
     transition: all var(--transition-fast);
-    margin-left: var(--sidebar-width);
 }
 
 .logo:hover {
@@ -143,17 +142,18 @@ body {
 
 .sidebar-nav {
     position: fixed;
-    top: 0;
+    top: var(--header-height);
     left: 0;
     width: var(--sidebar-width);
-    height: 100vh;
+    height: calc(100vh - var(--header-height));
     background: var(--bg-tertiary);
     border-right: 2px solid var(--primary);
     overflow-y: auto;
     overflow-x: hidden;
-    z-index: calc(var(--z-sticky) + 10);
-    padding: var(--spacing-lg) 0 var(--spacing-md) 0;
+    z-index: var(--z-fixed);
+    padding: var(--spacing-md) 0;
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+    border-top-right-radius: 20px;
 }
 
 /* Scrollbar personalizado para sidebar */
@@ -404,9 +404,9 @@ body {
         margin-left: 0;
     }
 
-    /* Logo sin margen */
-    .logo {
-        margin-left: 0;
+    /* Header ocupa todo el ancho */
+    .header {
+        left: 0;
     }
 
     /* Mostrar botón de menú móvil */
