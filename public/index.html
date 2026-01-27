@@ -560,7 +560,7 @@
     <header class="header">
         <div class="header-inner">
             <a href="/" class="logo">
-                <span>⚡</span> Excentrica
+                <img src="/assets/logo.png" alt="Logo" style="height: 28px; width: auto;"> Excentrica
             </a>
 
             <div class="header-search">
@@ -945,21 +945,16 @@
             const userWidget = document.getElementById('user-widget-content');
 
             if (user) {
-                userMenu.innerHTML = `
-                    <span style="color: #e2e8f0; margin-right: 0.5rem;">${escapeHtml(user.name || user.email)}</span>
-                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-outline btn-sm" style="margin-right: 0.5rem;">Editor</a>' : ''}
-                    <button class="btn btn-outline btn-sm" onclick="auth.logout()">Salir</button>
-                `;
+                let panelButton = '';
+                if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
+                    panelButton = `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+                }
+
                 userWidget.innerHTML = `
-                    <p style="color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${escapeHtml(user.name || 'Usuario')}</p>
-                    <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 0.75rem;">${escapeHtml(user.email)}</p>
-                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;">Panel de Editor</a>' : ''}
-                    <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="auth.logout()">Cerrar Sesion</button>
-                `;
-            } else {
-                userMenu.innerHTML = `
-                    <a href="/login.html" class="btn btn-outline btn-sm" style="margin-right: 0.5rem;">Ingresar</a>
-                    <a href="/registro.html" class="btn btn-primary btn-sm">Registrarse</a>
+                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+                    <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
+                    ${panelButton}
+                    <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
                 `;
             }
 
