@@ -1,8 +1,36 @@
 // =============================================
 // EXCENTRICA - Gastronomia Page JavaScript
+// Professional Design
 // =============================================
 
 let currentPage = 1;
+let currentType = '';
+let currentZone = '';
+let currentSearch = '';
+let currentView = 'grid';
+
+// Tipos de gastronomia predefinidos
+const GASTRO_TYPES = [
+    { slug: 'parrilla', name: 'Parrilla', icon: '🔥' },
+    { slug: 'restaurante', name: 'Restaurante', icon: '🍽️' },
+    { slug: 'bar', name: 'Bar', icon: '🍺' },
+    { slug: 'cafeteria', name: 'Cafeteria', icon: '☕' },
+    { slug: 'pizzeria', name: 'Pizzeria', icon: '🍕' },
+    { slug: 'pastas', name: 'Pastas', icon: '🍝' },
+    { slug: 'comida-rapida', name: 'Comida Rapida', icon: '🍔' },
+    { slug: 'sushi', name: 'Sushi / Oriental', icon: '🍣' },
+    { slug: 'heladeria', name: 'Heladeria', icon: '🍦' },
+    { slug: 'panaderia', name: 'Panaderia', icon: '🥐' },
+    { slug: 'comida-mexicana', name: 'Mexicana', icon: '🌮' },
+    { slug: 'rotiseria', name: 'Rotiseria', icon: '🍗' },
+    { slug: 'empanadas', name: 'Empanadas', icon: '🥟' },
+    { slug: 'food-truck', name: 'Food Truck', icon: '🚚' }
+];
+
+function getTypeLabel(slug) {
+    const type = GASTRO_TYPES.find(t => t.slug === slug);
+    return type ? `${type.icon} ${type.name}` : slug;
+}
 
 // Helper to escape HTML
 function escapeHtml(str) {
@@ -137,59 +165,193 @@ function showLoading(container) {
     `;
 }
 
-// Show error
-function showError(container, message) {
-    container.innerHTML = `
-        <div class="alert alert-danger" style="grid-column: 1 / -1;">
-            <strong>Error:</strong> ${escapeHtml(message)}
-        </div>
-    `;
+// Load and render category chips
+async function loadCategoryChips() {
+    try {
+        const response = await api.getCategories('gastronomia');
+        if (response.success && response.data) {
+            categories = response.data;
+
+            const chipsContainer = document.getElementById('category-chips');
+            const currentCat = new URLSearchParams(window.location.search).get('category') || '';
+
+            chipsContainer.innerHTML = `
+                <button class="gastro-category-chip ${!currentCat ? 'active' : ''}" data-category="">
+                    <span class="chip-icon">🍽️</span> Todos
+                </button>
+                ${categories.map(cat => `
+                    <button class="gastro-category-chip ${currentCat === cat.slug ? 'active' : ''}" data-category="${cat.slug}">
+                        <span class="chip-icon">${cat.icon || '🍴'}</span> ${escapeHtml(cat.name)}
+                    </button>
+                `).join('')}
+            `;
+
+            // Add click handlers
+            chipsContainer.querySelectorAll('.gastro-category-chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    currentCategory = chip.dataset.category;
+                    chipsContainer.querySelectorAll('.gastro-category-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    loadGastronomy(1);
+                });
+            });
+
+            // Also populate sidebar widget
+            const widgetContainer = document.getElementById('categories-widget');
+            if (widgetContainer) {
+                widgetContainer.innerHTML = `
+                    <a href="#" class="widget-item ${!currentCat ? 'active' : ''}" data-category="">
+                        <span>🍽️</span>
+                        <span>Todos</span>
+                    </a>
+                    ${categories.map(cat => `
+                        <a href="#" class="widget-item ${currentCat === cat.slug ? 'active' : ''}" data-category="${cat.slug}">
+                            <span>${cat.icon || '🍴'}</span>
+                            <span>${escapeHtml(cat.name)}</span>
+                        </a>
+                    `).join('')}
+                `;
+
+                widgetContainer.querySelectorAll('.widget-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        currentCategory = item.dataset.category;
+                        // Update chips
+                        chipsContainer.querySelectorAll('.gastro-category-chip').forEach(c => {
+                            c.classList.toggle('active', c.dataset.category === currentCategory);
+                        });
+                        // Update widget
+                        widgetContainer.querySelectorAll('.widget-item').forEach(w => {
+                            w.classList.toggle('active', w.dataset.category === currentCategory);
+                        });
+                        loadGastronomy(1);
+                    });
+                });
+            }
+
+            // Populate zone filter
+            await App.loadZones('zone-filter');
+        }
+    } catch (e) {
+        console.error('Error loading categories:', e);
+    }
 }
 
 // Load gastronomy data
 async function loadGastronomy(page = 1) {
     currentPage = page;
-    const search = document.getElementById('search-input').value;
-    const category = document.getElementById('category-filter').value;
-    const zone = document.getElementById('zone-filter').value;
+    const search = document.getElementById('search-input')?.value || '';
+    const zone = document.getElementById('zone-filter')?.value || '';
     const container = document.getElementById('gastronomy-grid');
 
     showLoading(container);
 
     try {
-        const response = await api.getGastronomy({ page, limit: 12, search, category, zone });
+        const response = await api.getGastronomy({
+            page,
+            limit: 12,
+            search,
+            category: currentCategory,
+            zone
+        });
 
         const items = response.data?.items || [];
+        const total = response.data?.pagination?.total || 0;
+
+        // Update results count
+        document.getElementById('results-count').textContent = total;
+
         if (response.success && items.length > 0) {
             container.innerHTML = items.map(g => renderGastronomyCard(g)).join('');
 
             // Render pagination
             const pagination = response.data.pagination;
             if (pagination && pagination.pages > 1) {
-                document.getElementById('pagination').innerHTML = Components.pagination(
-                    pagination.page,
-                    pagination.pages,
-                    'loadGastronomy'
-                );
+                renderPagination(pagination.page, pagination.pages);
             } else {
                 document.getElementById('pagination').innerHTML = '';
             }
         } else {
-            showEmpty(container, 'No hay restaurantes disponibles', '🍽️');
+            showEmpty(container, 'No se encontraron restaurantes', '🍽️');
             document.getElementById('pagination').innerHTML = '';
         }
     } catch (e) {
         console.error('Error loading gastronomy:', e);
-        showError(container, 'Error cargando restaurantes');
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: #ef4444;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                <h3 style="margin-bottom: 0.5rem;">Error cargando restaurantes</h3>
+                <p>Por favor, intenta de nuevo mas tarde.</p>
+            </div>
+        `;
     }
 
     // Update URL params
     Utils.updateUrl({
         page: page > 1 ? page : null,
-        category: category || null,
+        category: currentCategory || null,
         zone: zone || null,
         search: search || null
     });
+}
+
+// Render pagination
+function renderPagination(current, total) {
+    if (total <= 1) {
+        document.getElementById('pagination').innerHTML = '';
+        return;
+    }
+
+    let html = '<div class="pagination">';
+    html += `<button class="pagination-btn" onclick="loadGastronomy(${current - 1})" ${current <= 1 ? 'disabled' : ''}>← Anterior</button>`;
+
+    for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || (i >= current - 1 && i <= current + 1)) {
+            html += `<button class="pagination-btn ${i === current ? 'active' : ''}" onclick="loadGastronomy(${i})">${i}</button>`;
+        } else if (i === current - 2 || i === current + 2) {
+            html += '<span style="color: #6b7280; padding: 0.5rem;">...</span>';
+        }
+    }
+
+    html += `<button class="pagination-btn" onclick="loadGastronomy(${current + 1})" ${current >= total ? 'disabled' : ''}>Siguiente →</button>`;
+    html += '</div>';
+
+    document.getElementById('pagination').innerHTML = html;
+}
+
+// Toggle view (grid/list)
+function toggleView(view) {
+    currentView = view;
+    const grid = document.getElementById('gastronomy-grid');
+    const btns = document.querySelectorAll('.gastro-view-btn');
+
+    btns.forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+
+    if (view === 'list') {
+        grid.classList.add('list-view');
+    } else {
+        grid.classList.remove('list-view');
+    }
+}
+
+// Update user widget
+function updateUserWidget() {
+    const user = auth.getUser();
+    const widget = document.getElementById('user-widget-content');
+
+    if (user && widget) {
+        let panelButton = '';
+        if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
+            panelButton = `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">📝 Panel Editor</button>`;
+        }
+
+        widget.innerHTML = `
+            <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+            <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">👤 Mi Perfil</button>
+            ${panelButton}
+            <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
+        `;
+    }
 }
 
 // Debounced search
@@ -197,43 +359,29 @@ const debouncedSearch = Utils.debounce(() => loadGastronomy(1), 500);
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
-    // Load user widget
-    const user = auth.getUser();
-    const userWidget = document.getElementById('user-widget-content');
+    // Load categories and chips
+    await loadCategoryChips();
 
-    if (user && userWidget) {
-        let panelButton = '';
-        if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
-            panelButton = `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;">Panel de Editor</a>`;
-        }
-
-        userWidget.innerHTML = `
-            <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.5rem;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : 'Usuario')}</p>
-            <p style="color: #94a3b8; font-size: 0.8rem; margin-bottom: 0.75rem;">${Utils.escapeHtml(user.email)}</p>
-            ${panelButton}
-            <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
-        `;
-    }
-
-    // Load filter options
-    await Promise.all([
-        App.loadCategories('category-filter', 'gastronomia'),
-        App.loadZones('zone-filter')
-    ]);
-
-    // Apply URL params to filters
+    // Read URL params
     const params = Utils.getUrlParams();
-    if (params.category) document.getElementById('category-filter').value = params.category;
+    if (params.category) currentCategory = params.category;
     if (params.zone) document.getElementById('zone-filter').value = params.zone;
     if (params.search) document.getElementById('search-input').value = params.search;
 
     // Load data
     loadGastronomy(parseInt(params.page) || 1);
 
+    // Update user widget
+    updateUserWidget();
+
     // Event listeners
-    document.getElementById('search-input').addEventListener('input', debouncedSearch);
-    document.getElementById('category-filter').addEventListener('change', () => loadGastronomy(1));
-    document.getElementById('zone-filter').addEventListener('change', () => loadGastronomy(1));
+    document.getElementById('search-input')?.addEventListener('input', debouncedSearch);
+    document.getElementById('zone-filter')?.addEventListener('change', () => loadGastronomy(1));
+
+    // View toggle
+    document.querySelectorAll('.gastro-view-btn').forEach(btn => {
+        btn.addEventListener('click', () => toggleView(btn.dataset.view));
+    });
 });
 
 // Mobile menu toggle

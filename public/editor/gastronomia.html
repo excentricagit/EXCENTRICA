@@ -419,6 +419,23 @@
                 <!-- Filters -->
                 <div class="d-flex gap-3 mb-4 flex-wrap" style="align-items: center;">
                     <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
+                    <select id="filter-type" class="form-control" style="max-width: 180px;">
+                        <option value="">Todos los tipos</option>
+                        <option value="parrilla">🔥 Parrilla</option>
+                        <option value="restaurante">🍽️ Restaurante</option>
+                        <option value="bar">🍺 Bar</option>
+                        <option value="cafeteria">☕ Cafeteria</option>
+                        <option value="pizzeria">🍕 Pizzeria</option>
+                        <option value="pastas">🍝 Pastas</option>
+                        <option value="comida-rapida">🍔 Comida Rapida</option>
+                        <option value="sushi">🍣 Sushi</option>
+                        <option value="heladeria">🍦 Heladeria</option>
+                        <option value="panaderia">🥐 Panaderia</option>
+                        <option value="comida-mexicana">🌮 Mexicana</option>
+                        <option value="rotiseria">🍗 Rotiseria</option>
+                        <option value="empanadas">🥟 Empanadas</option>
+                        <option value="food-truck">🚚 Food Truck</option>
+                    </select>
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
                         <option value="pending">Pendiente</option>
@@ -476,8 +493,24 @@
                             <textarea id="restaurant-description" class="form-control" rows="2" placeholder="Breve descripcion..."></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="restaurant-specialties">Especialidades</label>
-                            <textarea id="restaurant-specialties" class="form-control" rows="2" placeholder="Parrilla, Pastas..."></textarea>
+                            <label for="restaurant-specialties">Tipo de Gastronomia *</label>
+                            <select id="restaurant-specialties" class="form-control" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="parrilla">🔥 Parrilla</option>
+                                <option value="restaurante">🍽️ Restaurante</option>
+                                <option value="bar">🍺 Bar</option>
+                                <option value="cafeteria">☕ Cafeteria</option>
+                                <option value="pizzeria">🍕 Pizzeria</option>
+                                <option value="pastas">🍝 Pastas</option>
+                                <option value="comida-rapida">🍔 Comida Rapida</option>
+                                <option value="sushi">🍣 Sushi / Oriental</option>
+                                <option value="heladeria">🍦 Heladeria</option>
+                                <option value="panaderia">🥐 Panaderia / Reposteria</option>
+                                <option value="comida-mexicana">🌮 Comida Mexicana</option>
+                                <option value="rotiseria">🍗 Pollo / Rotiseria</option>
+                                <option value="empanadas">🥟 Empanadas</option>
+                                <option value="food-truck">🚚 Food Truck</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Precio</label>
@@ -657,19 +690,20 @@
 
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
+            const type = document.getElementById('filter-type').value;
             const status = document.getElementById('filter-status').value;
             const zoneId = document.getElementById('filter-zone').value;
 
             filteredRestaurants = allRestaurants.filter(r => {
                 const matchSearch = !search ||
                     r.name.toLowerCase().includes(search) ||
-                    (r.description && r.description.toLowerCase().includes(search)) ||
-                    (r.specialties && r.specialties.toLowerCase().includes(search));
+                    (r.description && r.description.toLowerCase().includes(search));
 
+                const matchType = !type || r.specialties === type;
                 const matchStatus = !status || r.status === status;
                 const matchZone = !zoneId || r.zone_id == zoneId;
 
-                return matchSearch && matchStatus && matchZone;
+                return matchSearch && matchType && matchStatus && matchZone;
             });
 
             renderContent();
@@ -677,6 +711,7 @@
 
         function resetFilters() {
             document.getElementById('search').value = '';
+            document.getElementById('filter-type').value = '';
             document.getElementById('filter-status').value = '';
             document.getElementById('filter-zone').value = '';
             applyFilters();
@@ -732,11 +767,10 @@
                                     </span>
                                 </div>
                                 <div class="restaurant-card-meta">
+                                    ${r.specialties ? `<span style="background: rgba(249,115,22,0.2); color: #fb923c; padding: 0.15rem 0.4rem; border-radius: 4px;">${getTypeLabel(r.specialties)}</span>` : ''}
                                     ${r.zone_name ? `<span>[Z] ${r.zone_name}</span>` : ''}
                                     ${r.price_range ? `<span>${r.price_range}</span>` : ''}
-                                    ${r.phone ? `<span>[T] ${r.phone}</span>` : ''}
                                 </div>
-                                ${r.specialties ? `<p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-bottom: 0.75rem;">${truncate(r.specialties, 80)}</p>` : ''}
                                 <div class="restaurant-card-services">
                                     ${r.has_delivery ? '<span class="service-tag">Delivery</span>' : ''}
                                     ${r.has_takeaway ? '<span class="service-tag">Take away</span>' : ''}
@@ -788,7 +822,7 @@
                                     <tr>
                                         <td>
                                             <strong>${r.featured ? '<span class="featured-star">*</span> ' : ''}${r.name}</strong>
-                                            ${r.specialties ? `<br><small style="color: rgba(255,255,255,0.5);">${truncate(r.specialties, 50)}</small>` : ''}
+                                            ${r.specialties ? `<br><small style="color: #fb923c;">${getTypeLabel(r.specialties)}</small>` : ''}
                                         </td>
                                         <td>${r.zone_name || '-'}</td>
                                         <td>${r.price_range || '-'}</td>
@@ -831,6 +865,28 @@
                 rejected: 'Rechazado'
             };
             return labels[status] || status;
+        }
+
+        // Tipos de gastronomia
+        const GASTRO_TYPES = {
+            'parrilla': '🔥 Parrilla',
+            'restaurante': '🍽️ Restaurante',
+            'bar': '🍺 Bar',
+            'cafeteria': '☕ Cafeteria',
+            'pizzeria': '🍕 Pizzeria',
+            'pastas': '🍝 Pastas',
+            'comida-rapida': '🍔 Comida Rapida',
+            'sushi': '🍣 Sushi / Oriental',
+            'heladeria': '🍦 Heladeria',
+            'panaderia': '🥐 Panaderia',
+            'comida-mexicana': '🌮 Mexicana',
+            'rotiseria': '🍗 Rotiseria',
+            'empanadas': '🥟 Empanadas',
+            'food-truck': '🚚 Food Truck'
+        };
+
+        function getTypeLabel(type) {
+            return GASTRO_TYPES[type] || type || '-';
         }
 
         function truncate(text, maxLength) {
@@ -1077,6 +1133,7 @@
         // =============================================
 
         document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-type').addEventListener('change', applyFilters);
         document.getElementById('filter-status').addEventListener('change', applyFilters);
         document.getElementById('filter-zone').addEventListener('change', applyFilters);
 
