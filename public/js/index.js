@@ -2,6 +2,31 @@
 // EXCENTRICA - Index Page JavaScript
 // =============================================
 
+// Tipos de gastronomia predefinidos
+const GASTRO_TYPES = [
+    { slug: 'parrilla', name: 'Parrilla', icon: '🔥' },
+    { slug: 'restaurante', name: 'Restaurante', icon: '🍽️' },
+    { slug: 'bar', name: 'Bar', icon: '🍺' },
+    { slug: 'cafeteria', name: 'Cafeteria', icon: '☕' },
+    { slug: 'pizzeria', name: 'Pizzeria', icon: '🍕' },
+    { slug: 'pastas', name: 'Pastas', icon: '🍝' },
+    { slug: 'comida-rapida', name: 'Comida Rapida', icon: '🍔' },
+    { slug: 'sushi', name: 'Sushi', icon: '🍣' },
+    { slug: 'heladeria', name: 'Heladeria', icon: '🍦' },
+    { slug: 'panaderia', name: 'Panaderia', icon: '🥐' },
+    { slug: 'comida-mexicana', name: 'Mexicana', icon: '🌮' },
+    { slug: 'rotiseria', name: 'Rotiseria', icon: '🍗' },
+    { slug: 'empanadas', name: 'Empanadas', icon: '🥟' },
+    { slug: 'food-truck', name: 'Food Truck', icon: '🚚' }
+];
+
+let currentGastroType = '';
+
+function getGastroTypeLabel(slug) {
+    const type = GASTRO_TYPES.find(t => t.slug === slug);
+    return type ? `${type.icon} ${type.name}` : slug;
+}
+
 // Helper function to format date
 function formatDate(dateStr) {
     if (!dateStr) return '';
@@ -230,14 +255,13 @@ function renderGastronomyCard(restaurant) {
             <div class="gastro-card-image-container">
                 <img src="${imageUrl}" alt="${escapeHtml(restaurant.name)}" class="gastro-card-image" onerror="this.src='/images/placeholder.svg'">
                 <div class="gastro-card-overlay"></div>
-                ${restaurant.category_name ? `<span class="gastro-card-badge">${escapeHtml(restaurant.category_name)}</span>` : ''}
+                ${restaurant.specialties ? `<span class="gastro-card-badge">${getGastroTypeLabel(restaurant.specialties)}</span>` : ''}
                 ${restaurant.featured ? '<span class="gastro-card-featured">⭐ Destacado</span>' : ''}
             </div>
             <div class="gastro-card-body">
                 <h3 class="gastro-card-title">
                     <a href="/restaurante.html?id=${restaurant.id}">${escapeHtml(restaurant.name)}</a>
                 </h3>
-                ${restaurant.specialties ? `<p class="gastro-card-specialties">${escapeHtml(restaurant.specialties)}</p>` : ''}
                 <div class="gastro-card-meta">
                     ${restaurant.zone_name ? `<span class="gastro-card-meta-item">📍 ${escapeHtml(restaurant.zone_name)}</span>` : ''}
                     ${priceIcon ? `<span class="gastro-card-meta-item">${priceIcon}</span>` : ''}
@@ -278,6 +302,9 @@ async function loadHomePage() {
             <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
         `;
     }
+
+    // Render gastro type chips first
+    renderGastroTypeChips();
 
     // Load all sections in parallel
     await Promise.all([
@@ -362,10 +389,44 @@ async function loadMovies() {
     }
 }
 
+// Render gastronomy type chips
+function renderGastroTypeChips() {
+    const chipsContainer = document.getElementById('gastro-type-chips');
+    if (!chipsContainer) return;
+
+    chipsContainer.innerHTML = `
+        <button class="gastro-chip ${!currentGastroType ? 'active' : ''}" data-type="">
+            <span>🍽️</span> Todos
+        </button>
+        ${GASTRO_TYPES.slice(0, 8).map(type => `
+            <button class="gastro-chip ${currentGastroType === type.slug ? 'active' : ''}" data-type="${type.slug}">
+                <span>${type.icon}</span> ${type.name}
+            </button>
+        `).join('')}
+    `;
+
+    // Add click handlers
+    chipsContainer.querySelectorAll('.gastro-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            currentGastroType = chip.dataset.type;
+            chipsContainer.querySelectorAll('.gastro-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            loadGastronomy();
+        });
+    });
+}
+
 // Load gastronomy
 async function loadGastronomy() {
     try {
-        const gastroResponse = await api.getGastronomy({ limit: 6, featured: 1 });
+        const params = { limit: 6 };
+        if (currentGastroType) {
+            params.specialties = currentGastroType;
+        } else {
+            params.featured = 1;
+        }
+
+        const gastroResponse = await api.getGastronomy(params);
         const gastroGrid = document.getElementById('gastro-grid');
         if (!gastroGrid) return;
 

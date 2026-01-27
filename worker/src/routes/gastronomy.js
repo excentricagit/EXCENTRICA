@@ -40,6 +40,7 @@ export async function handleGetGastronomy(request, env) {
         const hasTakeaway = url.searchParams.get('has_takeaway');
         const priceRange = url.searchParams.get('price_range');
         const featured = url.searchParams.get('featured');
+        const specialties = url.searchParams.get('specialties');
 
         let query = `
             SELECT
@@ -84,6 +85,11 @@ export async function handleGetGastronomy(request, env) {
 
         if (featured === '1' || featured === 'true') {
             query += ' AND g.featured = 1';
+        }
+
+        if (specialties) {
+            query += ' AND g.specialties = ?';
+            params.push(specialties);
         }
 
         // Count total

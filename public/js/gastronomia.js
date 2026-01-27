@@ -105,14 +105,13 @@ function renderGastronomyCard(restaurant) {
             <div class="gastro-card-image-container">
                 <img src="${imageUrl}" alt="${escapeHtml(restaurant.name)}" class="gastro-card-image" onerror="this.src='/images/placeholder.svg'">
                 <div class="gastro-card-overlay"></div>
-                ${restaurant.category_name ? `<span class="gastro-card-badge">${escapeHtml(restaurant.category_name)}</span>` : ''}
+                ${restaurant.specialties ? `<span class="gastro-card-badge">${getTypeLabel(restaurant.specialties)}</span>` : ''}
                 ${restaurant.featured ? '<span class="gastro-card-featured">⭐ Destacado</span>' : ''}
             </div>
             <div class="gastro-card-body">
                 <h3 class="gastro-card-title">
                     <a href="/restaurante.html?id=${restaurant.id}">${escapeHtml(restaurant.name)}</a>
                 </h3>
-                ${restaurant.specialties ? `<p class="gastro-card-specialties">${escapeHtml(restaurant.specialties)}</p>` : ''}
                 <div class="gastro-card-meta">
                     ${restaurant.zone_name ? `
                         <span class="gastro-card-meta-item">
@@ -165,75 +164,73 @@ function showLoading(container) {
     `;
 }
 
-// Load and render category chips
-async function loadCategoryChips() {
-    try {
-        const response = await api.getCategories('gastronomia');
-        if (response.success && response.data) {
-            categories = response.data;
+// Render type chips (using predefined GASTRO_TYPES)
+function renderTypeChips() {
+    const chipsContainer = document.getElementById('category-chips');
+    const currentTypeParam = new URLSearchParams(window.location.search).get('type') || '';
+    currentType = currentTypeParam;
 
-            const chipsContainer = document.getElementById('category-chips');
-            const currentCat = new URLSearchParams(window.location.search).get('category') || '';
+    chipsContainer.innerHTML = `
+        <button class="gastro-category-chip ${!currentType ? 'active' : ''}" data-type="">
+            <span class="chip-icon">🍽️</span> Todos
+        </button>
+        ${GASTRO_TYPES.map(type => `
+            <button class="gastro-category-chip ${currentType === type.slug ? 'active' : ''}" data-type="${type.slug}">
+                <span class="chip-icon">${type.icon}</span> ${type.name}
+            </button>
+        `).join('')}
+    `;
 
-            chipsContainer.innerHTML = `
-                <button class="gastro-category-chip ${!currentCat ? 'active' : ''}" data-category="">
-                    <span class="chip-icon">🍽️</span> Todos
-                </button>
-                ${categories.map(cat => `
-                    <button class="gastro-category-chip ${currentCat === cat.slug ? 'active' : ''}" data-category="${cat.slug}">
-                        <span class="chip-icon">${cat.icon || '🍴'}</span> ${escapeHtml(cat.name)}
-                    </button>
-                `).join('')}
-            `;
+    // Add click handlers
+    chipsContainer.querySelectorAll('.gastro-category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            currentType = chip.dataset.type;
+            chipsContainer.querySelectorAll('.gastro-category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            // Update sidebar widget
+            updateWidgetActive();
+            loadGastronomy(1);
+        });
+    });
 
-            // Add click handlers
-            chipsContainer.querySelectorAll('.gastro-category-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    currentCategory = chip.dataset.category;
-                    chipsContainer.querySelectorAll('.gastro-category-chip').forEach(c => c.classList.remove('active'));
-                    chip.classList.add('active');
-                    loadGastronomy(1);
+    // Also populate sidebar widget
+    const widgetContainer = document.getElementById('categories-widget');
+    if (widgetContainer) {
+        widgetContainer.innerHTML = `
+            <a href="#" class="widget-item ${!currentType ? 'active' : ''}" data-type="">
+                <span>🍽️</span>
+                <span>Todos</span>
+            </a>
+            ${GASTRO_TYPES.map(type => `
+                <a href="#" class="widget-item ${currentType === type.slug ? 'active' : ''}" data-type="${type.slug}">
+                    <span>${type.icon}</span>
+                    <span>${type.name}</span>
+                </a>
+            `).join('')}
+        `;
+
+        widgetContainer.querySelectorAll('.widget-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentType = item.dataset.type;
+                // Update chips
+                chipsContainer.querySelectorAll('.gastro-category-chip').forEach(c => {
+                    c.classList.toggle('active', c.dataset.type === currentType);
                 });
+                // Update widget
+                updateWidgetActive();
+                loadGastronomy(1);
             });
+        });
+    }
+}
 
-            // Also populate sidebar widget
-            const widgetContainer = document.getElementById('categories-widget');
-            if (widgetContainer) {
-                widgetContainer.innerHTML = `
-                    <a href="#" class="widget-item ${!currentCat ? 'active' : ''}" data-category="">
-                        <span>🍽️</span>
-                        <span>Todos</span>
-                    </a>
-                    ${categories.map(cat => `
-                        <a href="#" class="widget-item ${currentCat === cat.slug ? 'active' : ''}" data-category="${cat.slug}">
-                            <span>${cat.icon || '🍴'}</span>
-                            <span>${escapeHtml(cat.name)}</span>
-                        </a>
-                    `).join('')}
-                `;
-
-                widgetContainer.querySelectorAll('.widget-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        e.preventDefault();
-                        currentCategory = item.dataset.category;
-                        // Update chips
-                        chipsContainer.querySelectorAll('.gastro-category-chip').forEach(c => {
-                            c.classList.toggle('active', c.dataset.category === currentCategory);
-                        });
-                        // Update widget
-                        widgetContainer.querySelectorAll('.widget-item').forEach(w => {
-                            w.classList.toggle('active', w.dataset.category === currentCategory);
-                        });
-                        loadGastronomy(1);
-                    });
-                });
-            }
-
-            // Populate zone filter
-            await App.loadZones('zone-filter');
-        }
-    } catch (e) {
-        console.error('Error loading categories:', e);
+function updateWidgetActive() {
+    const widgetContainer = document.getElementById('categories-widget');
+    if (widgetContainer) {
+        widgetContainer.querySelectorAll('.widget-item').forEach(w => {
+            w.classList.toggle('active', w.dataset.type === currentType);
+        });
     }
 }
 
@@ -251,7 +248,7 @@ async function loadGastronomy(page = 1) {
             page,
             limit: 12,
             search,
-            category: currentCategory,
+            specialties: currentType,
             zone
         });
 
@@ -289,7 +286,7 @@ async function loadGastronomy(page = 1) {
     // Update URL params
     Utils.updateUrl({
         page: page > 1 ? page : null,
-        category: currentCategory || null,
+        type: currentType || null,
         zone: zone || null,
         search: search || null
     });
@@ -357,14 +354,36 @@ function updateUserWidget() {
 // Debounced search
 const debouncedSearch = Utils.debounce(() => loadGastronomy(1), 500);
 
+// Load zones for filter
+async function loadZones() {
+    try {
+        const response = await api.getZones();
+        const zoneFilter = document.getElementById('zone-filter');
+        if (response.success && zoneFilter) {
+            const zones = response.data || [];
+            zones.forEach(zone => {
+                const option = document.createElement('option');
+                option.value = zone.id;
+                option.textContent = zone.name;
+                zoneFilter.appendChild(option);
+            });
+        }
+    } catch (e) {
+        console.error('Error loading zones:', e);
+    }
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
-    // Load categories and chips
-    await loadCategoryChips();
+    // Render type chips (predefined, no API call needed)
+    renderTypeChips();
+
+    // Load zones for filter
+    await loadZones();
 
     // Read URL params
     const params = Utils.getUrlParams();
-    if (params.category) currentCategory = params.category;
+    if (params.type) currentType = params.type;
     if (params.zone) document.getElementById('zone-filter').value = params.zone;
     if (params.search) document.getElementById('search-input').value = params.search;
 
