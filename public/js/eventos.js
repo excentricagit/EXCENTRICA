@@ -138,7 +138,9 @@ async function subscribeToEvent(eventId, e) {
             if (data.is_free) {
                 Components.toast('Inscripcion confirmada! Tu codigo: ' + data.registration_code, 'success', 5000);
             } else {
-                Components.toast('Inscripcion registrada. Contacta al organizador para confirmar el pago.', 'info', 5000);
+                Components.toast('Inscripcion registrada. Abriendo detalles...', 'info', 3000);
+                // Para eventos pagos, abrir el modal para mostrar el boton de WhatsApp
+                setTimeout(() => openEventModal(eventId), 500);
             }
 
             if (featuredEvent && featuredEvent.id === eventId) {
