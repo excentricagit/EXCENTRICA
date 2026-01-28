@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Videos - Video Editor Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/videoeditor/videoeditor.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">VIDEO EDITOR</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/videoeditor/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/videoeditor/mis-videos.html" class="admin-nav-item active">
+                    <span class="icon">🎬</span> Mis Videos
+                </a>
+                <a href="/videoeditor/mis-playlists.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Mis Playlists
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>🎬 Mis Videos</h1>
+                <div class="admin-user">
+                    <span id="user-name">Video Editor</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Actions bar -->
+                <div class="card mb-4">
+                    <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                            <select id="filter-status" class="form-group" style="margin: 0; width: auto; padding: 0.5rem 1rem;">
+                                <option value="">Todos los estados</option>
+                                <option value="pending">Pendientes</option>
+                                <option value="approved">Aprobados</option>
+                                <option value="rejected">Rechazados</option>
+                            </select>
+                            <input type="text" id="filter-search" placeholder="Buscar por titulo..." style="padding: 0.5rem 1rem; width: 250px;">
+                        </div>
+                        <button class="btn btn-success" onclick="openVideoModal()">
+                            ➕ Subir Video
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Videos list -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="videos-container">
+                            <div class="text-center p-4"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Video Modal -->
+    <div class="modal-overlay" id="video-modal">
+        <div class="modal modal-wide">
+            <form id="video-form" onsubmit="saveVideo(event)">
+                <div class="modal-header">
+                    <h3 id="modal-title">Subir Video</h3>
+                    <div class="modal-header-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="closeVideoModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="btn-save">Guardar</button>
+                        <button type="button" class="modal-close" onclick="closeVideoModal()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-columns">
+                        <!-- Columna izquierda: URL y Preview -->
+                        <div class="modal-col">
+                            <div class="form-group">
+                                <label>URL del Video (YouTube) *</label>
+                                <input type="url" id="video-url" required placeholder="https://www.youtube.com/watch?v=...">
+                                <small style="color: #64748b; font-size: 0.8rem;">Pega el enlace y se autocompletara</small>
+                            </div>
+
+                            <!-- Video Preview -->
+                            <div id="video-preview" class="video-preview-container" style="display: none;">
+                                <div class="video-preview-frame">
+                                    <iframe id="video-iframe" width="100%" height="200" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                                <div class="video-preview-info" id="video-preview-info"></div>
+                            </div>
+
+                            <!-- Loading indicator -->
+                            <div id="video-loading" style="display: none; text-align: center; padding: 2rem;">
+                                <div class="spinner"></div>
+                                <p style="color: #94a3b8; margin-top: 0.5rem;">Obteniendo datos del video...</p>
+                            </div>
+                        </div>
+
+                        <!-- Columna derecha: Datos -->
+                        <div class="modal-col">
+                            <div class="form-group">
+                                <label>Titulo *</label>
+                                <input type="text" id="video-title" required placeholder="Se autocompleta desde YouTube">
+                            </div>
+                            <div class="form-group">
+                                <label>Playlist</label>
+                                <select id="video-playlist">
+                                    <option value="">Sin playlist</option>
+                                </select>
+                                <small style="color: #64748b; font-size: 0.8rem;">Opcional - organiza tus videos en playlists</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Descripcion</label>
+                                <textarea id="video-description" placeholder="Opcional - descripcion del video" rows="5"></textarea>
+                            </div>
+                            <input type="hidden" id="video-id">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar videoeditor
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'videoeditor')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Video Editor';
+
+        let allVideos = [];
+        let playlists = [];
+        let pendingPlaylistMap = {}; // video_id -> playlist_id para videos pendientes
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                'approved': { class: 'success', label: 'Aprobado' },
+                'pending': { class: 'warning', label: 'Pendiente' },
+                'rejected': { class: 'danger', label: 'Rechazado' }
+            };
+            const s = statusMap[status] || { class: 'secondary', label: status };
+            return `<span class="badge badge-${s.class}">${s.label}</span>`;
+        }
+
+        function getYouTubeVideoId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        }
+
+        function getYouTubeThumbnail(url) {
+            const videoId = getYouTubeVideoId(url);
+            return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
+        }
+
+        // Autocompletar datos desde YouTube
+        let fetchTimeout = null;
+        async function fetchYouTubeData(url) {
+            const videoId = getYouTubeVideoId(url);
+            if (!videoId) {
+                document.getElementById('video-preview').style.display = 'none';
+                document.getElementById('video-loading').style.display = 'none';
+                return;
+            }
+
+            // Mostrar loading
+            document.getElementById('video-loading').style.display = 'block';
+            document.getElementById('video-preview').style.display = 'none';
+
+            try {
+                // Usar oEmbed API para obtener metadatos
+                const apiUrl = `${CONFIG.API_URL}/api/youtube/metadata?url=${encodeURIComponent(url)}`;
+                const fetchResponse = await fetch(apiUrl);
+                const response = await fetchResponse.json();
+
+                if (response.success && response.data) {
+                    const data = response.data;
+
+                    // Autocompletar campos si estan vacios
+                    const titleInput = document.getElementById('video-title');
+                    const descInput = document.getElementById('video-description');
+
+                    if (!titleInput.value && data.title) {
+                        titleInput.value = data.title;
+                    }
+
+                    if (!descInput.value && data.description) {
+                        descInput.value = data.description;
+                    }
+
+                    // Mostrar preview
+                    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                    document.getElementById('video-iframe').src = embedUrl;
+                    document.getElementById('video-preview-info').innerHTML = `
+                        <strong>Canal:</strong> ${data.channel || 'Desconocido'}
+                    `;
+                    document.getElementById('video-preview').style.display = 'block';
+                } else {
+                    throw new Error('No se pudieron obtener los datos');
+                }
+
+            } catch (e) {
+                console.error('Error fetching YouTube data:', e);
+                // Aun asi mostrar el preview si tenemos el videoId
+                const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+                document.getElementById('video-iframe').src = embedUrl;
+                document.getElementById('video-preview-info').innerHTML = '';
+                document.getElementById('video-preview').style.display = 'block';
+            } finally {
+                document.getElementById('video-loading').style.display = 'none';
+            }
+        }
+
+        // Debounce para el input de URL
+        function onVideoUrlChange(e) {
+            clearTimeout(fetchTimeout);
+            fetchTimeout = setTimeout(() => {
+                fetchYouTubeData(e.target.value);
+            }, 500);
+        }
+
+        async function loadPlaylists() {
+            try {
+                const response = await api.getVideoEditorPlaylists();
+                if (response.success) {
+                    playlists = response.data?.playlists || [];
+                    const select = document.getElementById('video-playlist');
+                    select.innerHTML = '<option value="">Sin playlist</option>' +
+                        playlists.map(p => `<option value="${p.id}">${escapeHtml(p.name)} (${p.video_count || 0} videos)</option>`).join('');
+                }
+            } catch (e) {
+                console.error('Error loading playlists:', e);
+            }
+        }
+
+        async function loadVideos() {
+            try {
+                const response = await api.getVideoEditorVideos({ limit: 100 });
+
+                if (response.success) {
+                    allVideos = response.data?.videos || [];
+                    applyFilters();
+                }
+            } catch (e) {
+                console.error('Error loading videos:', e);
+                Components.toast('Error cargando videos', 'error');
+            }
+        }
+
+        function applyFilters() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const searchFilter = document.getElementById('filter-search').value.toLowerCase();
+
+            let filtered = allVideos.filter(video => {
+                const matchStatus = !statusFilter || video.status === statusFilter;
+                const matchSearch = !searchFilter || video.title.toLowerCase().includes(searchFilter);
+                return matchStatus && matchSearch;
+            });
+
+            renderVideos(filtered);
+        }
+
+        function renderVideos(videos) {
+            const container = document.getElementById('videos-container');
+
+            if (videos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">🎬</div>
+                        <p>No se encontraron videos</p>
+                        <button class="btn btn-primary" onclick="openVideoModal()">Subir video</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = videos.map(video => `
+                <div class="video-card">
+                    <div class="video-thumbnail">
+                        <img src="${video.thumbnail_url || getYouTubeThumbnail(video.video_url) || ''}"
+                             alt="${escapeHtml(video.title)}"
+                             onerror="this.style.display='none'">
+                    </div>
+                    <div class="video-info">
+                        <div class="video-title">${escapeHtml(video.title)}</div>
+                        <div class="video-meta">
+                            ${getStatusBadge(video.status)}
+                            <span>👁️ ${(video.view_count || 0).toLocaleString()} vistas</span>
+                            <span>❤️ ${(video.like_count || 0).toLocaleString()} likes</span>
+                            <span>📅 ${formatDate(video.created_at)}</span>
+                        </div>
+                    </div>
+                    <div class="video-actions">
+                        <button onclick="editVideo(${video.id})" title="Editar">✏️</button>
+                        <button onclick="previewVideo('${escapeHtml(video.video_url)}')" title="Ver">▶️</button>
+                        ${video.status !== 'approved' ? `<button class="delete" onclick="deleteVideo(${video.id})" title="Eliminar">🗑️</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openVideoModal(video = null) {
+            document.getElementById('modal-title').textContent = video ? 'Editar Video' : 'Subir Video';
+            document.getElementById('video-id').value = video?.id || '';
+            document.getElementById('video-title').value = video?.title || '';
+            document.getElementById('video-url').value = video?.video_url || '';
+            document.getElementById('video-description').value = video?.description || '';
+            document.getElementById('video-playlist').value = video?.playlist_id || '';
+
+            // Reset preview
+            document.getElementById('video-preview').style.display = 'none';
+            document.getElementById('video-loading').style.display = 'none';
+            document.getElementById('video-iframe').src = '';
+
+            // Si es edicion y tiene URL, mostrar preview
+            if (video?.video_url) {
+                fetchYouTubeData(video.video_url);
+            }
+
+            document.getElementById('video-modal').classList.add('active');
+        }
+
+        function closeVideoModal() {
+            document.getElementById('video-modal').classList.remove('active');
+            document.getElementById('video-form').reset();
+            document.getElementById('video-iframe').src = '';
+            document.getElementById('video-preview').style.display = 'none';
+        }
+
+        async function editVideo(id) {
+            const video = allVideos.find(v => v.id === id);
+            if (video) {
+                openVideoModal(video);
+            }
+        }
+
+        async function saveVideo(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('video-id').value;
+            const playlistId = document.getElementById('video-playlist').value;
+            const data = {
+                title: document.getElementById('video-title').value,
+                video_url: document.getElementById('video-url').value,
+                description: document.getElementById('video-description').value,
+                playlist_id: playlistId || null
+            };
+
+            try {
+                document.getElementById('btn-save').disabled = true;
+                document.getElementById('btn-save').textContent = 'Guardando...';
+
+                let response;
+
+                if (id) {
+                    // Editar video existente
+                    response = await api.updateVideoEditorVideo(id, data);
+
+                    if (response.success) {
+                        // Manejar cambio de playlist
+                        const video = allVideos.find(v => v.id == id);
+                        const oldPlaylistId = video?.playlist_id;
+
+                        if (oldPlaylistId && oldPlaylistId != playlistId) {
+                            // Quitar de playlist anterior
+                            try {
+                                await api.removeVideoFromPlaylist(oldPlaylistId, parseInt(id));
+                            } catch (err) { console.error('Error removing from old playlist:', err); }
+                        }
+
+                        if (playlistId && playlistId != oldPlaylistId) {
+                            // Agregar a nueva playlist
+                            try {
+                                await api.addVideoToPlaylist(playlistId, parseInt(id));
+                            } catch (err) { console.error('Error adding to playlist:', err); }
+                        }
+
+                        Components.toast('Video actualizado', 'success');
+                    }
+                } else {
+                    // Crear video nuevo (se aprueba automaticamente y se agrega a playlist en backend)
+                    response = await api.createVideoEditorVideo(data);
+
+                    if (response.success) {
+                        Components.toast('Video publicado', 'success');
+                    }
+                }
+
+                if (response.success) {
+                    closeVideoModal();
+                    loadVideos();
+                    loadPlaylists();
+                } else {
+                    throw new Error(response.message || 'Error guardando video');
+                }
+            } catch (e) {
+                console.error('Error saving video:', e);
+                Components.toast(e.message || 'Error guardando video', 'error');
+            } finally {
+                document.getElementById('btn-save').disabled = false;
+                document.getElementById('btn-save').textContent = 'Guardar';
+            }
+        }
+
+        async function deleteVideo(id) {
+            if (!confirm('¿Estas seguro de eliminar este video?')) return;
+
+            try {
+                const response = await api.deleteVideoEditorVideo(id);
+                if (response.success) {
+                    Components.toast('Video eliminado', 'success');
+                    loadVideos();
+                } else {
+                    throw new Error(response.message || 'Error eliminando video');
+                }
+            } catch (e) {
+                console.error('Error deleting video:', e);
+                Components.toast(e.message || 'Error eliminando video', 'error');
+            }
+        }
+
+        function previewVideo(url) {
+            window.open(url, '_blank');
+        }
+
+        // Event listeners
+        document.getElementById('filter-status').addEventListener('change', applyFilters);
+        document.getElementById('filter-search').addEventListener('input', applyFilters);
+        document.getElementById('video-url').addEventListener('input', onVideoUrlChange);
+        document.getElementById('video-url').addEventListener('paste', (e) => {
+            setTimeout(() => fetchYouTubeData(e.target.value), 100);
+        });
+
+        // Check for #nuevo hash to auto-open modal
+        if (window.location.hash === '#nuevo') {
+            setTimeout(() => openVideoModal(), 500);
+        }
+
+        // Check for status parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusParam = urlParams.get('status');
+        if (statusParam) {
+            document.getElementById('filter-status').value = statusParam;
+        }
+
+        // Initial load
+        loadPlaylists();
+        loadVideos();
+    </script>
+</body>
+</html>

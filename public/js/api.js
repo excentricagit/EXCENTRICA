@@ -267,6 +267,56 @@ class ApiService {
         return this.delete(`/api/publicista/ads/${id}`);
     }
 
+    // ========== VIDEOEDITOR ==========
+    async getVideoEditorVideos(params = {}) {
+        return this.get('/api/videoeditor/videos', params);
+    }
+
+    async getVideoEditorStats() {
+        return this.get('/api/videoeditor/videos/stats');
+    }
+
+    async createVideoEditorVideo(data) {
+        return this.post('/api/videoeditor/videos', data);
+    }
+
+    async updateVideoEditorVideo(id, data) {
+        return this.put(`/api/videoeditor/videos/${id}`, data);
+    }
+
+    async deleteVideoEditorVideo(id) {
+        return this.delete(`/api/videoeditor/videos/${id}`);
+    }
+
+    // ========== VIDEOEDITOR PLAYLISTS ==========
+    async getVideoEditorPlaylists() {
+        return this.get('/api/videoeditor/playlists');
+    }
+
+    async createVideoEditorPlaylist(data) {
+        return this.post('/api/videoeditor/playlists', data);
+    }
+
+    async updateVideoEditorPlaylist(id, data) {
+        return this.put(`/api/videoeditor/playlists/${id}`, data);
+    }
+
+    async deleteVideoEditorPlaylist(id) {
+        return this.delete(`/api/videoeditor/playlists/${id}`);
+    }
+
+    async addVideoToPlaylist(playlistId, videoId) {
+        return this.post(`/api/videoeditor/playlists/${playlistId}/videos`, { video_id: videoId });
+    }
+
+    async removeVideoFromPlaylist(playlistId, videoId) {
+        return this.delete(`/api/videoeditor/playlists/${playlistId}/videos/${videoId}`);
+    }
+
+    async reorderPlaylistVideos(playlistId, videoIds) {
+        return this.put(`/api/videoeditor/playlists/${playlistId}/reorder`, { video_ids: videoIds });
+    }
+
     // ========== ADMIN ==========
     async getAdminStats() {
         return this.get('/api/admin/stats');

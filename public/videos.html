@@ -220,11 +220,9 @@
                     panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
                 } else if (user.role === 'publicista') {
                     panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+                } else if (user.role === 'videoeditor') {
+                    panelButtons += `<a href="/videoeditor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;">Panel Videos</a>`;
                 }
-                // TODO: Agregar rol de editor de videos cuando se implemente
-                // else if (user.role === 'videoeditor') {
-                //     panelButtons += `<a href="/videos-panel/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;">Panel Videos</a>`;
-                // }
 
                 userWidget.innerHTML = `
                     <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>

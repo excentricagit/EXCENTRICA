@@ -196,6 +196,8 @@
                     panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
                 } else if (user.role === 'publicista') {
                     panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+                } else if (user.role === 'videoeditor') {
+                    panelButtons += `<a href="/videoeditor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;">Panel Videos</a>`;
                 }
 
                 userWidget.innerHTML = `

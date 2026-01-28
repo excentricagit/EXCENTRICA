@@ -347,6 +347,9 @@ function updateUserWidget() {
         if (user.role === 'admin' || user.role === 'publicista') {
             panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
         }
+        if (user.role === 'admin' || user.role === 'videoeditor') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;" onclick="window.location.href='/videoeditor/'">Panel Videos</button>`;
+        }
 
         widget.innerHTML = `
             <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>

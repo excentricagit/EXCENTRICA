@@ -58,6 +58,13 @@ class AuthService {
         );
     }
 
+    isVideoEditor() {
+        return this.user && (
+            this.user.role === 'admin' ||
+            this.user.role === 'videoeditor'
+        );
+    }
+
     // Get panel URL for current user role
     getPanelUrl() {
         if (!this.user) return '/';
@@ -73,6 +80,8 @@ class AuthService {
                 return '/comerciante/';
             case 'publicista':
                 return '/publicista/';
+            case 'videoeditor':
+                return '/videoeditor/';
             default:
                 return '/';
         }

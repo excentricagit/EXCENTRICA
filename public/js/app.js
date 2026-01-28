@@ -64,6 +64,10 @@ const App = {
             else if (user.role === 'publicista') {
                 panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
             }
+            // VideoEditor
+            else if (user.role === 'videoeditor') {
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;" onclick="window.location.href='/videoeditor/'">Panel Videos</button>`;
+            }
 
             // Actualizar widget de usuario en sidebar (si existe - formato antiguo)
             if (widgetUser) {

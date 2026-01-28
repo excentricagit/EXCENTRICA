@@ -32,7 +32,15 @@ import {
 } from './routes/event-registrations.js';
 
 // Videos routes
-import { handleGetVideos, handleGetVideoById, handleAdminGetVideos, handleAdminCreateVideo, handleAdminUpdateVideo, handleAdminDeleteVideo } from './routes/videos.js';
+import {
+    handleGetVideos, handleGetVideoById, handleAdminGetVideos, handleAdminCreateVideo, handleAdminUpdateVideo, handleAdminDeleteVideo,
+    handleVideoEditorGetVideos, handleVideoEditorGetStats, handleVideoEditorCreateVideo, handleVideoEditorUpdateVideo, handleVideoEditorDeleteVideo,
+    handleGetYouTubeMetadata,
+    // Playlists
+    handleGetPlaylists, handleGetPlaylistById,
+    handleVideoEditorGetPlaylists, handleVideoEditorCreatePlaylist, handleVideoEditorUpdatePlaylist, handleVideoEditorDeletePlaylist,
+    handleVideoEditorAddToPlaylist, handleVideoEditorRemoveFromPlaylist, handleVideoEditorReorderPlaylist
+} from './routes/videos.js';
 
 // Likes routes
 import { handleToggleLike, handleGetLikeStatus, handleGetUserLikes } from './routes/likes.js';
@@ -280,6 +288,33 @@ const routes = [
     { method: 'POST', path: '/api/publicista/ads', handler: handlePublicistaCreateAd },
     { method: 'PUT', path: '/api/publicista/ads/:id', handler: (req, env, params) => handlePublicistaUpdateAd(req, env, params.id) },
     { method: 'DELETE', path: '/api/publicista/ads/:id', handler: (req, env, params) => handlePublicistaDeleteAd(req, env, params.id) },
+
+    // ========== VIDEOEDITOR ROUTES ==========
+
+    // VideoEditor - Videos
+    { method: 'GET', path: '/api/videoeditor/videos', handler: handleVideoEditorGetVideos },
+    { method: 'GET', path: '/api/videoeditor/videos/stats', handler: handleVideoEditorGetStats },
+    { method: 'POST', path: '/api/videoeditor/videos', handler: handleVideoEditorCreateVideo },
+    { method: 'PUT', path: '/api/videoeditor/videos/:id', handler: (req, env, params) => handleVideoEditorUpdateVideo(req, env, params.id) },
+    { method: 'DELETE', path: '/api/videoeditor/videos/:id', handler: (req, env, params) => handleVideoEditorDeleteVideo(req, env, params.id) },
+
+    // YouTube metadata (public)
+    { method: 'GET', path: '/api/youtube/metadata', handler: handleGetYouTubeMetadata },
+
+    // VideoEditor - Playlists
+    { method: 'GET', path: '/api/videoeditor/playlists', handler: handleVideoEditorGetPlaylists },
+    { method: 'POST', path: '/api/videoeditor/playlists', handler: handleVideoEditorCreatePlaylist },
+    { method: 'PUT', path: '/api/videoeditor/playlists/:id', handler: (req, env, params) => handleVideoEditorUpdatePlaylist(req, env, params.id) },
+    { method: 'DELETE', path: '/api/videoeditor/playlists/:id', handler: (req, env, params) => handleVideoEditorDeletePlaylist(req, env, params.id) },
+    { method: 'POST', path: '/api/videoeditor/playlists/:id/videos', handler: (req, env, params) => handleVideoEditorAddToPlaylist(req, env, params.id) },
+    { method: 'DELETE', path: '/api/videoeditor/playlists/:playlistId/videos/:videoId', handler: (req, env, params) => handleVideoEditorRemoveFromPlaylist(req, env, params.playlistId, params.videoId) },
+    { method: 'PUT', path: '/api/videoeditor/playlists/:id/reorder', handler: (req, env, params) => handleVideoEditorReorderPlaylist(req, env, params.id) },
+
+    // ========== VIDEO PLAYLISTS PUBLIC ==========
+
+    // Playlists (public)
+    { method: 'GET', path: '/api/playlists', handler: handleGetPlaylists },
+    { method: 'GET', path: '/api/playlists/:id', handler: (req, env, params) => handleGetPlaylistById(req, env, params.id) },
 
     // ========== CINEMA ROUTES ==========
 

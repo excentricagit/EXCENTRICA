@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Editor - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/videoeditor/videoeditor.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">VIDEO EDITOR</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/videoeditor/" class="admin-nav-item active">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/videoeditor/mis-videos.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> Mis Videos
+                </a>
+                <a href="/videoeditor/mis-playlists.html" class="admin-nav-item">
+                    <span class="icon">📁</span> Mis Playlists
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Dashboard - Video Editor</h1>
+                <div class="admin-user">
+                    <span id="user-name">Video Editor</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats cards -->
+                <div class="stats-grid" id="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎬</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-videos">-</span>
+                            <span class="stat-label">Mis Videos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-approved">-</span>
+                            <span class="stat-label">Aprobados</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-pending">-</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-views">-</span>
+                            <span class="stat-label">Vistas Totales</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="grid grid-2 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">⏳ Videos pendientes de aprobacion</h3>
+                            <p class="text-muted mb-3">Tienes <strong id="pending-videos">0</strong> videos esperando aprobacion del administrador</p>
+                            <a href="/videoeditor/mis-videos.html?status=pending" class="btn btn-primary btn-sm">Ver videos pendientes</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">➕ Subir nuevo video</h3>
+                            <p class="text-muted mb-3">Agrega un nuevo video a la plataforma</p>
+                            <a href="/videoeditor/mis-videos.html#nuevo" class="btn btn-success btn-sm">Subir video</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent videos -->
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3 class="mb-3">🕐 Videos recientes</h3>
+                        <div id="recent-videos">
+                            <div class="text-center p-3"><div class="spinner"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar videoeditor
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'videoeditor')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Video Editor';
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function getStatusBadge(status) {
+            const statusMap = {
+                'approved': { class: 'success', label: 'Aprobado' },
+                'pending': { class: 'warning', label: 'Pendiente' },
+                'rejected': { class: 'danger', label: 'Rechazado' }
+            };
+            const s = statusMap[status] || { class: 'secondary', label: status };
+            return `<span class="badge badge-${s.class}">${s.label}</span>`;
+        }
+
+        function getYouTubeThumbnail(url) {
+            if (!url) return '';
+            const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            if (videoId && videoId[1]) {
+                return `https://img.youtube.com/vi/${videoId[1]}/mqdefault.jpg`;
+            }
+            return '';
+        }
+
+        async function loadDashboard() {
+            try {
+                // Get stats
+                const statsResponse = await api.getVideoEditorStats();
+
+                if (statsResponse.success) {
+                    const stats = statsResponse.data || {};
+                    document.getElementById('stat-videos').textContent = stats.total || 0;
+                    document.getElementById('stat-approved').textContent = stats.approved || 0;
+                    document.getElementById('stat-pending').textContent = stats.pending || 0;
+                    document.getElementById('stat-views').textContent = (stats.total_views || 0).toLocaleString();
+                    document.getElementById('pending-videos').textContent = stats.pending || 0;
+                }
+
+                // Get recent videos
+                const videosResponse = await api.getVideoEditorVideos({ limit: 5 });
+
+                if (videosResponse.success) {
+                    const videos = videosResponse.data?.videos || [];
+                    const videosContainer = document.getElementById('recent-videos');
+
+                    if (videos.length > 0) {
+                        videosContainer.innerHTML = `
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>Video</th>
+                                        <th>Estado</th>
+                                        <th>Vistas</th>
+                                        <th>Fecha</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${videos.map(video => `
+                                        <tr>
+                                            <td>
+                                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                    <img src="${getYouTubeThumbnail(video.video_url) || video.thumbnail_url || ''}"
+                                                         alt=""
+                                                         style="width: 80px; height: 45px; object-fit: cover; border-radius: 6px; background: rgba(0,0,0,0.3);">
+                                                    <strong>${escapeHtml(video.title)}</strong>
+                                                </div>
+                                            </td>
+                                            <td>${getStatusBadge(video.status)}</td>
+                                            <td>${(video.view_count || 0).toLocaleString()}</td>
+                                            <td>${formatDate(video.created_at)}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        `;
+                    } else {
+                        videosContainer.innerHTML = `
+                            <div class="empty-state">
+                                <div class="icon">🎬</div>
+                                <p>No tienes videos aun. Comienza subiendo tu primer video!</p>
+                                <a href="/videoeditor/mis-videos.html#nuevo" class="btn btn-primary">Subir video</a>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (e) {
+                console.error('Error loading dashboard:', e);
+                Components.toast('Error cargando dashboard', 'error');
+            }
+        }
+
+        loadDashboard();
+    </script>
+</body>
+</html>

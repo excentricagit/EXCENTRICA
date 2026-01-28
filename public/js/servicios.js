@@ -414,6 +414,9 @@
             if (user.role === 'admin' || user.role === 'publicista') {
                 panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
             }
+            if (user.role === 'admin' || user.role === 'videoeditor') {
+                panelButtons += `<a href="/videoeditor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;">Panel Videos</a>`;
+            }
             userWidget.innerHTML = `
                 <p style="color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${Utils.escapeHtml(user.name || 'Usuario')}</p>
                 <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 0.75rem;">${Utils.escapeHtml(user.email)}</p>

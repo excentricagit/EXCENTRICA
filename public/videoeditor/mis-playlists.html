@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Playlists - Video Editor Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/videoeditor/videoeditor.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">VIDEO EDITOR</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/videoeditor/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/videoeditor/mis-videos.html" class="admin-nav-item">
+                    <span class="icon">🎬</span> Mis Videos
+                </a>
+                <a href="/videoeditor/mis-playlists.html" class="admin-nav-item active">
+                    <span class="icon">📁</span> Mis Playlists
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>📁 Mis Playlists</h1>
+                <div class="admin-user">
+                    <span id="user-name">Video Editor</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Actions bar -->
+                <div class="card mb-4">
+                    <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <p style="margin: 0; color: #94a3b8;">Organiza tus videos aprobados en playlists para que los usuarios puedan verlos agrupados.</p>
+                        <button class="btn btn-success" onclick="openPlaylistModal()">
+                            ➕ Nueva Playlist
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Playlists grid -->
+                <div id="playlists-container">
+                    <div class="text-center p-4"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Playlist Modal (Create/Edit) -->
+    <div class="modal-overlay" id="playlist-modal">
+        <div class="modal">
+            <form id="playlist-form" onsubmit="savePlaylist(event)">
+                <div class="modal-header">
+                    <h3 id="modal-title">Nueva Playlist</h3>
+                    <div class="modal-header-actions">
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="closePlaylistModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-success btn-sm" id="btn-save">Guardar</button>
+                        <button type="button" class="modal-close" onclick="closePlaylistModal()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Nombre de la Playlist *</label>
+                        <input type="text" id="playlist-name" required placeholder="Ej: Mejores videos del mes">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripcion</label>
+                        <textarea id="playlist-description" placeholder="Descripcion opcional" rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="playlist-public" checked>
+                            <span>Playlist publica (visible para todos)</span>
+                        </label>
+                    </div>
+                    <input type="hidden" id="playlist-id">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Videos Modal -->
+    <div class="modal-overlay" id="videos-modal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h3 id="videos-modal-title">Videos de la Playlist</h3>
+                <div class="modal-header-actions">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="closeVideosModal()">Cerrar</button>
+                    <button type="button" class="modal-close" onclick="closeVideosModal()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs -->
+                <div class="playlist-tabs">
+                    <button class="tab-btn active" data-tab="current" onclick="switchTab('current')">Videos en Playlist</button>
+                    <button class="tab-btn" data-tab="add" onclick="switchTab('add')">Agregar Videos</button>
+                </div>
+
+                <!-- Current videos tab -->
+                <div id="tab-current" class="tab-content active">
+                    <div id="current-videos-container">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Add videos tab -->
+                <div id="tab-add" class="tab-content" style="display: none;">
+                    <div id="available-videos-container">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar videoeditor
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'videoeditor')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Video Editor';
+
+        let allPlaylists = [];
+        let allVideos = []; // Videos aprobados del usuario
+        let currentPlaylist = null;
+        let currentPlaylistVideos = [];
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function getYouTubeVideoId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        }
+
+        function getYouTubeThumbnail(url) {
+            const videoId = getYouTubeVideoId(url);
+            return videoId ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg` : '';
+        }
+
+        async function loadPlaylists() {
+            try {
+                const response = await api.getVideoEditorPlaylists();
+                if (response.success) {
+                    allPlaylists = response.data?.playlists || [];
+                    renderPlaylists();
+                }
+            } catch (e) {
+                console.error('Error loading playlists:', e);
+                Components.toast('Error cargando playlists', 'error');
+            }
+        }
+
+        async function loadVideos() {
+            try {
+                const response = await api.getVideoEditorVideos({ limit: 200, status: 'approved' });
+                if (response.success) {
+                    allVideos = response.data?.videos || [];
+                }
+            } catch (e) {
+                console.error('Error loading videos:', e);
+            }
+        }
+
+        function renderPlaylists() {
+            const container = document.getElementById('playlists-container');
+
+            if (allPlaylists.length === 0) {
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <div class="icon">📁</div>
+                                <p>No tienes playlists aun</p>
+                                <button class="btn btn-primary" onclick="openPlaylistModal()">Crear mi primera playlist</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="playlists-grid">
+                    ${allPlaylists.map(playlist => `
+                        <div class="playlist-card">
+                            <div class="playlist-cover">
+                                ${playlist.cover_image ?
+                                    `<img src="${escapeHtml(playlist.cover_image)}" alt="">` :
+                                    `<div class="playlist-cover-placeholder">📁</div>`
+                                }
+                                <div class="playlist-video-count">${playlist.video_count || 0} videos</div>
+                            </div>
+                            <div class="playlist-info">
+                                <div class="playlist-name">${escapeHtml(playlist.name)}</div>
+                                <div class="playlist-meta">
+                                    <span>${playlist.is_public ? '🌐 Publica' : '🔒 Privada'}</span>
+                                    <span>👁️ ${(playlist.view_count || 0).toLocaleString()}</span>
+                                </div>
+                            </div>
+                            <div class="playlist-actions">
+                                <button onclick="manageVideos(${playlist.id})" class="btn btn-sm btn-primary" title="Gestionar videos">
+                                    🎬 Videos
+                                </button>
+                                <button onclick="editPlaylist(${playlist.id})" class="btn btn-sm btn-secondary" title="Editar">
+                                    ✏️
+                                </button>
+                                <button onclick="deletePlaylist(${playlist.id})" class="btn btn-sm btn-danger" title="Eliminar">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function openPlaylistModal(playlist = null) {
+            document.getElementById('modal-title').textContent = playlist ? 'Editar Playlist' : 'Nueva Playlist';
+            document.getElementById('playlist-id').value = playlist?.id || '';
+            document.getElementById('playlist-name').value = playlist?.name || '';
+            document.getElementById('playlist-description').value = playlist?.description || '';
+            document.getElementById('playlist-public').checked = playlist?.is_public !== 0;
+            document.getElementById('playlist-modal').classList.add('active');
+        }
+
+        function closePlaylistModal() {
+            document.getElementById('playlist-modal').classList.remove('active');
+            document.getElementById('playlist-form').reset();
+        }
+
+        async function editPlaylist(id) {
+            const playlist = allPlaylists.find(p => p.id === id);
+            if (playlist) {
+                openPlaylistModal(playlist);
+            }
+        }
+
+        async function savePlaylist(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('playlist-id').value;
+            const data = {
+                name: document.getElementById('playlist-name').value,
+                description: document.getElementById('playlist-description').value,
+                is_public: document.getElementById('playlist-public').checked
+            };
+
+            try {
+                document.getElementById('btn-save').disabled = true;
+                document.getElementById('btn-save').textContent = 'Guardando...';
+
+                let response;
+                if (id) {
+                    response = await api.updateVideoEditorPlaylist(id, data);
+                } else {
+                    response = await api.createVideoEditorPlaylist(data);
+                }
+
+                if (response.success) {
+                    Components.toast(id ? 'Playlist actualizada' : 'Playlist creada', 'success');
+                    closePlaylistModal();
+                    loadPlaylists();
+                } else {
+                    throw new Error(response.message || 'Error guardando playlist');
+                }
+            } catch (e) {
+                console.error('Error saving playlist:', e);
+                Components.toast(e.message || 'Error guardando playlist', 'error');
+            } finally {
+                document.getElementById('btn-save').disabled = false;
+                document.getElementById('btn-save').textContent = 'Guardar';
+            }
+        }
+
+        async function deletePlaylist(id) {
+            if (!confirm('¿Estas seguro de eliminar esta playlist? Los videos NO se eliminaran.')) return;
+
+            try {
+                const response = await api.deleteVideoEditorPlaylist(id);
+                if (response.success) {
+                    Components.toast('Playlist eliminada', 'success');
+                    loadPlaylists();
+                } else {
+                    throw new Error(response.message || 'Error eliminando playlist');
+                }
+            } catch (e) {
+                console.error('Error deleting playlist:', e);
+                Components.toast(e.message || 'Error eliminando playlist', 'error');
+            }
+        }
+
+        // ===== MANAGE VIDEOS =====
+
+        async function manageVideos(playlistId) {
+            currentPlaylist = allPlaylists.find(p => p.id === playlistId);
+            if (!currentPlaylist) return;
+
+            document.getElementById('videos-modal-title').textContent = `Videos de "${escapeHtml(currentPlaylist.name)}"`;
+            document.getElementById('videos-modal').classList.add('active');
+
+            switchTab('current');
+            await loadPlaylistVideos(playlistId);
+        }
+
+        function closeVideosModal() {
+            document.getElementById('videos-modal').classList.remove('active');
+            currentPlaylist = null;
+            currentPlaylistVideos = [];
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            document.getElementById('tab-current').style.display = tab === 'current' ? 'block' : 'none';
+            document.getElementById('tab-add').style.display = tab === 'add' ? 'block' : 'none';
+
+            if (tab === 'add') {
+                renderAvailableVideos();
+            }
+        }
+
+        async function loadPlaylistVideos(playlistId) {
+            document.getElementById('current-videos-container').innerHTML = '<div class="text-center p-4"><div class="spinner"></div></div>';
+
+            try {
+                const response = await fetch(`${CONFIG.API_URL}/api/playlists/${playlistId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    currentPlaylistVideos = data.data?.videos || [];
+                    renderCurrentVideos();
+                }
+            } catch (e) {
+                console.error('Error loading playlist videos:', e);
+                document.getElementById('current-videos-container').innerHTML = '<p class="text-center text-muted">Error cargando videos</p>';
+            }
+        }
+
+        function renderCurrentVideos() {
+            const container = document.getElementById('current-videos-container');
+
+            if (currentPlaylistVideos.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-small">
+                        <p>Esta playlist esta vacia</p>
+                        <button class="btn btn-sm btn-primary" onclick="switchTab('add')">Agregar videos</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="playlist-videos-list">
+                    ${currentPlaylistVideos.map((video, index) => `
+                        <div class="playlist-video-item" data-video-id="${video.id}">
+                            <div class="playlist-video-order">${index + 1}</div>
+                            <div class="playlist-video-thumb">
+                                <img src="${getYouTubeThumbnail(video.video_url)}" alt="">
+                            </div>
+                            <div class="playlist-video-info">
+                                <div class="playlist-video-title">${escapeHtml(video.title)}</div>
+                                <div class="playlist-video-meta">👁️ ${(video.view_count || 0).toLocaleString()}</div>
+                            </div>
+                            <div class="playlist-video-actions">
+                                ${index > 0 ? `<button onclick="moveVideo(${video.id}, 'up')" title="Subir">⬆️</button>` : ''}
+                                ${index < currentPlaylistVideos.length - 1 ? `<button onclick="moveVideo(${video.id}, 'down')" title="Bajar">⬇️</button>` : ''}
+                                <button onclick="removeFromPlaylist(${video.id})" class="delete" title="Quitar">✖️</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderAvailableVideos() {
+            const container = document.getElementById('available-videos-container');
+
+            // Filtrar videos que ya estan en la playlist
+            const playlistVideoIds = currentPlaylistVideos.map(v => v.id);
+            const available = allVideos.filter(v => !playlistVideoIds.includes(v.id));
+
+            if (available.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-small">
+                        <p>No hay videos disponibles para agregar</p>
+                        <small>Solo puedes agregar videos aprobados que no esten ya en la playlist</small>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="playlist-videos-list">
+                    ${available.map(video => `
+                        <div class="playlist-video-item available">
+                            <div class="playlist-video-thumb">
+                                <img src="${getYouTubeThumbnail(video.video_url)}" alt="">
+                            </div>
+                            <div class="playlist-video-info">
+                                <div class="playlist-video-title">${escapeHtml(video.title)}</div>
+                                <div class="playlist-video-meta">
+                                    👁️ ${(video.view_count || 0).toLocaleString()}
+                                    ${video.category_name ? ` • ${escapeHtml(video.category_name)}` : ''}
+                                </div>
+                            </div>
+                            <div class="playlist-video-actions">
+                                <button onclick="addToPlaylist(${video.id})" class="add" title="Agregar">➕</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function addToPlaylist(videoId) {
+            if (!currentPlaylist) return;
+
+            try {
+                const response = await api.addVideoToPlaylist(currentPlaylist.id, videoId);
+                if (response.success) {
+                    Components.toast('Video agregado', 'success');
+                    await loadPlaylistVideos(currentPlaylist.id);
+                    renderAvailableVideos();
+                    loadPlaylists(); // Actualizar contador
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (e) {
+                console.error('Error adding video:', e);
+                Components.toast(e.message || 'Error agregando video', 'error');
+            }
+        }
+
+        async function removeFromPlaylist(videoId) {
+            if (!currentPlaylist) return;
+
+            try {
+                const response = await api.removeVideoFromPlaylist(currentPlaylist.id, videoId);
+                if (response.success) {
+                    Components.toast('Video quitado', 'success');
+                    await loadPlaylistVideos(currentPlaylist.id);
+                    renderAvailableVideos();
+                    loadPlaylists(); // Actualizar contador
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (e) {
+                console.error('Error removing video:', e);
+                Components.toast(e.message || 'Error quitando video', 'error');
+            }
+        }
+
+        async function moveVideo(videoId, direction) {
+            if (!currentPlaylist) return;
+
+            const index = currentPlaylistVideos.findIndex(v => v.id === videoId);
+            if (index === -1) return;
+
+            const newIndex = direction === 'up' ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= currentPlaylistVideos.length) return;
+
+            // Swap
+            const videoIds = currentPlaylistVideos.map(v => v.id);
+            [videoIds[index], videoIds[newIndex]] = [videoIds[newIndex], videoIds[index]];
+
+            try {
+                const response = await api.reorderPlaylistVideos(currentPlaylist.id, videoIds);
+                if (response.success) {
+                    await loadPlaylistVideos(currentPlaylist.id);
+                } else {
+                    throw new Error(response.message);
+                }
+            } catch (e) {
+                console.error('Error reordering:', e);
+                Components.toast('Error reordenando', 'error');
+            }
+        }
+
+        // Initial load
+        loadPlaylists();
+        loadVideos();
+    </script>
+</body>
+</html>

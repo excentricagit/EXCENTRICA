@@ -3,8 +3,8 @@
 > **Base de datos:** Cloudflare D1 (SQLite)
 > **Nombre:** excentrica-db
 > **ID:** 7616d9fe-1043-4b69-9751-7026d89b8c81
-> **Versión:** 1.4.0
-> **Última actualización:** 2026-01-26
+> **Versión:** 1.6.0
+> **Última actualización:** 2026-01-28
 
 ---
 
@@ -16,6 +16,8 @@
 | `news` | Noticias y artículos |
 | `events` | Eventos y actividades |
 | `videos` | Videos (YouTube, etc) |
+| `video_playlists` | Playlists de videos |
+| `video_playlist_items` | Videos en playlists |
 | `products` | Productos del marketplace |
 | `services` | Servicios profesionales |
 | `accommodation` | Alojamientos (versión extendida) |
@@ -77,7 +79,11 @@ Usuarios del sistema (admins, editores, usuarios, y futuros roles como cines).
 
 **Roles disponibles:**
 - `admin` - Acceso total
-- `editor` - Puede crear/editar contenido
+- `editor` - Puede crear/editar contenido (noticias, eventos, productos, etc.)
+- `periodista` - Igual que editor
+- `comerciante` - Puede gestionar sus propios productos y servicios
+- `publicista` - Puede gestionar anuncios publicitarios
+- `videoeditor` - Puede subir y gestionar videos de la plataforma
 - `user` - Usuario regular
 - `cinema` - (Futuro) Dueño de cine
 
@@ -170,6 +176,40 @@ Videos (YouTube, etc).
 | like_count | INTEGER | - | 0 | Contador likes |
 | view_count | INTEGER | - | 0 | Contador vistas |
 | created_at | TEXT | - | datetime('now') | Fecha creación |
+
+### `video_playlists`
+Playlists de videos creadas por videoeditors.
+
+| Campo | Tipo | NOT NULL | Default | Descripción |
+|-------|------|----------|---------|-------------|
+| id | INTEGER | PK | - | ID único |
+| name | TEXT | ✓ | - | Nombre de la playlist |
+| slug | TEXT | ✓ | - | URL amigable (UNIQUE) |
+| description | TEXT | - | - | Descripción |
+| cover_image | TEXT | - | - | Imagen de portada |
+| author_id | INTEGER | ✓ | - | FK → users (videoeditor) |
+| is_public | INTEGER | - | 1 | Visible públicamente 0/1 |
+| video_count | INTEGER | - | 0 | Cantidad de videos (auto) |
+| view_count | INTEGER | - | 0 | Contador vistas |
+| created_at | TEXT | - | datetime('now') | Fecha creación |
+| updated_at | TEXT | - | datetime('now') | Última actualización |
+
+**Triggers:**
+- `update_playlist_count_insert` - Actualiza video_count al agregar video
+- `update_playlist_count_delete` - Actualiza video_count al eliminar video
+
+### `video_playlist_items`
+Relación entre playlists y videos.
+
+| Campo | Tipo | NOT NULL | Default | Descripción |
+|-------|------|----------|---------|-------------|
+| id | INTEGER | PK | - | ID único |
+| playlist_id | INTEGER | ✓ | - | FK → video_playlists |
+| video_id | INTEGER | ✓ | - | FK → videos |
+| position | INTEGER | - | 0 | Orden del video en playlist |
+| added_at | TEXT | - | datetime('now') | Fecha agregado |
+
+**Restricción UNIQUE:** `(playlist_id, video_id)` - Un video solo puede estar una vez en cada playlist.
 
 ---
 
@@ -681,6 +721,7 @@ users ─────┬───> news
            ├───> products
            ├───> events
            ├───> videos
+           ├───> video_playlists
            ├───> services
            ├───> accommodations
            ├───> gastronomy
@@ -689,6 +730,8 @@ users ─────┬───> news
            ├───> bus_lines
            ├───> points_of_interest
            └───> cinemas (owner_id - futuro)
+
+video_playlists ───> video_playlist_items ───> videos
 
 categories ────> news, products, events, movies, services,
                  accommodations, gastronomy, points_of_interest
