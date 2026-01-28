@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" href="/images/favicon.ico">
+    <style>
+        .detail-hero {
+            position: relative;
+            height: 350px;
+            background: var(--bg-tertiary);
+            overflow: hidden;
+        }
+        .detail-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .detail-hero-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(11, 6, 18, 0.95));
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+        .detail-content {
+            padding: var(--spacing-xl) 0;
+        }
+        .detail-title {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: var(--spacing-sm);
+        }
+        .detail-type-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: var(--text-light);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        .detail-featured {
+            display: inline-block;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #1f2937;
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+            font-weight: 700;
+            margin-left: var(--spacing-sm);
+        }
+        .detail-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+        .detail-section-title {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: var(--spacing-md);
+        }
+        .service-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            font-size: var(--font-size-sm);
+        }
+        .service-item.active {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.2), rgba(234, 88, 12, 0.2));
+            border: 1px solid rgba(249, 115, 22, 0.4);
+            color: #fb923c;
+        }
+        .service-icon {
+            font-size: var(--font-size-lg);
+        }
+        .contact-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+        }
+        .contact-btn-phone {
+            background: var(--success);
+            color: var(--text-light);
+        }
+        .contact-btn-whatsapp {
+            background: #25D366;
+            color: var(--text-light);
+        }
+        .contact-btn-web {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: var(--text-light);
+        }
+        .contact-btn-email {
+            background: var(--info);
+            color: var(--text-light);
+        }
+        .contact-btn-instagram {
+            background: linear-gradient(135deg, #E1306C, #C13584);
+            color: var(--text-light);
+        }
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        .price-display {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-size-xl);
+        }
+        .price-display .active {
+            color: #22c55e;
+        }
+        .price-display .inactive {
+            color: #3f3f46;
+        }
+        .schedule-text {
+            white-space: pre-line;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: var(--spacing-md);
+        }
+        .gallery-item {
+            aspect-ratio: 16/10;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition);
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .map-container {
+            height: 250px;
+            background: var(--bg-tertiary);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: var(--spacing-md);
+            transition: color var(--transition-fast);
+        }
+        .back-link:hover {
+            color: #fb923c;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar de Navegacion Lateral Fijo -->
+    <nav class="sidebar-nav">
+        <a href="/" class="sidebar-nav-item">
+            <span class="icon">🏠</span>
+            <span>Inicio</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Explorar</div>
+
+        <a href="/noticias.html" class="sidebar-nav-item">
+            <span class="icon">📰</span>
+            <span>Noticias</span>
+        </a>
+        <a href="/mercaderia.html" class="sidebar-nav-item">
+            <span class="icon">🛒</span>
+            <span>Mercaderia</span>
+        </a>
+        <a href="/eventos.html" class="sidebar-nav-item">
+            <span class="icon">📅</span>
+            <span>Eventos</span>
+        </a>
+        <a href="/videos.html" class="sidebar-nav-item">
+            <span class="icon">🎥</span>
+            <span>Videos</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-section-title">Servicios</div>
+
+        <a href="/gastronomia.html" class="sidebar-nav-item active">
+            <span class="icon">🍽️</span>
+            <span>Gastronomia</span>
+        </a>
+        <a href="/alojamiento.html" class="sidebar-nav-item">
+            <span class="icon">🏨</span>
+            <span>Alojamiento</span>
+        </a>
+        <a href="/transporte.html" class="sidebar-nav-item">
+            <span class="icon">🚌</span>
+            <span>Transporte</span>
+        </a>
+        <a href="/servicios.html" class="sidebar-nav-item">
+            <span class="icon">🔧</span>
+            <span>Servicios</span>
+        </a>
+        <a href="/puntos-interes.html" class="sidebar-nav-item">
+            <span class="icon">📍</span>
+            <span>Turismo</span>
+        </a>
+
+        <div class="sidebar-divider"></div>
+
+        <a href="/cine.html" class="sidebar-nav-item">
+            <span class="icon">🎬</span>
+            <span>Cine</span>
+        </a>
+        <a href="/contacto.html" class="sidebar-nav-item">
+            <span class="icon">📞</span>
+            <span>Contacto</span>
+        </a>
+    </nav>
+
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <img src="/assets/logo.png" alt="Logo" style="height: 28px; width: auto;"> Excentrica
+            </a>
+            <div class="header-search">
+                <input type="search" placeholder="Buscar en Excentrica..." />
+            </div>
+            <div class="user-menu"></div>
+            <button class="menu-toggle"><span></span><span></span><span></span></button>
+        </div>
+    </header>
+
+    <main class="main" style="padding-top: 0;">
+        <!-- Hero -->
+        <div id="detail-hero" class="detail-hero">
+            <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
+        </div>
+
+        <div class="container detail-content">
+            <a href="/gastronomia.html" class="back-link">← Volver a Gastronomia</a>
+
+            <div class="row">
+                <!-- Main Content -->
+                <div class="col-lg-8">
+                    <!-- Description -->
+                    <div id="description-section" class="detail-section" style="display: none;">
+                        <h2 class="detail-section-title">📝 Descripcion</h2>
+                        <p id="description-text" class="text-secondary"></p>
+                    </div>
+
+                    <!-- Services -->
+                    <div class="detail-section">
+                        <h2 class="detail-section-title">✨ Servicios</h2>
+                        <div id="services-grid" class="services-grid"></div>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div id="schedule-section" class="detail-section" style="display: none;">
+                        <h2 class="detail-section-title">🕐 Horarios</h2>
+                        <p id="schedule-text" class="schedule-text"></p>
+                    </div>
+
+                    <!-- Gallery -->
+                    <div id="gallery-section" class="detail-section" style="display: none;">
+                        <h2 class="detail-section-title">📷 Galeria</h2>
+                        <div id="gallery-grid" class="gallery-grid"></div>
+                    </div>
+
+                    <!-- Location -->
+                    <div id="location-section" class="detail-section" style="display: none;">
+                        <h2 class="detail-section-title">📍 Ubicacion</h2>
+                        <p id="address-text" class="text-secondary mb-3"></p>
+                        <div id="map-container" class="map-container">
+                            <span>Mapa no disponible</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Price Range -->
+                    <div id="price-section" class="detail-section" style="display: none;">
+                        <h2 class="detail-section-title">💰 Rango de Precios</h2>
+                        <div id="price-display" class="price-display"></div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="detail-section">
+                        <h2 class="detail-section-title">📞 Contacto</h2>
+                        <div id="contact-buttons" class="contact-buttons"></div>
+                    </div>
+
+                    <!-- Zone -->
+                    <div id="zone-section" class="detail-section" style="display: none;">
+                        <h2 class="detail-section-title">🗺️ Zona</h2>
+                        <p id="zone-name" class="text-primary fw-bold"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Excentrica - Contenidos y Comunicacion. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+    <script>
+        const GASTRO_TYPES = {
+            'parrilla': '🔥 Parrilla',
+            'restaurante': '🍽️ Restaurante',
+            'bar': '🍺 Bar',
+            'cafeteria': '☕ Cafeteria',
+            'pizzeria': '🍕 Pizzeria',
+            'pastas': '🍝 Pastas',
+            'comida-rapida': '🍔 Comida Rapida',
+            'sushi': '🍣 Sushi / Oriental',
+            'heladeria': '🍦 Heladeria',
+            'panaderia': '🥐 Panaderia',
+            'comida-mexicana': '🌮 Mexicana',
+            'rotiseria': '🍗 Rotiseria',
+            'empanadas': '🥟 Empanadas',
+            'food-truck': '🚚 Food Truck'
+        };
+
+        function getTypeLabel(type) {
+            return GASTRO_TYPES[type] || type || 'Restaurante';
+        }
+
+        async function loadRestaurant() {
+            const params = Utils.getUrlParams();
+            const id = params.id;
+
+            if (!id) {
+                window.location.href = '/gastronomia.html';
+                return;
+            }
+
+            try {
+                const response = await api.getGastronomyById(id);
+
+                if (!response.success || !response.data) {
+                    document.getElementById('detail-hero').innerHTML = `
+                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; color: #ef4444;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">🍽️</div>
+                            <h2>Restaurante no encontrado</h2>
+                            <a href="/gastronomia.html" style="color: #fb923c; margin-top: 1rem;">Volver a Gastronomia</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const r = response.data;
+                document.title = `${r.name} - Excentrica`;
+
+                // Hero
+                const heroHtml = `
+                    <img src="${r.image_url || '/images/placeholder.svg'}" alt="${Utils.escapeHtml(r.name)}"
+                         onerror="this.src='/images/placeholder.svg'">
+                    <div class="detail-hero-overlay">
+                        <div class="container">
+                            ${r.specialties ? `<span class="detail-type-badge">${getTypeLabel(r.specialties)}</span>` : ''}
+                            ${r.featured ? '<span class="detail-featured">⭐ Destacado</span>' : ''}
+                            <h1 class="detail-title">${Utils.escapeHtml(r.name)}</h1>
+                            ${r.zone_name ? `<p class="text-light opacity-75">📍 ${Utils.escapeHtml(r.zone_name)}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('detail-hero').innerHTML = heroHtml;
+
+                // Description
+                if (r.description) {
+                    document.getElementById('description-section').style.display = 'block';
+                    document.getElementById('description-text').textContent = r.description;
+                }
+
+                // Services
+                const services = [
+                    { key: 'has_delivery', icon: '🛵', label: 'Delivery' },
+                    { key: 'has_takeaway', icon: '🥡', label: 'Take Away' },
+                ];
+                const servicesHtml = services.map(s => `
+                    <div class="service-item ${r[s.key] ? 'active' : ''}">
+                        <span class="service-icon">${s.icon}</span>
+                        <span>${s.label}</span>
+                    </div>
+                `).join('');
+                document.getElementById('services-grid').innerHTML = servicesHtml;
+
+                // Schedule
+                if (r.schedule) {
+                    document.getElementById('schedule-section').style.display = 'block';
+                    document.getElementById('schedule-text').textContent = r.schedule;
+                }
+
+                // Gallery
+                if (r.images) {
+                    try {
+                        const images = JSON.parse(r.images);
+                        if (images && images.length > 0) {
+                            document.getElementById('gallery-section').style.display = 'block';
+                            const galleryHtml = images.map(img => `
+                                <div class="gallery-item">
+                                    <img src="${img}" alt="Galeria" onerror="this.src='/images/placeholder.svg'">
+                                </div>
+                            `).join('');
+                            document.getElementById('gallery-grid').innerHTML = galleryHtml;
+                        }
+                    } catch (e) {}
+                }
+
+                // Location
+                if (r.address) {
+                    document.getElementById('location-section').style.display = 'block';
+                    document.getElementById('address-text').textContent = r.address;
+                }
+
+                // Price Range
+                if (r.price_range) {
+                    document.getElementById('price-section').style.display = 'block';
+                    const priceLevel = r.price_range.length;
+                    let priceHtml = '';
+                    for (let i = 0; i < 4; i++) {
+                        priceHtml += `<span class="${i < priceLevel ? 'active' : 'inactive'}">$</span>`;
+                    }
+                    document.getElementById('price-display').innerHTML = priceHtml;
+                }
+
+                // Contact buttons
+                let contactHtml = '';
+                if (r.website) {
+                    contactHtml += `<a href="${r.website}" target="_blank" rel="noopener noreferrer" class="contact-btn contact-btn-web">🌐 Visitar Sitio Web</a>`;
+                }
+                if (r.phone) {
+                    const phoneClean = r.phone.replace(/\D/g, '');
+                    contactHtml += `<a href="https://wa.me/54${phoneClean}" target="_blank" rel="noopener noreferrer" class="contact-btn contact-btn-whatsapp">💬 WhatsApp</a>`;
+                    contactHtml += `<a href="tel:${r.phone}" class="contact-btn contact-btn-phone">📞 Llamar</a>`;
+                }
+                if (r.email) {
+                    contactHtml += `<a href="mailto:${r.email}" class="contact-btn contact-btn-email">✉️ Email</a>`;
+                }
+                if (r.instagram) {
+                    const igHandle = r.instagram.replace('@', '');
+                    contactHtml += `<a href="https://instagram.com/${igHandle}" target="_blank" rel="noopener noreferrer" class="contact-btn contact-btn-instagram">📷 Instagram</a>`;
+                }
+                if (!contactHtml) {
+                    contactHtml = '<p class="text-muted">No hay informacion de contacto disponible</p>';
+                }
+                document.getElementById('contact-buttons').innerHTML = contactHtml;
+
+                // Zone
+                if (r.zone_name) {
+                    document.getElementById('zone-section').style.display = 'block';
+                    document.getElementById('zone-name').textContent = r.zone_name;
+                }
+
+            } catch (e) {
+                console.error('Error:', e);
+                document.getElementById('detail-hero').innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; color: #ef4444;">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+                        <h2>Error cargando restaurante</h2>
+                        <p class="text-muted">Por favor, intenta de nuevo mas tarde</p>
+                    </div>
+                `;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadRestaurant);
+    </script>
+</body>
+</html>

@@ -24,21 +24,26 @@
                     <h2 class="section-title"><span>🛒</span> Mercaderia</h2>
                 </div>
 
-                <!-- Filtros inline -->
+                <!-- Chips de categorias -->
+                <div id="category-chips" class="category-chips"></div>
+
+                <!-- Filtros secundarios -->
                 <div class="filter-bar">
-                    <select id="category-filter">
-                        <option value="">Categoria</option>
-                    </select>
                     <select id="zone-filter">
-                        <option value="">Zona</option>
+                        <option value="">Todas las zonas</option>
                     </select>
                     <select id="condition-filter">
-                        <option value="">Condicion</option>
+                        <option value="">Cualquier condicion</option>
                         <option value="nuevo">Nuevo</option>
                         <option value="usado">Usado</option>
                     </select>
                     <span class="filter-results" id="results-count"></span>
                 </div>
+
+                <!-- Hidden select para compatibilidad -->
+                <select id="category-filter" style="display:none;">
+                    <option value="">Categoria</option>
+                </select>
 
                 <!-- Grid de productos -->
                 <div id="products-grid" class="products-grid">

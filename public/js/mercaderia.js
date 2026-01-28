@@ -5,6 +5,7 @@
 // Estado global
 let currentPage = 1;
 let categories = [];
+let currentCategory = '';
 let currentProduct = null;
 let currentImageIndex = 0;
 let productImages = [];
@@ -351,6 +352,10 @@ async function loadCategories() {
         if (response.success && response.data) {
             categories = response.data;
 
+            // Renderizar chips de categorias
+            renderCategoryChips();
+
+            // Mantener select oculto para compatibilidad
             const select = document.getElementById('category-filter');
             if (select) {
                 select.innerHTML = '<option value="">Categoria</option>';
@@ -359,9 +364,9 @@ async function loadCategories() {
                 });
             }
 
+            // Widget del sidebar
             const widget = document.getElementById('categories-widget');
             if (widget) {
-                const currentCategory = new URLSearchParams(window.location.search).get('category') || '';
                 widget.innerHTML = categories.map(cat => `
                     <a href="#" class="widget-item ${currentCategory === cat.slug ? 'active' : ''}" onclick="filterByCategory('${cat.slug}'); return false;">
                         <span>${cat.icon || '📦'}</span>
@@ -373,6 +378,45 @@ async function loadCategories() {
     } catch (e) {
         console.error('Error loading categories:', e);
     }
+}
+
+function renderCategoryChips() {
+    const chipsContainer = document.getElementById('category-chips');
+    if (!chipsContainer) return;
+
+    chipsContainer.innerHTML = `
+        <button class="category-chip ${!currentCategory ? 'active' : ''}" data-category="">
+            <span>🛒</span> Todos
+        </button>
+        ${categories.map(cat => `
+            <button class="category-chip ${currentCategory === cat.slug ? 'active' : ''}" data-category="${cat.slug}">
+                <span>${cat.icon || '📦'}</span> ${escapeHtml(cat.name)}
+            </button>
+        `).join('')}
+    `;
+
+    // Event listeners para chips
+    chipsContainer.querySelectorAll('.category-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            currentCategory = chip.dataset.category;
+
+            // Actualizar visual de chips
+            chipsContainer.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+
+            // Actualizar select oculto
+            const select = document.getElementById('category-filter');
+            if (select) select.value = currentCategory;
+
+            // Actualizar widget sidebar
+            document.querySelectorAll('#categories-widget .widget-item').forEach(item => {
+                const itemCat = item.getAttribute('onclick')?.match(/'([^']+)'/)?.[1] || '';
+                item.classList.toggle('active', itemCat === currentCategory);
+            });
+
+            loadProducts(1);
+        });
+    });
 }
 
 async function loadZones() {
@@ -393,8 +437,26 @@ async function loadZones() {
 }
 
 function filterByCategory(slug) {
+    currentCategory = slug;
+
+    // Actualizar select oculto
     const select = document.getElementById('category-filter');
     if (select) select.value = slug;
+
+    // Actualizar chips
+    const chipsContainer = document.getElementById('category-chips');
+    if (chipsContainer) {
+        chipsContainer.querySelectorAll('.category-chip').forEach(chip => {
+            chip.classList.toggle('active', chip.dataset.category === slug);
+        });
+    }
+
+    // Actualizar widget
+    document.querySelectorAll('#categories-widget .widget-item').forEach(item => {
+        const itemCat = item.getAttribute('onclick')?.match(/'([^']+)'/)?.[1] || '';
+        item.classList.toggle('active', itemCat === slug);
+    });
+
     loadProducts(1);
 }
 
@@ -453,9 +515,16 @@ function initMercaderia() {
 document.addEventListener('DOMContentLoaded', async () => {
     initMercaderia();
 
+    // Obtener params de URL
+    const params = typeof Utils !== 'undefined' ? Utils.getUrlParams() : {};
+
+    // Establecer categoria inicial desde URL
+    if (params.category) {
+        currentCategory = params.category;
+    }
+
     await Promise.all([loadCategories(), loadZones()]);
 
-    const params = typeof Utils !== 'undefined' ? Utils.getUrlParams() : {};
     const categoryFilter = document.getElementById('category-filter');
     const zoneFilter = document.getElementById('zone-filter');
 

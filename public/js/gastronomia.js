@@ -249,7 +249,7 @@ async function loadGastronomy(page = 1) {
             limit: 12,
             search,
             specialties: currentType,
-            zone
+            zone_id: zone
         });
 
         const items = response.data?.items || [];

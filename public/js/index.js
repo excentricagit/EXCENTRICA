@@ -20,11 +20,31 @@ const GASTRO_TYPES = [
     { slug: 'food-truck', name: 'Food Truck', icon: '🚚' }
 ];
 
+// Categorias de productos predefinidas
+const PRODUCT_CATEGORIES = [
+    { slug: 'electronica', name: 'Electronica', icon: '📱' },
+    { slug: 'hogar', name: 'Hogar', icon: '🏠' },
+    { slug: 'ropa', name: 'Ropa', icon: '👕' },
+    { slug: 'deportes', name: 'Deportes', icon: '⚽' },
+    { slug: 'vehiculos', name: 'Vehiculos', icon: '🚗' },
+    { slug: 'servicios', name: 'Servicios', icon: '🔧' },
+    { slug: 'mascotas', name: 'Mascotas', icon: '🐾' },
+    { slug: 'belleza', name: 'Belleza', icon: '💄' },
+    { slug: 'juguetes', name: 'Juguetes', icon: '🧸' },
+    { slug: 'libros', name: 'Libros', icon: '📚' }
+];
+
 let currentGastroType = '';
+let currentProductCategory = '';
 
 function getGastroTypeLabel(slug) {
     const type = GASTRO_TYPES.find(t => t.slug === slug);
     return type ? `${type.icon} ${type.name}` : slug;
+}
+
+function getProductCategoryLabel(slug) {
+    const cat = PRODUCT_CATEGORIES.find(c => c.slug === slug);
+    return cat ? `${cat.icon} ${cat.name}` : slug;
 }
 
 // Helper function to format date
@@ -147,19 +167,42 @@ function renderNewsCard(news) {
     `;
 }
 
-// Render product card
+// Render product card - Estilo mejorado
 function renderProductCard(product) {
     const imageUrl = product.image_url || product.imageUrl || '/images/placeholder.svg';
     const price = product.price ? `$${Number(product.price).toLocaleString('es-AR')}` : 'Consultar';
+    const isNew = product.created_at && isRecentNews(product.created_at);
+    const condition = product.condition === 'new' ? 'Nuevo' : product.condition === 'used' ? 'Usado' : '';
+
     return `
         <article class="product-card">
-            <img src="${imageUrl}" alt="${escapeHtml(product.title || product.name)}" class="product-card-image" onerror="this.src='/images/placeholder.svg'">
+            <div class="product-card-image-container">
+                <img src="${imageUrl}" alt="${escapeHtml(product.title || product.name)}" class="product-card-image" onerror="this.src='/images/placeholder.svg'">
+                <div class="product-card-overlay"></div>
+                ${isNew ? '<span class="product-card-badge product-card-badge-new">Nuevo</span>' : ''}
+                ${product.featured ? '<span class="product-card-badge product-card-badge-featured">Destacado</span>' : ''}
+                ${condition ? `<span class="product-card-condition">${condition}</span>` : ''}
+            </div>
             <div class="product-card-body">
+                ${product.category_name ? `<span class="product-card-category">${escapeHtml(product.category_name)}</span>` : ''}
                 <h3 class="product-card-title">
                     <a href="/producto.html?id=${product.id}">${escapeHtml(product.title || product.name)}</a>
                 </h3>
                 <div class="product-card-price">${price}</div>
-                ${product.zone_name ? `<div class="product-card-zone">📍 ${escapeHtml(product.zone_name)}</div>` : ''}
+                <div class="product-card-meta">
+                    ${product.zone_name ? `<span class="product-card-meta-item">📍 ${escapeHtml(product.zone_name)}</span>` : ''}
+                    ${product.views ? `<span class="product-card-meta-item">👁️ ${product.views}</span>` : ''}
+                </div>
+                <div class="product-card-actions">
+                    <a href="/producto.html?id=${product.id}" class="product-card-btn product-card-btn-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                        Ver detalles
+                    </a>
+                </div>
             </div>
         </article>
     `;
@@ -303,8 +346,9 @@ async function loadHomePage() {
         `;
     }
 
-    // Render gastro type chips first
+    // Render chips first
     renderGastroTypeChips();
+    renderProductCategoryChips();
 
     // Load all sections in parallel
     await Promise.all([
@@ -335,10 +379,44 @@ async function loadNews() {
     }
 }
 
+// Render product category chips
+function renderProductCategoryChips() {
+    const chipsContainer = document.getElementById('product-category-chips');
+    if (!chipsContainer) return;
+
+    chipsContainer.innerHTML = `
+        <button class="product-chip ${!currentProductCategory ? 'active' : ''}" data-category="">
+            <span>🛒</span> Todos
+        </button>
+        ${PRODUCT_CATEGORIES.slice(0, 8).map(cat => `
+            <button class="product-chip ${currentProductCategory === cat.slug ? 'active' : ''}" data-category="${cat.slug}">
+                <span>${cat.icon}</span> ${cat.name}
+            </button>
+        `).join('')}
+    `;
+
+    // Add click handlers
+    chipsContainer.querySelectorAll('.product-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            currentProductCategory = chip.dataset.category;
+            chipsContainer.querySelectorAll('.product-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            loadProducts();
+        });
+    });
+}
+
 // Load products
 async function loadProducts() {
     try {
-        const productsResponse = await api.getProducts({ limit: 8 });
+        const params = { limit: 8 };
+        if (currentProductCategory) {
+            params.category = currentProductCategory;
+        } else {
+            params.featured = 1;
+        }
+
+        const productsResponse = await api.getProducts(params);
         const productsGrid = document.getElementById('products-grid');
         const productsData = extractArray(productsResponse, 'products', 'items');
 
