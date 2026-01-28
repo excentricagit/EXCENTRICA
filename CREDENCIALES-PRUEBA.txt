@@ -3,6 +3,8 @@ npx wrangler pages deploy public --project-name=excentrica
 
 deploy del worker:
 cd c:\Users\Ezekiel\Documents\GitHub\EXCENTRICA\worker && npx wrangler deploy
+cd /c/Users/Ezekiel/Documents/GitHub/EXCENTRICA/worker && npx wrangler deploy 2>&1
+
 ═══════════════════════════════════════════════════════════════
   CREDENCIALES DE PRUEBA - EXCENTRICA
 ═══════════════════════════════════════════════════════════════

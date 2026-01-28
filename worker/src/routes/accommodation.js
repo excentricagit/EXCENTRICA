@@ -22,6 +22,7 @@ export async function handleGetAccommodations(request, env) {
         const zone = url.searchParams.get('zone');
         const search = url.searchParams.get('search');
         const featured = url.searchParams.get('featured');
+        const category = url.searchParams.get('category') || url.searchParams.get('accommodation_type');
 
         let query = `
             SELECT
@@ -41,6 +42,11 @@ export async function handleGetAccommodations(request, env) {
         if (zone) {
             query += ' AND z.slug = ?';
             params.push(zone);
+        }
+
+        if (category) {
+            query += ' AND a.accommodation_type = ?';
+            params.push(category);
         }
 
         if (search) {
@@ -148,6 +154,7 @@ export async function handleAdminGetAccommodations(request, env) {
         const status = url.searchParams.get('status');
         const zoneId = url.searchParams.get('zone_id');
         const search = url.searchParams.get('search');
+        const category = url.searchParams.get('category') || url.searchParams.get('accommodation_type');
 
         let query = `
             SELECT
@@ -167,6 +174,11 @@ export async function handleAdminGetAccommodations(request, env) {
         if (zoneId) {
             query += ' AND a.zone_id = ?';
             params.push(zoneId);
+        }
+
+        if (category) {
+            query += ' AND a.accommodation_type = ?';
+            params.push(category);
         }
 
         if (search) {
@@ -222,8 +234,9 @@ export async function handleAdminCreateAccommodation(request, env) {
                 zone_id, address, latitude, longitude,
                 phone, email, website,
                 price_per_night, amenities, star_rating,
+                accommodation_type,
                 author_id, status, featured, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
         `).bind(
             data.name.trim(),
             data.description || null,
@@ -238,6 +251,7 @@ export async function handleAdminCreateAccommodation(request, env) {
             data.price_per_night || null,
             data.amenities ? JSON.stringify(data.amenities) : null,
             data.star_rating || 0,
+            data.accommodation_type || 'hotel',
             user.id,
             data.status || 'pending',
             data.featured ? 1 : 0
@@ -288,6 +302,7 @@ export async function handleAdminUpdateAccommodation(request, env, id) {
                 price_per_night = ?,
                 amenities = ?,
                 star_rating = ?,
+                accommodation_type = ?,
                 status = COALESCE(?, status),
                 featured = ?,
                 updated_at = datetime('now')
@@ -306,6 +321,7 @@ export async function handleAdminUpdateAccommodation(request, env, id) {
             data.price_per_night !== undefined ? data.price_per_night : existing.price_per_night,
             data.amenities ? JSON.stringify(data.amenities) : existing.amenities,
             data.star_rating !== undefined ? data.star_rating : existing.star_rating,
+            data.accommodation_type !== undefined ? data.accommodation_type : existing.accommodation_type,
             data.status,
             data.featured !== undefined ? (data.featured ? 1 : 0) : existing.featured,
             id

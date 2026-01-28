@@ -22,6 +22,7 @@ export async function handleGetTransport(request, env) {
         const zone = url.searchParams.get('zone');
         const search = url.searchParams.get('search');
         const featured = url.searchParams.get('featured');
+        const transportType = url.searchParams.get('type'); // 'public' o 'private'
 
         let query = `
             SELECT
@@ -32,6 +33,11 @@ export async function handleGetTransport(request, env) {
             WHERE t.status = 'approved'
         `;
         const params = [];
+
+        if (transportType) {
+            query += ' AND t.transport_type = ?';
+            params.push(transportType);
+        }
 
         if (zoneId) {
             query += ' AND t.zone_id = ?';
@@ -44,9 +50,9 @@ export async function handleGetTransport(request, env) {
         }
 
         if (search) {
-            query += ' AND (t.name LIKE ? OR t.description LIKE ? OR t.routes LIKE ?)';
+            query += ' AND (t.name LIKE ? OR t.description LIKE ? OR t.routes LIKE ? OR t.line_number LIKE ?)';
             const searchTerm = `%${search}%`;
-            params.push(searchTerm, searchTerm, searchTerm);
+            params.push(searchTerm, searchTerm, searchTerm, searchTerm);
         }
 
         if (featured === '1' || featured === 'true') {
@@ -58,8 +64,12 @@ export async function handleGetTransport(request, env) {
         const countResult = await env.DB.prepare(countQuery).bind(...params).first();
         const total = countResult?.total || 0;
 
-        // Get results
-        query += ' ORDER BY t.featured DESC, t.created_at DESC LIMIT ? OFFSET ?';
+        // Get results - ordenar colectivos por numero de linea, privados por destacados
+        if (transportType === 'public') {
+            query += ' ORDER BY t.featured DESC, CAST(t.line_number AS INTEGER), t.name ASC LIMIT ? OFFSET ?';
+        } else {
+            query += ' ORDER BY t.featured DESC, t.created_at DESC LIMIT ? OFFSET ?';
+        }
         params.push(limit, offset);
 
         const results = await env.DB.prepare(query).bind(...params).all();
@@ -197,8 +207,9 @@ export async function handleAdminCreateTransport(request, env) {
                 zone_id, address, latitude, longitude,
                 phone, email, website,
                 schedule, routes,
+                transport_type, line_number, fare, frequency,
                 author_id, status, featured, created_at, updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))
         `).bind(
             data.name.trim(),
             data.description || null,
@@ -212,6 +223,10 @@ export async function handleAdminCreateTransport(request, env) {
             data.website || null,
             data.schedule || null,
             data.routes || null,
+            data.transport_type || 'private',
+            data.line_number || null,
+            data.fare || null,
+            data.frequency || null,
             user.id,
             data.status || 'pending',
             data.featured ? 1 : 0
@@ -261,6 +276,10 @@ export async function handleAdminUpdateTransport(request, env, id) {
                 website = ?,
                 schedule = ?,
                 routes = ?,
+                transport_type = ?,
+                line_number = ?,
+                fare = ?,
+                frequency = ?,
                 status = COALESCE(?, status),
                 featured = ?,
                 updated_at = datetime('now')
@@ -278,6 +297,10 @@ export async function handleAdminUpdateTransport(request, env, id) {
             data.website !== undefined ? data.website : existing.website,
             data.schedule !== undefined ? data.schedule : existing.schedule,
             data.routes !== undefined ? data.routes : existing.routes,
+            data.transport_type !== undefined ? data.transport_type : existing.transport_type,
+            data.line_number !== undefined ? data.line_number : existing.line_number,
+            data.fare !== undefined ? data.fare : existing.fare,
+            data.frequency !== undefined ? data.frequency : existing.frequency,
             data.status,
             data.featured !== undefined ? (data.featured ? 1 : 0) : existing.featured,
             id

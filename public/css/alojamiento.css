@@ -1,0 +1,572 @@
+/* =============================================
+   EXCENTRICA - Alojamiento Page Styles
+   Professional Design
+   ============================================= */
+
+/* Page header */
+.page-header {
+    margin-bottom: 1.5rem;
+}
+.page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+}
+.page-subtitle {
+    color: #94a3b8;
+    font-size: 1rem;
+}
+
+/* =============================================
+   FILTERS - Professional Design
+   ============================================= */
+
+/* Category chips */
+.aloja-category-chips {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.15);
+}
+.aloja-category-chip {
+    padding: 0.5rem 1rem;
+    background: rgba(30, 30, 40, 0.9);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 20px;
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.aloja-category-chip:hover {
+    border-color: rgba(14, 165, 233, 0.5);
+    color: #38bdf8;
+    background: rgba(14, 165, 233, 0.1);
+}
+.aloja-category-chip.active {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(14, 165, 233, 0.4);
+}
+.aloja-category-chip .chip-icon {
+    font-size: 1rem;
+}
+
+/* Filter bar */
+.aloja-filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.aloja-filter-bar .filter-input {
+    background: rgba(30, 30, 40, 0.95);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    padding-left: 2.5rem;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    min-width: 280px;
+    transition: all 0.2s;
+    position: relative;
+}
+.aloja-filter-bar .filter-input:focus {
+    border-color: rgba(14, 165, 233, 0.5);
+    outline: none;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.15);
+}
+.aloja-filter-bar .filter-input::placeholder {
+    color: #64748b;
+}
+.filter-input-wrapper {
+    position: relative;
+}
+.filter-input-wrapper .filter-icon {
+    position: absolute;
+    left: 0.9rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 1rem;
+}
+.aloja-filter-bar select {
+    background: rgba(30, 30, 40, 0.95);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    color: #e2e8f0;
+    font-size: 0.9rem;
+    min-width: 160px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.aloja-filter-bar select:hover,
+.aloja-filter-bar select:focus {
+    border-color: rgba(168, 85, 247, 0.5);
+    outline: none;
+}
+
+/* Results bar */
+.aloja-results-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: rgba(30, 30, 40, 0.6);
+    border-radius: 12px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+}
+.aloja-results-count {
+    color: #94a3b8;
+    font-size: 0.88rem;
+}
+.aloja-results-count strong {
+    color: #38bdf8;
+    font-weight: 600;
+}
+.aloja-view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+.aloja-view-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(168, 85, 247, 0.1);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 8px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1.1rem;
+}
+.aloja-view-btn:hover {
+    border-color: rgba(168, 85, 247, 0.4);
+    color: #e2e8f0;
+}
+.aloja-view-btn.active {
+    background: rgba(14, 165, 233, 0.2);
+    border-color: rgba(14, 165, 233, 0.4);
+    color: #38bdf8;
+}
+
+/* =============================================
+   ACCOMMODATION GRID & CARDS
+   ============================================= */
+
+.aloja-page-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+.aloja-page-grid.list-view {
+    grid-template-columns: 1fr;
+}
+.aloja-page-grid.list-view .aloja-card {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+}
+.aloja-page-grid.list-view .aloja-card-image-container {
+    height: 100%;
+}
+
+/* Card styles */
+.aloja-card {
+    background: linear-gradient(145deg, rgba(25, 20, 35, 0.98), rgba(15, 12, 25, 0.99));
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+.aloja-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0ea5e9, #06b6d4, #0ea5e9);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.aloja-card:hover {
+    border-color: rgba(14, 165, 233, 0.5);
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 0 0 50px rgba(14, 165, 233, 0.15);
+}
+.aloja-card:hover::before {
+    opacity: 1;
+}
+
+/* Card image */
+.aloja-card-image-container {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+}
+.aloja-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.aloja-card:hover .aloja-card-image {
+    transform: scale(1.08);
+}
+.aloja-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to top, rgba(15, 12, 25, 0.98), transparent);
+    pointer-events: none;
+}
+
+/* Badges */
+.aloja-card-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #fff;
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(14, 165, 233, 0.4);
+}
+.aloja-card-featured {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    box-shadow: 0 2px 10px rgba(251, 191, 36, 0.4);
+}
+
+/* Stars rating */
+.aloja-card-stars {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 0.25rem 0.6rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    color: #fbbf24;
+    display: flex;
+    gap: 0.15rem;
+    backdrop-filter: blur(5px);
+}
+
+/* Card body */
+.aloja-card-body {
+    padding: 1.25rem;
+}
+.aloja-card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    line-height: 1.35;
+}
+.aloja-card-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.aloja-card-title a:hover {
+    color: #38bdf8;
+}
+.aloja-card-description {
+    color: #9ca3af;
+    font-size: 0.88rem;
+    margin-bottom: 0.85rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Meta info */
+.aloja-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+}
+.aloja-card-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    color: #94a3b8;
+}
+.aloja-card-meta-item svg {
+    width: 14px;
+    height: 14px;
+    opacity: 0.8;
+}
+
+/* Amenities tags */
+.aloja-card-amenities {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.aloja-card-amenity {
+    background: rgba(14, 165, 233, 0.15);
+    color: #38bdf8;
+    padding: 0.3rem 0.7rem;
+    border-radius: 15px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    border: 1px solid rgba(14, 165, 233, 0.25);
+    transition: all 0.2s;
+}
+.aloja-card-amenity:hover {
+    background: rgba(14, 165, 233, 0.25);
+    border-color: rgba(14, 165, 233, 0.4);
+}
+
+/* Action buttons */
+.aloja-card-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(168, 85, 247, 0.1);
+}
+.aloja-card-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.45rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+.aloja-card-btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(14, 165, 233, 0.3);
+}
+.aloja-card-btn-primary:hover {
+    box-shadow: 0 4px 20px rgba(14, 165, 233, 0.5);
+    transform: translateY(-2px);
+}
+.aloja-card-btn-secondary {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c4b5fd;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+}
+.aloja-card-btn-secondary:hover {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.5);
+}
+.aloja-card-btn-whatsapp {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(37, 211, 102, 0.3);
+}
+.aloja-card-btn-whatsapp:hover {
+    box-shadow: 0 4px 20px rgba(37, 211, 102, 0.5);
+    transform: translateY(-2px);
+}
+.aloja-card-btn svg {
+    width: 12px;
+    height: 12px;
+}
+
+/* Price display */
+.aloja-card-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+.aloja-card-price-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #22c55e;
+}
+.aloja-card-price-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* =============================================
+   SIDEBAR WIDGETS
+   ============================================= */
+
+.widget {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95));
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+.widget-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #a855f7;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+.widget-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.widget-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+.widget-item:hover, .widget-item.active {
+    background: rgba(14, 165, 233, 0.15);
+    color: #38bdf8;
+}
+.widget-item.active {
+    font-weight: 500;
+}
+
+/* =============================================
+   PAGINATION & STATES
+   ============================================= */
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+.pagination {
+    display: flex;
+    gap: 0.5rem;
+}
+.pagination-btn {
+    padding: 0.6rem 1rem;
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 10px;
+    color: #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pagination-btn:hover:not(:disabled) {
+    background: rgba(168, 85, 247, 0.3);
+    border-color: rgba(168, 85, 247, 0.5);
+}
+.pagination-btn.active {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    border-color: transparent;
+    color: #fff;
+}
+.pagination-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #64748b;
+}
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+.empty-state-title {
+    font-size: 1.1rem;
+    color: #94a3b8;
+}
+
+/* Loading */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+
+@media (max-width: 1024px) {
+    .aloja-page-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+}
+@media (max-width: 768px) {
+    .aloja-page-grid {
+        grid-template-columns: 1fr;
+    }
+    .aloja-page-grid.list-view .aloja-card {
+        grid-template-columns: 1fr;
+    }
+    .aloja-filter-bar {
+        flex-direction: column;
+    }
+    .aloja-filter-bar .filter-input,
+    .aloja-filter-bar select {
+        width: 100%;
+        min-width: unset;
+    }
+    .aloja-card-actions {
+        flex-direction: column;
+    }
+    .aloja-category-chips {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .aloja-category-chip {
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+}

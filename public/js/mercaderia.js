@@ -348,7 +348,7 @@ async function loadProducts(page = 1) {
 
 async function loadCategories() {
     try {
-        const response = await api.getCategories('mercaderia');
+        const response = await api.getCategories('productos');
         if (response.success && response.data) {
             categories = response.data;
 

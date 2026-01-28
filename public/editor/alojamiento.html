@@ -267,6 +267,19 @@
 
                 <div class="d-flex gap-3 mb-4 flex-wrap">
                     <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
+                    <select id="filter-category" class="form-control" style="max-width: 180px;">
+                        <option value="">Todas las categorias</option>
+                        <option value="hotel">🏨 Hotel</option>
+                        <option value="apart-hotel">🏢 Apart Hotel</option>
+                        <option value="hostel">🛏️ Hostel</option>
+                        <option value="cabanas">🏡 Cabanas</option>
+                        <option value="departamento">🏠 Departamento</option>
+                        <option value="residencial">🏘️ Residencial</option>
+                        <option value="bed-breakfast">🛋️ B&B</option>
+                        <option value="motel">🅿️ Motel</option>
+                        <option value="camping">⛺ Camping</option>
+                        <option value="estancia">🌾 Estancia</option>
+                    </select>
                     <select id="filter-status" class="form-control" style="max-width: 150px;">
                         <option value="">Todos los estados</option>
                         <option value="pending">Pendiente</option>
@@ -302,6 +315,21 @@
                         <div class="form-group">
                             <label for="item-name">Nombre *</label>
                             <input type="text" id="item-name" class="form-control" required placeholder="Nombre">
+                        </div>
+                        <div class="form-group">
+                            <label for="item-type">Tipo de Alojamiento *</label>
+                            <select id="item-type" class="form-control" required>
+                                <option value="hotel">🏨 Hotel</option>
+                                <option value="apart-hotel">🏢 Apart Hotel</option>
+                                <option value="hostel">🛏️ Hostel</option>
+                                <option value="cabanas">🏡 Cabanas</option>
+                                <option value="departamento">🏠 Departamento</option>
+                                <option value="residencial">🏘️ Residencial</option>
+                                <option value="bed-breakfast">🛋️ B&B</option>
+                                <option value="motel">🅿️ Motel</option>
+                                <option value="camping">⛺ Camping</option>
+                                <option value="estancia">🌾 Estancia</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="item-description">Descripcion</label>
@@ -442,6 +470,7 @@
 
         function applyFilters() {
             const search = document.getElementById('search').value.toLowerCase();
+            const category = document.getElementById('filter-category').value;
             const status = document.getElementById('filter-status').value;
             const zoneId = document.getElementById('filter-zone').value;
 
@@ -450,9 +479,10 @@
                     i.name.toLowerCase().includes(search) ||
                     (i.description && i.description.toLowerCase().includes(search)) ||
                     (i.address && i.address.toLowerCase().includes(search));
+                const matchCategory = !category || i.accommodation_type === category;
                 const matchStatus = !status || i.status === status;
                 const matchZone = !zoneId || i.zone_id == zoneId;
-                return matchSearch && matchStatus && matchZone;
+                return matchSearch && matchCategory && matchStatus && matchZone;
             });
 
             renderGrid();
@@ -460,6 +490,7 @@
 
         function resetFilters() {
             document.getElementById('search').value = '';
+            document.getElementById('filter-category').value = '';
             document.getElementById('filter-status').value = '';
             document.getElementById('filter-zone').value = '';
             applyFilters();
@@ -489,7 +520,8 @@
                                     <span class="badge badge-${i.status}">${getStatusLabel(i.status)}</span>
                                 </div>
                                 <div class="alojamiento-card-meta">
-                                    ${i.star_rating ? `<span>${'*'.repeat(i.star_rating)}</span>` : ''}
+                                    ${i.accommodation_type ? `<span style="background: rgba(14,165,233,0.2); color: #38bdf8; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.7rem;">${getTypeLabel(i.accommodation_type)}</span>` : ''}
+                                    ${i.star_rating ? `<span>${'★'.repeat(i.star_rating)}</span>` : ''}
                                     ${i.zone_name ? `<span>[Z] ${i.zone_name}</span>` : ''}
                                     ${i.price_per_night ? `<span>$${formatNumber(i.price_per_night)}/noche</span>` : ''}
                                 </div>
@@ -512,6 +544,23 @@
             return { pending: 'Pendiente', approved: 'Aprobado', rejected: 'Rechazado' }[status] || status;
         }
 
+        const ALOJA_TYPES = {
+            'hotel': '🏨 Hotel',
+            'apart-hotel': '🏢 Apart Hotel',
+            'hostel': '🛏️ Hostel',
+            'cabanas': '🏡 Cabanas',
+            'departamento': '🏠 Depto',
+            'residencial': '🏘️ Residencial',
+            'bed-breakfast': '🛋️ B&B',
+            'motel': '🅿️ Motel',
+            'camping': '⛺ Camping',
+            'estancia': '🌾 Estancia'
+        };
+
+        function getTypeLabel(type) {
+            return ALOJA_TYPES[type] || type;
+        }
+
         function formatNumber(num) {
             return new Intl.NumberFormat('es-AR').format(num);
         }
@@ -532,6 +581,7 @@
             document.getElementById('modal-title').textContent = 'Nuevo Alojamiento';
             document.getElementById('alojamiento-form').reset();
             document.getElementById('item-id').value = '';
+            document.getElementById('item-type').value = 'hotel';
             document.getElementById('item-status').value = 'pending';
             document.getElementById('item-image-url').value = '';
             document.getElementById('image-preview').innerHTML = '<span>+</span>Click para subir imagen';
@@ -547,6 +597,7 @@
             document.getElementById('modal-title').textContent = 'Editar Alojamiento';
             document.getElementById('item-id').value = i.id;
             document.getElementById('item-name').value = i.name || '';
+            document.getElementById('item-type').value = i.accommodation_type || 'hotel';
             document.getElementById('item-description').value = i.description || '';
             document.getElementById('item-price').value = i.price_per_night || '';
             setStarRating(i.star_rating || 0);
@@ -632,6 +683,7 @@
             const id = document.getElementById('item-id').value;
             const data = {
                 name: document.getElementById('item-name').value.trim(),
+                accommodation_type: document.getElementById('item-type').value,
                 description: document.getElementById('item-description').value.trim() || null,
                 price_per_night: document.getElementById('item-price').value || null,
                 star_rating: parseInt(document.getElementById('item-star-rating').value) || 0,
@@ -706,6 +758,7 @@
         }
 
         document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('filter-category').addEventListener('change', applyFilters);
         document.getElementById('filter-status').addEventListener('change', applyFilters);
         document.getElementById('filter-zone').addEventListener('change', applyFilters);
 
