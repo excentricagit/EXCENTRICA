@@ -256,6 +256,46 @@ function renderPoiCard(poi) {
     `;
 }
 
+// Render video card - YouTube style
+function renderVideoCard(video) {
+    const videoId = getYouTubeVideoId(video.video_url);
+    const thumbnail = videoId
+        ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+        : (video.thumbnail_url || '/images/placeholder.svg');
+    const views = video.view_count || 0;
+    const likes = video.like_count || 0;
+
+    return `
+        <article class="video-card-home">
+            <a href="/video.html?id=${video.id}" class="video-card-link">
+                <div class="video-card-thumbnail">
+                    <img src="${thumbnail}" alt="${escapeHtml(video.title)}" onerror="this.src='/images/placeholder.svg'">
+                    <div class="video-card-play">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                    <div class="video-card-duration">${video.duration || ''}</div>
+                </div>
+                <div class="video-card-info">
+                    <h3 class="video-card-title">${escapeHtml(video.title)}</h3>
+                    <div class="video-card-meta">
+                        <span class="video-card-views">👁️ ${views.toLocaleString()}</span>
+                        ${likes > 0 ? `<span class="video-card-likes">❤️ ${likes.toLocaleString()}</span>` : ''}
+                    </div>
+                </div>
+            </a>
+        </article>
+    `;
+}
+
+// Helper to get YouTube video ID
+function getYouTubeVideoId(url) {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : null;
+}
+
 // Render gastronomy card - Interactive with website button
 function renderGastronomyCard(restaurant) {
     const imageUrl = restaurant.image_url || '/images/placeholder.svg';
@@ -362,6 +402,7 @@ async function loadHomePage() {
     // Load all sections in parallel
     await Promise.all([
         loadNews(),
+        loadVideos(),
         loadProducts(),
         loadEvents(),
         loadMovies(),
@@ -385,6 +426,29 @@ async function loadNews() {
     } catch (e) {
         console.error('Error loading news:', e);
         showEmpty(document.getElementById('news-feed'), 'Error cargando noticias', '❌');
+    }
+}
+
+// Load videos
+async function loadVideos() {
+    try {
+        const videosResponse = await api.getVideos({ limit: 6 });
+        const videosGrid = document.getElementById('videos-grid');
+        if (!videosGrid) return;
+
+        const videosData = extractArray(videosResponse, 'videos', 'items');
+
+        if (videosData.length > 0) {
+            videosGrid.innerHTML = videosData.map(v => renderVideoCard(v)).join('');
+        } else {
+            showEmpty(videosGrid, 'No hay videos disponibles', '🎥');
+        }
+    } catch (e) {
+        console.error('Error loading videos:', e);
+        const videosGrid = document.getElementById('videos-grid');
+        if (videosGrid) {
+            showEmpty(videosGrid, 'Error cargando videos', '❌');
+        }
     }
 }
 

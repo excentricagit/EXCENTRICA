@@ -7,6 +7,7 @@
     <meta name="description" content="Eventos y actividades en Santiago del Estero. Conciertos, teatro, deportes y mas.">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/eventos.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
 </head>
 <body>
     <!-- Sidebar de Navegacion -->
@@ -193,15 +194,9 @@
                     <div id="user-widget-content"></div>
                 </div>
 
-                <!-- Widget de contenido patrocinado -->
-                <div class="widget" id="ad-widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(124, 58, 237, 0.15)); border: 2px solid rgba(168, 85, 247, 0.5); position: relative; overflow: hidden; min-height: 320px;">
-                    <div style="position: relative; z-index: 1;">
-                        <div class="widget-title" style="color: #e9d5ff; font-size: 1rem;">
-                            <span style="font-size: 1.1rem;">⭐</span>
-                            Espacio Publicitario
-                        </div>
-                        <div id="ad-widget-content"></div>
-                    </div>
+                <!-- Widget de publicidad -->
+                <div class="widget" id="ad-widget">
+                    <div id="ad-widget-content"></div>
                 </div>
             </aside>
         </div>
@@ -273,10 +268,15 @@
     <!-- Scripts de eventos -->
     <script src="/js/eventos-core.js"></script>
     <script src="/js/eventos.js"></script>
+    <script src="/js/ads-player.js"></script>
     <script>
         // Inicializar componentes de layout
         Components.initLayout({
             headerOptions: { searchPlaceholder: 'Buscar eventos...' }
+        });
+        // Init ads player
+        document.addEventListener('DOMContentLoaded', function() {
+            initAdsPlayer('ad-widget-content', 'eventos-sidebar');
         });
     </script>
 </body>

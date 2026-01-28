@@ -6,6 +6,7 @@
     <title>Noticias - Excentrica</title>
     <meta name="description" content="Las ultimas noticias de Santiago del Estero. Informacion local, politica, deportes, cultura y mas.">
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
     <style>
         /* Featured news hero */
         .featured-news {
@@ -495,33 +496,9 @@
                     </div>
                 </div>
 
-                <!-- Widget de contenido patrocinado - DESTACADO (para videos de clientes) -->
-                <div class="widget" id="ad-widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(124, 58, 237, 0.15)); border: 2px solid rgba(168, 85, 247, 0.5); position: relative; overflow: hidden; min-height: 320px;">
-                    <!-- Efecto de brillo animado -->
-                    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%); animation: shimmer 3s infinite;"></div>
-                    <style>@keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }</style>
-
-                    <div style="position: relative; z-index: 1;">
-                        <div class="widget-title" style="color: #e9d5ff; font-size: 1rem;">
-                            <span style="font-size: 1.1rem;">⭐</span>
-                            Espacio Publicitario
-                        </div>
-
-                        <!-- Contenedor para video/contenido del cliente -->
-                        <div id="ad-content" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; text-align: center; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div style="width: 70px; height: 70px; margin-bottom: 1rem; background: linear-gradient(135deg, #a855f7, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; box-shadow: 0 0 25px rgba(168, 85, 247, 0.5);">📣</div>
-                            <p style="color: #fff; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Promociona tu Negocio</p>
-                            <p style="color: #c4b5fd; font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem;">Llega a miles de personas en Santiago del Estero</p>
-                            <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
-                                <span style="background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">✓ Alto alcance</span>
-                                <span style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 500;">✓ Videos promocionales</span>
-                            </div>
-                        </div>
-
-                        <a href="/contacto.html" class="btn btn-block" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; color: #1f2937; font-weight: 700; padding: 0.75rem; font-size: 0.95rem; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
-                            Quiero Anunciar
-                        </a>
-                    </div>
+                <!-- Widget de publicidad -->
+                <div class="widget" id="ad-widget">
+                    <div id="ad-widget-content"></div>
                 </div>
 
                 <!-- Widget de categorias -->
@@ -596,6 +573,7 @@
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
+    <script src="/js/ads-player.js"></script>
     <script>
         let currentPage = 1;
         let categories = [];
@@ -845,13 +823,14 @@
                 let panelButtons = '';
                 if (user.role === 'admin') {
                     panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;" onclick="window.location.href='/admin/'">Panel Admin</button>`;
+                }
+                if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
                     panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+                }
+                if (user.role === 'admin' || user.role === 'publicista') {
                     panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
-                } else if (user.role === 'editor' || user.role === 'periodista') {
-                    panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
-                } else if (user.role === 'publicista') {
-                    panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
-                } else if (user.role === 'videoeditor') {
+                }
+                if (user.role === 'admin' || user.role === 'videoeditor') {
                     panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;" onclick="window.location.href='/videoeditor/'">Panel Videos</button>`;
                 }
 
@@ -880,6 +859,9 @@
 
             // Update user widget
             updateUserWidget();
+
+            // Init ads player
+            initAdsPlayer('ad-widget-content', 'noticias-sidebar');
 
             // Event listeners
             document.getElementById('category-filter').addEventListener('change', () => loadNews(1));
