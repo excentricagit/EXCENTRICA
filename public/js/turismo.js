@@ -396,11 +396,21 @@
         const user = auth.getUser();
         const userWidget = document.getElementById('user-widget-content');
         if (user && userWidget) {
+            let panelButtons = '';
+            if (user.role === 'admin') {
+                panelButtons += `<a href="/admin/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;">Panel Admin</a>`;
+            }
+            if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
+                panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: transparent; border: 1px solid #10b981; color: #e2e8f0;">Panel Editor</a>`;
+            }
+            if (user.role === 'admin' || user.role === 'publicista') {
+                panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+            }
             userWidget.innerHTML = `
                 <p style="color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${Utils.escapeHtml(user.name || 'Usuario')}</p>
                 <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 0.75rem;">${Utils.escapeHtml(user.email)}</p>
                 <a href="/perfil.html" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #10b981, #059669); border: none; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); color: #fff;">Mi Perfil</a>
-                ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-block mb-2" style="background: transparent; border: 1px solid #10b981; color: #e2e8f0;">Panel de Editor</a>' : ''}
+                ${panelButtons}
                 <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
             `;
         }

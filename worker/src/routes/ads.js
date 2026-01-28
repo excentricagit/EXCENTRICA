@@ -1,12 +1,14 @@
 // Rutas de publicidad (Ads)
 
 import { success, error, notFound } from '../utils/response.js';
-import { requireAdmin } from '../middleware/auth.js';
+import { requireAdmin, requirePublicista } from '../middleware/auth.js';
 
 export async function handleGetAds(request, env) {
     try {
         const url = new URL(request.url);
         const position = url.searchParams.get('position') || '';
+
+        console.log('[handleGetAds] Requested position:', position);
 
         let query = `
             SELECT * FROM ads
@@ -24,6 +26,8 @@ export async function handleGetAds(request, env) {
         query += ' ORDER BY priority DESC, created_at DESC';
 
         const result = await env.DB.prepare(query).bind(...params).all();
+
+        console.log('[handleGetAds] Found', result.results.length, 'ads. Positions:', result.results.map(a => a.position));
 
         return success(result.results);
 
@@ -186,5 +190,188 @@ export async function handleAdminDeleteAd(request, env, id) {
 
     } catch (e) {
         return error('Error eliminando anuncio: ' + e.message, 500);
+    }
+}
+
+// PUBLICISTA ENDPOINTS
+
+export async function handlePublicistaGetAds(request, env) {
+    const { user, error: authError } = await requirePublicista(request, env);
+    if (authError) return authError;
+
+    try {
+        const url = new URL(request.url);
+        const status = url.searchParams.get('status');
+        const position = url.searchParams.get('position');
+
+        // Admin ve todos los anuncios, publicista solo los suyos
+        let query;
+        let params = [];
+
+        if (user.role === 'admin') {
+            query = 'SELECT * FROM ads WHERE 1=1';
+        } else {
+            query = 'SELECT * FROM ads WHERE author_id = ?';
+            params.push(user.id);
+        }
+
+        if (status === 'activo') {
+            query += ' AND is_active = 1';
+        } else if (status === 'inactivo') {
+            query += ' AND is_active = 0';
+        }
+
+        if (position) {
+            query += ' AND position = ?';
+            params.push(position);
+        }
+
+        query += ' ORDER BY created_at DESC';
+
+        const result = await env.DB.prepare(query).bind(...params).all();
+
+        return success(result.results);
+
+    } catch (e) {
+        return error('Error obteniendo anuncios: ' + e.message, 500);
+    }
+}
+
+export async function handlePublicistaCreateAd(request, env) {
+    const { user, error: authError } = await requirePublicista(request, env);
+    if (authError) return authError;
+
+    try {
+        const data = await request.json();
+        const { title, description, video_url, link_url, position, priority, is_active, start_date, end_date } = data;
+
+        console.log('[handlePublicistaCreateAd] Creating ad with position:', position);
+
+        if (!title || !video_url) {
+            return error('Titulo y URL del video son requeridos');
+        }
+
+        const finalPosition = position || 'sidebar';
+        console.log('[handlePublicistaCreateAd] Final position to save:', finalPosition);
+
+        const result = await env.DB.prepare(`
+            INSERT INTO ads (title, description, video_url, link_url, position, priority, author_id, is_active, start_date, end_date)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).bind(
+            title,
+            description || null,
+            video_url,
+            link_url || null,
+            finalPosition,
+            priority || 0,
+            user.id,
+            is_active ? 1 : 0,
+            start_date || null,
+            end_date || null
+        ).run();
+
+        return success({ id: result.meta.last_row_id }, 'Anuncio creado');
+
+    } catch (e) {
+        return error('Error creando anuncio: ' + e.message, 500);
+    }
+}
+
+export async function handlePublicistaUpdateAd(request, env, id) {
+    const { user, error: authError } = await requirePublicista(request, env);
+    if (authError) return authError;
+
+    try {
+        const data = await request.json();
+        const { title, description, video_url, link_url, position, priority, is_active, start_date, end_date } = data;
+
+        console.log('[handlePublicistaUpdateAd] Updating ad', id, 'with position:', position);
+
+        // Verificar que el anuncio pertenece al publicista
+        const existing = await env.DB.prepare('SELECT id, author_id FROM ads WHERE id = ?').bind(id).first();
+        if (!existing) {
+            return notFound('Anuncio no encontrado');
+        }
+
+        if (existing.author_id !== user.id && user.role !== 'admin') {
+            return error('No tienes permiso para editar este anuncio', 403);
+        }
+
+        await env.DB.prepare(`
+            UPDATE ads SET
+                title = COALESCE(?, title),
+                description = COALESCE(?, description),
+                video_url = COALESCE(?, video_url),
+                link_url = COALESCE(?, link_url),
+                position = COALESCE(?, position),
+                priority = COALESCE(?, priority),
+                is_active = COALESCE(?, is_active),
+                start_date = COALESCE(?, start_date),
+                end_date = COALESCE(?, end_date),
+                updated_at = datetime('now')
+            WHERE id = ?
+        `).bind(
+            title || null,
+            description || null,
+            video_url || null,
+            link_url || null,
+            position || null,
+            priority !== undefined ? priority : null,
+            is_active !== undefined ? (is_active ? 1 : 0) : null,
+            start_date || null,
+            end_date || null,
+            id
+        ).run();
+
+        return success(null, 'Anuncio actualizado');
+
+    } catch (e) {
+        return error('Error actualizando anuncio: ' + e.message, 500);
+    }
+}
+
+export async function handlePublicistaDeleteAd(request, env, id) {
+    const { user, error: authError } = await requirePublicista(request, env);
+    if (authError) return authError;
+
+    try {
+        // Verificar que el anuncio pertenece al publicista
+        const existing = await env.DB.prepare('SELECT id, author_id FROM ads WHERE id = ?').bind(id).first();
+        if (!existing) {
+            return notFound('Anuncio no encontrado');
+        }
+
+        if (existing.author_id !== user.id && user.role !== 'admin') {
+            return error('No tienes permiso para eliminar este anuncio', 403);
+        }
+
+        await env.DB.prepare('DELETE FROM ads WHERE id = ?').bind(id).run();
+
+        return success(null, 'Anuncio eliminado');
+
+    } catch (e) {
+        return error('Error eliminando anuncio: ' + e.message, 500);
+    }
+}
+
+export async function handlePublicistaGetAdStats(request, env) {
+    const { user, error: authError } = await requirePublicista(request, env);
+    if (authError) return authError;
+
+    try {
+        const stats = await env.DB.prepare(`
+            SELECT
+                COUNT(*) as total,
+                SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as activos,
+                SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactivos,
+                SUM(impressions) as total_impresiones,
+                SUM(clicks) as total_clicks
+            FROM ads WHERE author_id = ?
+        `).bind(user.id).first();
+
+        return success(stats);
+
+    } catch (e) {
+        return error('Error obteniendo estadisticas: ' + e.message, 500);
     }
 }

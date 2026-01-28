@@ -50,13 +50,32 @@ function renderStars(stars) {
 function renderAccommodationCard(accommodation) {
     const imageUrl = accommodation.image_url || '/images/placeholder.svg';
 
-    // Amenities
+    // Parse amenities from JSON string if needed
+    let amenitiesData = accommodation.amenities;
+    if (typeof amenitiesData === 'string') {
+        try { amenitiesData = JSON.parse(amenitiesData); } catch(e) { amenitiesData = []; }
+    }
+    amenitiesData = amenitiesData || [];
+
+    // Map amenities to display
+    const amenityMap = {
+        'wifi': { icon: '📶', label: 'WiFi' },
+        'parking': { icon: '🅿️', label: 'Parking' },
+        'pool': { icon: '🏊', label: 'Piscina' },
+        'breakfast': { icon: '🍳', label: 'Desayuno' },
+        'ac': { icon: '❄️', label: 'A/C' },
+        'tv': { icon: '📺', label: 'TV' },
+        'restaurant': { icon: '🍽️', label: 'Restaurant' },
+        'gym': { icon: '💪', label: 'Gym' },
+        'spa': { icon: '💆', label: 'Spa' }
+    };
+
     const amenities = [];
-    if (accommodation.has_wifi) amenities.push({ icon: '📶', label: 'WiFi' });
-    if (accommodation.has_parking) amenities.push({ icon: '🅿️', label: 'Parking' });
-    if (accommodation.has_pool) amenities.push({ icon: '🏊', label: 'Piscina' });
-    if (accommodation.has_breakfast) amenities.push({ icon: '🍳', label: 'Desayuno' });
-    if (accommodation.has_ac) amenities.push({ icon: '❄️', label: 'A/C' });
+    if (Array.isArray(amenitiesData)) {
+        amenitiesData.forEach(a => {
+            if (amenityMap[a]) amenities.push(amenityMap[a]);
+        });
+    }
 
     // Action buttons
     let actionButtons = '';
@@ -100,12 +119,13 @@ function renderAccommodationCard(accommodation) {
         </a>
     `;
 
-    // Price display
+    // Price display (use price_per_night from backend)
     let priceHtml = '';
-    if (accommodation.price_from) {
+    const price = accommodation.price_per_night || accommodation.price_from;
+    if (price) {
         priceHtml = `
             <div class="aloja-card-price">
-                <span class="aloja-card-price-value">$${accommodation.price_from.toLocaleString()}</span>
+                <span class="aloja-card-price-value">$${Number(price).toLocaleString()}</span>
                 <span class="aloja-card-price-label">/ noche</span>
             </div>
         `;
@@ -118,7 +138,7 @@ function renderAccommodationCard(accommodation) {
                 <div class="aloja-card-overlay"></div>
                 ${accommodation.accommodation_type ? `<span class="aloja-card-badge">${getTypeLabel(accommodation.accommodation_type)}</span>` : ''}
                 ${accommodation.featured ? '<span class="aloja-card-featured">⭐ Destacado</span>' : ''}
-                ${accommodation.stars ? `<span class="aloja-card-stars">${renderStars(accommodation.stars)}</span>` : ''}
+                ${(accommodation.star_rating || accommodation.stars) ? `<span class="aloja-card-stars">${renderStars(accommodation.star_rating || accommodation.stars)}</span>` : ''}
             </div>
             <div class="aloja-card-body">
                 <h3 class="aloja-card-title">
@@ -347,15 +367,21 @@ function updateUserWidget() {
     const widget = document.getElementById('user-widget-content');
 
     if (user && widget) {
-        let panelButton = '';
+        let panelButtons = '';
+        if (user.role === 'admin') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;" onclick="window.location.href='/admin/'">Panel Admin</button>`;
+        }
         if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
-            panelButton = `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">📝 Panel Editor</button>`;
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+        }
+        if (user.role === 'admin' || user.role === 'publicista') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
         }
 
         widget.innerHTML = `
             <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
-            <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">👤 Mi Perfil</button>
-            ${panelButton}
+            <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
+            ${panelButtons}
             <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
         `;
     }
@@ -383,8 +409,44 @@ async function loadZones() {
     }
 }
 
+// Load featured accommodations
+async function loadFeaturedAccommodations() {
+    const container = document.getElementById('featured-grid');
+    const section = document.getElementById('featured-section');
+
+    if (!container || !section) return;
+
+    console.log('loadFeaturedAccommodations: starting...');
+
+    try {
+        const response = await api.getAccommodations({
+            featured: '1',
+            limit: 8
+        });
+
+        console.log('loadFeaturedAccommodations: response', response);
+
+        const items = response.data?.items || [];
+
+        if (response.success && items.length > 0) {
+            console.log('loadFeaturedAccommodations: rendering', items.length, 'items');
+            container.innerHTML = items.map(a => renderAccommodationCard(a)).join('');
+        } else {
+            // Hide featured section if no featured items
+            console.log('loadFeaturedAccommodations: no featured items, hiding section');
+            section.style.display = 'none';
+        }
+    } catch (e) {
+        console.error('Error loading featured accommodations:', e);
+        section.style.display = 'none';
+    }
+}
+
 // Initialize page
 document.addEventListener('DOMContentLoaded', async () => {
+    // Load featured accommodations
+    loadFeaturedAccommodations();
+
     // Render category chips
     renderCategoryChips();
 

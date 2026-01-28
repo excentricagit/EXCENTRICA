@@ -7,6 +7,7 @@
     <meta name="description" content="Red social y marketplace de Santiago del Estero, Argentina. Noticias, eventos, productos y mas.">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/index.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
     <link rel="icon" href="/images/favicon.ico">
 </head>
 <body>
@@ -301,28 +302,8 @@
                 </div>
 
                 <!-- Widget de publicidad -->
-                <div class="widget widget-ad">
-                    <div class="widget-ad-shine"></div>
-                    <div class="widget-ad-content">
-                        <div class="widget-title widget-title-ad">
-                            <span>⭐</span>
-                            Espacio Publicitario
-                        </div>
-                        <div class="ad-showcase">
-                            <div class="ad-icon-container">
-                                <span class="ad-icon">📣</span>
-                            </div>
-                            <h4 class="ad-title">Promociona tu Negocio</h4>
-                            <p class="ad-description">Llega a miles de personas en Santiago del Estero</p>
-                            <div class="ad-features">
-                                <span class="ad-feature ad-feature-green">✓ Alto alcance</span>
-                                <span class="ad-feature ad-feature-blue">✓ Videos</span>
-                            </div>
-                        </div>
-                        <a href="/contacto.html" class="btn-anunciar">
-                            Quiero Anunciar
-                        </a>
-                    </div>
+                <div class="widget" id="ad-widget">
+                    <div id="ad-widget-content"></div>
                 </div>
 
                 <!-- Widget de redes sociales -->
@@ -398,5 +379,11 @@
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
     <script src="/js/index.js"></script>
+    <script src="/js/ads-player.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initAdsPlayer('ad-widget-content', 'sidebar');
+        });
+    </script>
 </body>
 </html>

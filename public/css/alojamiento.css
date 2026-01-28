@@ -3,6 +3,90 @@
    Professional Design
    ============================================= */
 
+/* =============================================
+   FEATURED SECTION - Destacados
+   ============================================= */
+
+.aloja-featured-section {
+    margin-bottom: 2rem;
+}
+
+.aloja-featured-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.aloja-featured-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+}
+
+.aloja-featured-title .icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
+.aloja-featured-subtitle {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+.aloja-featured-scroll {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(14, 165, 233, 0.4) transparent;
+}
+
+.aloja-featured-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+
+.aloja-featured-scroll::-webkit-scrollbar-track {
+    background: rgba(30, 30, 40, 0.5);
+    border-radius: 3px;
+}
+
+.aloja-featured-scroll::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+    border-radius: 3px;
+}
+
+.aloja-featured-scroll .aloja-card {
+    flex: 0 0 320px;
+    scroll-snap-align: start;
+}
+
+.aloja-featured-scroll .aloja-card:first-child {
+    margin-left: 0;
+}
+
+.aloja-featured-empty {
+    text-align: center;
+    padding: 2rem;
+    color: #64748b;
+    background: rgba(30, 30, 40, 0.5);
+    border-radius: 12px;
+    border: 1px dashed rgba(168, 85, 247, 0.2);
+}
+
+.aloja-featured-loading {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+}
+
 /* Page header */
 .page-header {
     margin-bottom: 1.5rem;

@@ -72,6 +72,31 @@ function formatSchedule(schedule) {
     return schedule;
 }
 
+function parseScheduleByDay(schedule) {
+    if (!schedule) return null;
+
+    // Buscar patron: "Dia: HH:MM - HH:MM"
+    const dayPatterns = [
+        { key: 'lun', label: 'Lun', regex: /lun[a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i },
+        { key: 'mar', label: 'Mar', regex: /mar[a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i },
+        { key: 'mie', label: 'Mie', regex: /mi[eé][a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i },
+        { key: 'jue', label: 'Jue', regex: /jue[a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i },
+        { key: 'vie', label: 'Vie', regex: /vie[a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i },
+        { key: 'sab', label: 'Sab', regex: /s[aá]b[a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i },
+        { key: 'dom', label: 'Dom', regex: /dom[a-z]*:?\s*(\d{1,2}:\d{2})\s*[-a]\s*(\d{1,2}:\d{2})/i }
+    ];
+
+    const result = [];
+    for (const pattern of dayPatterns) {
+        const match = schedule.match(pattern.regex);
+        if (match) {
+            result.push({ day: pattern.label, time: `${match[1]}-${match[2]}` });
+        }
+    }
+
+    return result.length > 0 ? result : null;
+}
+
 // =============================================
 // WHATSAPP
 // =============================================
@@ -99,33 +124,64 @@ function renderBusCard(busLine) {
     const stops = parseStops(busLine.route_description);
     const mainRoute = stops.length >= 2 ? `${stops[0]} → ${stops[stops.length - 1]}` : busLine.route_description || '';
     const color = busLine.color || '#3b82f6';
+    const scheduleByDay = parseScheduleByDay(busLine.schedule);
     const scheduleShort = formatSchedule(busLine.schedule);
+
+    // Renderizar horarios por dia o version corta
+    let scheduleHtml = '';
+    if (scheduleByDay && scheduleByDay.length > 0) {
+        scheduleHtml = `
+            <div class="bus-card-schedule">
+                <div class="bus-schedule-header">
+                    <span>🕐</span> Horarios
+                </div>
+                <div class="bus-schedule-grid">
+                    ${scheduleByDay.map(s => `
+                        <div class="bus-schedule-item">
+                            <span class="bus-schedule-day">${s.day}</span>
+                            <span class="bus-schedule-time">${s.time}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
 
     return `
         <article class="bus-card" onclick="openBusModal(${busLine.id})">
-            <div class="bus-line-badge" style="background: linear-gradient(135deg, ${color}, ${color}dd);">${escapeHtml(busLine.line_number) || '?'}</div>
-
-            <div class="bus-card-info">
-                <h3 class="bus-card-name">${escapeHtml(busLine.name)}</h3>
-                <div class="bus-card-route">${escapeHtml(mainRoute)}</div>
+            <div class="bus-card-header">
+                <div class="bus-line-badge" style="background: linear-gradient(135deg, ${color}, ${color}dd);">${escapeHtml(busLine.line_number) || '?'}</div>
+                <div class="bus-card-info">
+                    <h3 class="bus-card-name">${escapeHtml(busLine.name)}</h3>
+                    <div class="bus-card-route">${escapeHtml(mainRoute)}</div>
+                </div>
             </div>
 
-            <div class="bus-card-details">
-                ${scheduleShort ? `
-                    <div class="bus-detail">
-                        <span class="bus-detail-icon">🕐</span>
-                        <span class="bus-detail-value">${escapeHtml(scheduleShort)}</span>
-                    </div>
-                ` : ''}
-                ${busLine.price ? `
-                    <div class="bus-detail">
-                        <span class="bus-detail-icon">💵</span>
-                        <span class="bus-detail-value">${formatPrice(busLine.price)}</span>
-                    </div>
-                ` : ''}
-            </div>
+            ${scheduleHtml}
 
-            <button class="btn-bus-info" onclick="event.stopPropagation(); openBusModal(${busLine.id})">Ver mas</button>
+            <div class="bus-card-footer">
+                <div class="bus-card-details">
+                    ${!scheduleByDay && scheduleShort ? `
+                        <div class="bus-detail">
+                            <span class="bus-detail-icon">🕐</span>
+                            <span class="bus-detail-value">${escapeHtml(scheduleShort)}</span>
+                        </div>
+                    ` : ''}
+                    ${busLine.price ? `
+                        <div class="bus-detail">
+                            <span class="bus-detail-icon">💵</span>
+                            <span class="bus-detail-value">${formatPrice(busLine.price)}</span>
+                        </div>
+                    ` : ''}
+                    ${busLine.company ? `
+                        <div class="bus-detail">
+                            <span class="bus-detail-icon">🚌</span>
+                            <span class="bus-detail-value">${escapeHtml(busLine.company)}</span>
+                        </div>
+                    ` : ''}
+                </div>
+                <button class="btn-bus-info" onclick="event.stopPropagation(); openBusModal(${busLine.id})">Ver mas</button>
+            </div>
         </article>
     `;
 }

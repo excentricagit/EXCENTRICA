@@ -206,6 +206,35 @@
 
         const debouncedSearch = Utils.debounce(() => loadVideos(1), 500);
 
+        // Actualizar widget de usuario
+        function updateUserWidget() {
+            const user = auth.getUser();
+            const userWidget = document.getElementById('user-widget-content');
+            if (user && userWidget) {
+                let panelButtons = '';
+                if (user.role === 'admin') {
+                    panelButtons += `<a href="/admin/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;">Panel Admin</a>`;
+                    panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
+                    panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+                } else if (user.role === 'editor' || user.role === 'periodista') {
+                    panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
+                } else if (user.role === 'publicista') {
+                    panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+                }
+                // TODO: Agregar rol de editor de videos cuando se implemente
+                // else if (user.role === 'videoeditor') {
+                //     panelButtons += `<a href="/videos-panel/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;">Panel Videos</a>`;
+                // }
+
+                userWidget.innerHTML = `
+                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+                    <a href="/perfil.html" class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;">Mi Perfil</a>
+                    ${panelButtons}
+                    <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
+                `;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             await App.loadCategories('category-filter', 'videos');
 
@@ -214,6 +243,7 @@
             if (params.search) document.getElementById('search-input').value = params.search;
 
             loadVideos(parseInt(params.page) || 1);
+            updateUserWidget();
 
             document.getElementById('search-input').addEventListener('input', debouncedSearch);
             document.getElementById('category-filter').addEventListener('change', () => loadVideos(1));

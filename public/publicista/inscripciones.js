@@ -268,18 +268,25 @@
         try {
             const response = await api.verifyRegistrationCode(code);
 
-            if (response.success && response.data) {
-                const reg = response.data;
+            if (response.success && response.data && response.data.valid) {
+                const reg = response.data.registration;
+                const canEnter = response.data.can_enter;
+
                 resultContainer.className = 'verify-result valid';
                 resultContainer.innerHTML = `
-                    <div class="verify-result-title">✅ Codigo valido</div>
+                    <div class="verify-result-title">${canEnter ? '✅ Codigo valido - PUEDE INGRESAR' : '⚠️ Codigo encontrado'}</div>
                     <div class="verify-result-details">
                         <strong>Usuario:</strong> ${Utils.escapeHtml(reg.user_name || 'Sin nombre')}<br>
                         <strong>Email:</strong> ${Utils.escapeHtml(reg.user_email || '-')}<br>
+                        ${reg.user_phone ? `<strong>Telefono:</strong> ${Utils.escapeHtml(reg.user_phone)}<br>` : ''}
                         <strong>Evento:</strong> ${Utils.escapeHtml(reg.event_title || 'Evento')}<br>
-                        <strong>Estado:</strong> ${getStatusLabel(reg.status)}<br>
+                        <strong>Fecha evento:</strong> ${formatDate(reg.event_date)}${reg.event_time ? ' ' + reg.event_time : ''}<br>
+                        <strong>Estado:</strong> <span class="badge badge-${reg.status}">${getStatusLabel(reg.status)}</span><br>
                         <strong>Fecha inscripcion:</strong> ${formatDate(reg.registered_at)}
+                        ${reg.approved_at ? `<br><strong>Fecha aprobacion:</strong> ${formatDate(reg.approved_at)}` : ''}
                     </div>
+                    ${!canEnter && reg.status === 'pendiente' ? '<p style="margin-top: 0.75rem; color: #fcd34d; font-size: 0.85rem;">⚠️ Esta inscripcion aun no ha sido aprobada</p>' : ''}
+                    ${reg.status === 'rechazado' ? '<p style="margin-top: 0.75rem; color: #fca5a5; font-size: 0.85rem;">❌ Esta inscripcion fue rechazada</p>' : ''}
                 `;
             } else {
                 resultContainer.className = 'verify-result invalid';

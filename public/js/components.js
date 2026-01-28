@@ -614,15 +614,23 @@ Components.renderUserWidget = function(containerId = 'user-widget-content') {
     const user = typeof auth !== 'undefined' ? auth.getUser() : null;
 
     if (user) {
-        let panelButton = '';
+        let panelButtons = '';
+        // Boton de Panel Admin/Editor
+        if (user.role === 'admin') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;" onclick="window.location.href='/admin/'">Panel Admin</button>`;
+        }
         if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
-            panelButton = `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+        }
+        // Boton de Panel Publicista
+        if (user.role === 'admin' || user.role === 'publicista') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
         }
 
         container.innerHTML = `
             <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
             <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
-            ${panelButton}
+            ${panelButtons}
             <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
         `;
     } else {

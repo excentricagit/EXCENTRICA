@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estadísticas - Publicista Excentrica</title>
+    <title>Estadisticas - Publicista Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/publicista/publicista.css">
+    <link rel="stylesheet" href="/publicista/estadisticas.css">
 </head>
 <body>
     <div class="admin-layout">
@@ -33,7 +34,7 @@
                     <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">🚪</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
@@ -41,7 +42,7 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>📈 Estadísticas de Anuncios</h1>
+                <h1>📈 Estadisticas de Anuncios</h1>
                 <div class="admin-user">
                     <span id="user-name">Publicista</span>
                 </div>
@@ -54,7 +55,7 @@
                         <div class="stat-icon">👁️</div>
                         <div class="stat-info">
                             <span class="stat-value" id="total-views">0</span>
-                            <span class="stat-label">Vistas Totales</span>
+                            <span class="stat-label">Impresiones Totales</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -75,7 +76,7 @@
                         <div class="stat-icon">🎯</div>
                         <div class="stat-info">
                             <span class="stat-value" id="active-campaigns">0</span>
-                            <span class="stat-label">Campañas Activas</span>
+                            <span class="stat-label">Anuncios Activos</span>
                         </div>
                     </div>
                 </div>
@@ -95,7 +96,7 @@
                 <!-- Performance by Position -->
                 <div class="card">
                     <div class="card-body">
-                        <h3 class="mb-3">📍 Rendimiento por Posición</h3>
+                        <h3 class="mb-3">📍 Rendimiento por Seccion</h3>
                         <div id="position-performance">
                             <div class="text-center p-4">
                                 <div class="spinner"></div>
@@ -121,18 +122,39 @@
 
         document.getElementById('user-name').textContent = user?.name || 'Publicista';
 
+        function getPositionLabel(position) {
+            const labels = {
+                'sidebar': 'General',
+                'mercaderia-sidebar': 'Mercaderia',
+                'alojamiento-sidebar': 'Alojamiento',
+                'gastronomia-sidebar': 'Gastronomia',
+                'transporte-sidebar': 'Transporte',
+                'eventos-sidebar': 'Eventos',
+                'turismo-sidebar': 'Turismo',
+                'servicios-sidebar': 'Servicios'
+            };
+            return labels[position] || position;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         async function loadStatistics() {
             try {
-                const response = await api.getAds({ publicista_id: user.id });
+                const response = await api.getPublicistaAds();
 
                 if (response.success) {
-                    const ads = response.data;
+                    const ads = response.data || [];
 
                     // Calculate overall stats
-                    const totalViews = ads.reduce((sum, ad) => sum + (ad.vistas || 0), 0);
-                    const totalClicks = ads.reduce((sum, ad) => sum + (ad.clics || 0), 0);
+                    const totalViews = ads.reduce((sum, ad) => sum + (ad.impressions || 0), 0);
+                    const totalClicks = ads.reduce((sum, ad) => sum + (ad.clicks || 0), 0);
                     const avgCTR = totalViews > 0 ? ((totalClicks / totalViews) * 100).toFixed(2) : 0;
-                    const activeCampaigns = ads.filter(a => a.estado === 'activo').length;
+                    const activeCampaigns = ads.filter(a => a.is_active === 1).length;
 
                     document.getElementById('total-views').textContent = totalViews.toLocaleString();
                     document.getElementById('total-clicks').textContent = totalClicks.toLocaleString();
@@ -147,7 +169,7 @@
                 }
             } catch (e) {
                 console.error('Error loading statistics:', e);
-                Components.showToast('Error cargando estadísticas', 'error');
+                Components.toast('Error cargando estadisticas', 'error');
             }
         }
 
@@ -155,20 +177,20 @@
             const container = document.getElementById('ads-performance');
 
             if (ads.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center p-4">No hay anuncios para mostrar estadísticas</p>';
+                container.innerHTML = '<p class="text-muted text-center p-4">No hay anuncios para mostrar estadisticas</p>';
                 return;
             }
 
-            // Sort by views descending
-            const sortedAds = [...ads].sort((a, b) => (b.vistas || 0) - (a.vistas || 0));
+            // Sort by impressions descending
+            const sortedAds = [...ads].sort((a, b) => (b.impressions || 0) - (a.impressions || 0));
 
             container.innerHTML = `
                 <table class="admin-table">
                     <thead>
                         <tr>
                             <th>Anuncio</th>
-                            <th>Posición</th>
-                            <th>Vistas</th>
+                            <th>Seccion</th>
+                            <th>Impresiones</th>
                             <th>Clics</th>
                             <th>CTR</th>
                             <th>Estado</th>
@@ -176,18 +198,18 @@
                     </thead>
                     <tbody>
                         ${sortedAds.map(ad => {
-                            const views = ad.vistas || 0;
-                            const clicks = ad.clics || 0;
+                            const views = ad.impressions || 0;
+                            const clicks = ad.clicks || 0;
                             const ctr = views > 0 ? ((clicks / views) * 100).toFixed(2) : 0;
 
                             return `
                                 <tr>
-                                    <td><strong>${Utils.escapeHtml(ad.titulo)}</strong></td>
-                                    <td><span class="badge badge-secondary">${ad.posicion}</span></td>
+                                    <td><strong>${escapeHtml(ad.title)}</strong></td>
+                                    <td><span class="badge badge-secondary">${getPositionLabel(ad.position)}</span></td>
                                     <td>${views.toLocaleString()}</td>
                                     <td>${clicks.toLocaleString()}</td>
                                     <td><strong>${ctr}%</strong></td>
-                                    <td><span class="badge badge-${ad.estado === 'activo' ? 'success' : 'warning'}">${ad.estado}</span></td>
+                                    <td><span class="badge badge-${ad.is_active ? 'success' : 'warning'}">${ad.is_active ? 'Activo' : 'Pendiente'}</span></td>
                                 </tr>
                             `;
                         }).join('')}
@@ -202,33 +224,37 @@
             // Group by position
             const positionStats = {};
             ads.forEach(ad => {
-                if (!positionStats[ad.posicion]) {
-                    positionStats[ad.posicion] = {
-                        position: ad.posicion,
+                const pos = ad.position || 'sidebar';
+                if (!positionStats[pos]) {
+                    positionStats[pos] = {
+                        position: pos,
                         count: 0,
                         views: 0,
                         clicks: 0
                     };
                 }
-                positionStats[ad.posicion].count++;
-                positionStats[ad.posicion].views += ad.vistas || 0;
-                positionStats[ad.posicion].clicks += ad.clics || 0;
+                positionStats[pos].count++;
+                positionStats[pos].views += ad.impressions || 0;
+                positionStats[pos].clicks += ad.clicks || 0;
             });
 
             const positions = Object.values(positionStats);
 
             if (positions.length === 0) {
-                container.innerHTML = '<p class="text-muted text-center p-4">No hay datos de posiciones</p>';
+                container.innerHTML = '<p class="text-muted text-center p-4">No hay datos de secciones</p>';
                 return;
             }
+
+            // Sort by views
+            positions.sort((a, b) => b.views - a.views);
 
             container.innerHTML = `
                 <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Posición</th>
+                            <th>Seccion</th>
                             <th>Anuncios</th>
-                            <th>Vistas Totales</th>
+                            <th>Impresiones Totales</th>
                             <th>Clics Totales</th>
                             <th>CTR</th>
                         </tr>
@@ -239,7 +265,7 @@
 
                             return `
                                 <tr>
-                                    <td><span class="badge badge-primary">${pos.position}</span></td>
+                                    <td><span class="badge badge-primary">${getPositionLabel(pos.position)}</span></td>
                                     <td>${pos.count}</td>
                                     <td>${pos.views.toLocaleString()}</td>
                                     <td>${pos.clicks.toLocaleString()}</td>

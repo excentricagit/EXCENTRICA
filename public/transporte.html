@@ -6,6 +6,7 @@
     <title>Transporte - Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/transporte.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
 </head>
 <body>
     <!-- Sidebar de Navegación Lateral Fijo -->
@@ -132,27 +133,9 @@
                     </div>
                 </div>
 
-                <!-- Widget de contenido patrocinado - DESTACADO -->
-                <div class="widget" id="ad-widget" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(37, 99, 235, 0.15)); border: 2px solid rgba(59, 130, 246, 0.5); position: relative; overflow: hidden; min-height: 280px;">
-                    <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%); animation: shimmer 3s infinite;"></div>
-                    <style>@keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }</style>
-
-                    <div style="position: relative; z-index: 1;">
-                        <div class="widget-title" style="color: #60a5fa; font-size: 1rem;">
-                            <span style="font-size: 1.1rem;">⭐</span>
-                            Espacio Publicitario
-                        </div>
-
-                        <div id="ad-content" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; text-align: center; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <div style="width: 60px; height: 60px; margin-bottom: 0.75rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);">🚌</div>
-                            <p style="color: #fff; font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Promociona tu Servicio</p>
-                            <p style="color: #93c5fd; font-size: 0.8rem; line-height: 1.4;">Taxis, remises o combis en Santiago</p>
-                        </div>
-
-                        <a href="/contacto.html" class="btn btn-block" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); border: none; color: #fff; font-weight: 700; padding: 0.7rem; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
-                            Quiero Anunciar
-                        </a>
-                    </div>
+                <!-- Widget de publicidad -->
+                <div class="widget" id="ad-widget">
+                    <div id="ad-widget-content"></div>
                 </div>
 
                 <!-- Widget de redes sociales -->
@@ -192,17 +175,33 @@
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
     <script src="/js/transporte.js"></script>
+    <script src="/js/ads-player.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            initAdsPlayer('ad-widget-content', 'transporte-sidebar');
+        });
+    </script>
     <script>
         // Actualizar widget de usuario
         function updateUserWidget() {
             const user = auth.getUser();
             const userWidget = document.getElementById('user-widget-content');
             if (user && userWidget) {
+                let panelButtons = '';
+                if (user.role === 'admin') {
+                    panelButtons += `<a href="/admin/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;">Panel Admin</a>`;
+                    panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
+                    panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+                } else if (user.role === 'editor' || user.role === 'periodista') {
+                    panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
+                } else if (user.role === 'publicista') {
+                    panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
+                }
+
                 userWidget.innerHTML = `
-                    <p style="color: #f1f5f9; font-size: 0.95rem; margin-bottom: 0.5rem;">Hola, ${Utils.escapeHtml(user.name || 'Usuario')}</p>
-                    <p style="color: #cbd5e1; font-size: 0.8rem; margin-bottom: 0.75rem;">${Utils.escapeHtml(user.email)}</p>
-                    <a href="/perfil.html" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;">Mi Perfil</a>
-                    ${user.role === 'admin' || user.role === 'editor' ? '<a href="/editor/" class="btn btn-block mb-2" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;">Panel de Editor</a>' : ''}
+                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+                    <a href="/perfil.html" class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;">Mi Perfil</a>
+                    ${panelButtons}
                     <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
                 `;
             }

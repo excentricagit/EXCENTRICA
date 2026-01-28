@@ -246,6 +246,27 @@ class ApiService {
         return this.post(`/api/ads/${id}/click`);
     }
 
+    // ========== PUBLICISTA ==========
+    async getPublicistaAds(params = {}) {
+        return this.get('/api/publicista/ads', params);
+    }
+
+    async getPublicistaAdStats() {
+        return this.get('/api/publicista/ads/stats');
+    }
+
+    async createPublicistaAd(data) {
+        return this.post('/api/publicista/ads', data);
+    }
+
+    async updatePublicistaAd(id, data) {
+        return this.put(`/api/publicista/ads/${id}`, data);
+    }
+
+    async deletePublicistaAd(id) {
+        return this.delete(`/api/publicista/ads/${id}`);
+    }
+
     // ========== ADMIN ==========
     async getAdminStats() {
         return this.get('/api/admin/stats');

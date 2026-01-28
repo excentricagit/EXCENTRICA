@@ -53,3 +53,7 @@ export async function requireAdmin(request, env) {
 export async function requireEditor(request, env) {
     return requireRole(request, env, ['admin', 'editor', 'periodista', 'reporter']);
 }
+
+export async function requirePublicista(request, env) {
+    return requireRole(request, env, ['admin', 'publicista']);
+}

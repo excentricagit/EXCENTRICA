@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anuncios - Admin Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge">ADMIN</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/admin/" class="admin-nav-item">
+                    <span class="icon">📊</span> Dashboard
+                </a>
+                <a href="/admin/usuarios.html" class="admin-nav-item">
+                    <span class="icon">👥</span> Usuarios
+                </a>
+                <a href="/admin/anuncios.html" class="admin-nav-item active">
+                    <span class="icon">📺</span> Anuncios
+                </a>
+                <a href="/admin/almacenamiento.html" class="admin-nav-item">
+                    <span class="icon">💾</span> Almacenamiento
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>📺 Gestion de Anuncios</h1>
+                <div class="admin-user">
+                    <span id="user-name">Admin</span>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">📺</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-ads">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: #f59e0b;">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="pending-ads">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="color: #10b981;">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="active-ads">0</span>
+                            <span class="stat-label">Activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-impressions">0</span>
+                            <span class="stat-label">Impresiones</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="d-flex gap-3 mb-4 flex-wrap">
+                    <select id="filter-status" class="form-control" style="max-width: 150px;">
+                        <option value="">Todos</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="active">Activos</option>
+                    </select>
+                    <select id="filter-position" class="form-control" style="max-width: 180px;">
+                        <option value="">Todas las secciones</option>
+                        <option value="sidebar">General</option>
+                        <option value="mercaderia-sidebar">Mercaderia</option>
+                        <option value="alojamiento-sidebar">Alojamiento</option>
+                        <option value="gastronomia-sidebar">Gastronomia</option>
+                        <option value="transporte-sidebar">Transporte</option>
+                        <option value="eventos-sidebar">Eventos</option>
+                        <option value="turismo-sidebar">Turismo</option>
+                        <option value="servicios-sidebar">Servicios</option>
+                    </select>
+                </div>
+
+                <!-- Ads Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div id="ads-table">
+                            <div class="text-center p-4">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar admin
+        const user = auth.getUser();
+        if (!user || user.role !== 'admin') {
+            window.location.href = '/login.html';
+        }
+        document.getElementById('user-name').textContent = user?.name || 'Admin';
+
+        let allAds = [];
+
+        function getPositionLabel(position) {
+            const labels = {
+                'sidebar': 'General',
+                'mercaderia-sidebar': 'Mercaderia',
+                'alojamiento-sidebar': 'Alojamiento',
+                'gastronomia-sidebar': 'Gastronomia',
+                'transporte-sidebar': 'Transporte',
+                'eventos-sidebar': 'Eventos',
+                'turismo-sidebar': 'Turismo',
+                'servicios-sidebar': 'Servicios'
+            };
+            return labels[position] || position;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-AR', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        async function loadAds() {
+            try {
+                const response = await api.getAds();
+                if (response.success) {
+                    allAds = response.data || [];
+                    updateStats();
+                    renderTable();
+                }
+            } catch (e) {
+                console.error('Error loading ads:', e);
+                Components.toast('Error cargando anuncios', 'error');
+            }
+        }
+
+        function updateStats() {
+            const total = allAds.length;
+            const pending = allAds.filter(a => !a.is_active).length;
+            const active = allAds.filter(a => a.is_active).length;
+            const impressions = allAds.reduce((sum, a) => sum + (a.impressions || 0), 0);
+
+            document.getElementById('total-ads').textContent = total;
+            document.getElementById('pending-ads').textContent = pending;
+            document.getElementById('active-ads').textContent = active;
+            document.getElementById('total-impressions').textContent = impressions.toLocaleString();
+        }
+
+        function renderTable() {
+            const container = document.getElementById('ads-table');
+            const statusFilter = document.getElementById('filter-status').value;
+            const positionFilter = document.getElementById('filter-position').value;
+
+            let filtered = allAds;
+
+            if (statusFilter === 'pending') {
+                filtered = filtered.filter(a => !a.is_active);
+            } else if (statusFilter === 'active') {
+                filtered = filtered.filter(a => a.is_active);
+            }
+
+            if (positionFilter) {
+                filtered = filtered.filter(a => a.position === positionFilter);
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted p-4">No hay anuncios</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Anuncio</th>
+                            <th>Seccion</th>
+                            <th>Autor</th>
+                            <th>Impresiones</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filtered.map(ad => `
+                            <tr>
+                                <td>#${ad.id}</td>
+                                <td>
+                                    <strong>${escapeHtml(ad.title)}</strong>
+                                    ${ad.video_url ? `<br><a href="${escapeHtml(ad.video_url)}" target="_blank" class="text-muted" style="font-size: 0.8rem;">Ver video</a>` : ''}
+                                </td>
+                                <td><span class="badge badge-secondary">${getPositionLabel(ad.position)}</span></td>
+                                <td>${ad.author_id || '-'}</td>
+                                <td>${(ad.impressions || 0).toLocaleString()}</td>
+                                <td>
+                                    <span class="badge badge-${ad.is_active ? 'success' : 'warning'}">
+                                        ${ad.is_active ? 'Activo' : 'Pendiente'}
+                                    </span>
+                                </td>
+                                <td>${formatDate(ad.created_at)}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        ${!ad.is_active ? `
+                                            <button class="btn btn-sm btn-success" onclick="toggleAdStatus(${ad.id}, true)" title="Aprobar">
+                                                ✓
+                                            </button>
+                                        ` : `
+                                            <button class="btn btn-sm btn-warning" onclick="toggleAdStatus(${ad.id}, false)" title="Desactivar">
+                                                ✗
+                                            </button>
+                                        `}
+                                        <button class="btn btn-sm btn-danger" onclick="deleteAd(${ad.id})" title="Eliminar">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function toggleAdStatus(adId, activate) {
+            try {
+                const response = await api.updateAd(adId, { is_active: activate ? 1 : 0 });
+                if (response.success) {
+                    Components.toast(activate ? 'Anuncio aprobado' : 'Anuncio desactivado', 'success');
+                    await loadAds();
+                } else {
+                    Components.toast(response.message || 'Error', 'error');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                Components.toast('Error actualizando anuncio', 'error');
+            }
+        }
+
+        async function deleteAd(adId) {
+            if (!confirm('¿Eliminar este anuncio? Esta accion no se puede deshacer.')) return;
+
+            try {
+                const response = await api.deleteAd(adId);
+                if (response.success) {
+                    Components.toast('Anuncio eliminado', 'success');
+                    await loadAds();
+                } else {
+                    Components.toast(response.message || 'Error', 'error');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                Components.toast('Error eliminando anuncio', 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('filter-status').addEventListener('change', renderTable);
+        document.getElementById('filter-position').addEventListener('change', renderTable);
+
+        // Load data
+        loadAds();
+    </script>
+</body>
+</html>

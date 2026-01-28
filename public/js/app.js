@@ -36,58 +36,53 @@ const App = {
         const authButtons = document.querySelector('.auth-buttons');
         const userDropdown = document.querySelector('.user-dropdown');
         const widgetUser = document.querySelector('.widget-user');
+        const widgetUserContent = document.getElementById('user-widget-content');
 
         if (auth.isAuthenticated()) {
             const user = auth.getUser();
 
             // No mostrar nada en el header - el usuario accede desde el widget del sidebar
 
-            // Actualizar widget de usuario en sidebar (si existe)
-            if (widgetUser) {
-                // Determinar panel según rol
-                let panelButton = '';
-                switch(user.role) {
-                    case 'admin':
-                        panelButton = `
-                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/admin/'">
-                                ⚙️ Panel Admin
-                            </button>
-                        `;
-                        break;
-                    case 'editor':
-                    case 'reporter':
-                    case 'periodista':
-                        panelButton = `
-                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/editor/'">
-                                📝 Panel Editor
-                            </button>
-                        `;
-                        break;
-                    case 'merchant':
-                    case 'comerciante':
-                        panelButton = `
-                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/comerciante/'">
-                                🏪 Mi Negocio
-                            </button>
-                        `;
-                        break;
-                    case 'publicista':
-                        panelButton = `
-                            <button class="btn btn-primary btn-block mb-2" onclick="window.location.href='/publicista/'">
-                                📺 Mis Anuncios
-                            </button>
-                        `;
-                        break;
-                }
+            // Determinar paneles según rol
+            let panelButtons = '';
 
+            // Admin puede ver todos los paneles
+            if (user.role === 'admin') {
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;" onclick="window.location.href='/admin/'">Panel Admin</button>`;
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
+            }
+            // Editor/Reporter/Periodista
+            else if (user.role === 'editor' || user.role === 'reporter' || user.role === 'periodista') {
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+            }
+            // Comerciante
+            else if (user.role === 'merchant' || user.role === 'comerciante') {
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff;" onclick="window.location.href='/comerciante/'">Mi Negocio</button>`;
+            }
+            // Publicista
+            else if (user.role === 'publicista') {
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
+            }
+
+            // Actualizar widget de usuario en sidebar (si existe - formato antiguo)
+            if (widgetUser) {
                 widgetUser.innerHTML = `
                     <div class="widget-icon">👤</div>
-                    <h3 class="widget-title">Hola, ${user.name.split(' ')[0]}</h3>
+                    <h3 class="widget-title">Hola, ${user.name ? user.name.split(' ')[0] : 'Usuario'}</h3>
                     <p class="widget-text">${user.email}</p>
-                    ${panelButton}
-                    <button class="btn btn-outline btn-block" onclick="auth.logout()">
-                        🚪 Cerrar Sesión
-                    </button>
+                    ${panelButtons}
+                    <button class="btn btn-outline btn-block" onclick="auth.logout()">Cerrar Sesion</button>
+                `;
+            }
+
+            // Actualizar widget de usuario en sidebar (formato nuevo con id)
+            if (widgetUserContent) {
+                widgetUserContent.innerHTML = `
+                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+                    <button class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
+                    ${panelButtons}
+                    <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
                 `;
             }
 
@@ -96,7 +91,7 @@ const App = {
         } else {
             // No mostrar nada en el header - el usuario accede desde el widget del sidebar
 
-            // Mostrar botones de login en widget (si existe)
+            // Mostrar botones de login en widget (si existe - formato antiguo)
             if (widgetUser) {
                 widgetUser.innerHTML = `
                     <div class="widget-icon">👤</div>
@@ -106,6 +101,8 @@ const App = {
                     <button class="btn btn-outline btn-block" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
                 `;
             }
+
+            // Widget formato nuevo ya tiene el HTML estático correcto para usuarios no logueados
         }
     },
 

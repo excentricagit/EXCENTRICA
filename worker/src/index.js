@@ -41,7 +41,11 @@ import { handleToggleLike, handleGetLikeStatus, handleGetUserLikes } from './rou
 import { handleUpload, handleDeleteFile, handleGetMedia } from './routes/upload.js';
 
 // Ads routes
-import { handleGetAds, handleGetAdById, handleTrackImpression, handleTrackClick, handleAdminGetAds, handleAdminCreateAd, handleAdminUpdateAd, handleAdminDeleteAd } from './routes/ads.js';
+import {
+    handleGetAds, handleGetAdById, handleTrackImpression, handleTrackClick,
+    handleAdminGetAds, handleAdminCreateAd, handleAdminUpdateAd, handleAdminDeleteAd,
+    handlePublicistaGetAds, handlePublicistaCreateAd, handlePublicistaUpdateAd, handlePublicistaDeleteAd, handlePublicistaGetAdStats
+} from './routes/ads.js';
 
 // Admin routes
 import { handleGetStats, handleGetStorageStats } from './routes/admin.js';
@@ -267,6 +271,15 @@ const routes = [
     { method: 'POST', path: '/api/admin/ads', handler: handleAdminCreateAd },
     { method: 'PUT', path: '/api/admin/ads/:id', handler: (req, env, params) => handleAdminUpdateAd(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/ads/:id', handler: (req, env, params) => handleAdminDeleteAd(req, env, params.id) },
+
+    // ========== PUBLICISTA ROUTES ==========
+
+    // Publicista - Ads
+    { method: 'GET', path: '/api/publicista/ads', handler: handlePublicistaGetAds },
+    { method: 'GET', path: '/api/publicista/ads/stats', handler: handlePublicistaGetAdStats },
+    { method: 'POST', path: '/api/publicista/ads', handler: handlePublicistaCreateAd },
+    { method: 'PUT', path: '/api/publicista/ads/:id', handler: (req, env, params) => handlePublicistaUpdateAd(req, env, params.id) },
+    { method: 'DELETE', path: '/api/publicista/ads/:id', handler: (req, env, params) => handlePublicistaDeleteAd(req, env, params.id) },
 
     // ========== CINEMA ROUTES ==========
 
