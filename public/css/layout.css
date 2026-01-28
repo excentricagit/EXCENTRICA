@@ -266,13 +266,14 @@ body {
     height: fit-content;
 }
 
-/* Layout simple con sidebar */
+/* Layout simple con sidebar - Grid de 2 columnas */
 .layout-sidebar {
     display: grid;
-    grid-template-columns: 1fr 280px;
+    grid-template-columns: 1fr 300px;
     gap: var(--spacing-lg);
     max-width: var(--container-max);
     margin: 0 auto;
+    align-items: start;
 }
 
 .layout-sidebar .content {
@@ -281,8 +282,11 @@ body {
 
 .sidebar {
     position: sticky;
-    top: calc(var(--header-height) + var(--spacing-xl));
+    top: calc(var(--header-height) + 15px);
     height: fit-content;
+    max-height: calc(100vh - var(--header-height) - 30px);
+    overflow-y: auto;
+    z-index: 100;
 }
 
 /* ============================================

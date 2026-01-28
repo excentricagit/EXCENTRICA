@@ -1,0 +1,913 @@
+/* ===========================================
+   CINE - Estilos especificos
+   =========================================== */
+
+/* ===========================================
+   SELECTOR DE FECHA
+   =========================================== */
+
+.cine-date-selector {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.cine-date-selector::-webkit-scrollbar {
+    display: none;
+}
+
+.cine-date-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 70px;
+    white-space: nowrap;
+}
+
+.cine-date-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.cine-date-btn.active {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+}
+
+.cine-date-btn .day-name {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 0.25rem;
+}
+
+.cine-date-btn .day-num {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.cine-date-btn.today .day-name {
+    color: #fbbf24;
+}
+
+/* ===========================================
+   FILTROS
+   =========================================== */
+
+.cine-filter-bar {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    flex-wrap: wrap;
+    align-items: center;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+    margin-bottom: 1.5rem;
+}
+
+.cine-filter-bar .form-control {
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(30, 30, 40, 0.8);
+    color: #f1f5f9;
+    font-size: 0.9rem;
+    min-width: 180px;
+}
+
+.cine-filter-bar .form-control:focus {
+    outline: none;
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+/* ===========================================
+   TABS DE VISTA
+   =========================================== */
+
+.cine-view-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.cine-view-tab {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: transparent;
+    color: #fca5a5;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cine-view-tab:hover {
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.cine-view-tab.active {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: transparent;
+    color: #fff;
+}
+
+/* ===========================================
+   CARDS DE PELICULAS
+   =========================================== */
+
+.cine-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.movie-card {
+    background: linear-gradient(145deg, rgba(30, 25, 35, 0.95), rgba(20, 15, 25, 0.98));
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.movie-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.2);
+}
+
+.movie-card-header {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.movie-poster {
+    width: 100px;
+    height: 150px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.movie-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.movie-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.movie-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.movie-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.movie-rating {
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+}
+
+.movie-rating.atp { background: #22c55e; color: #fff; }
+.movie-rating.plus13 { background: #eab308; color: #000; }
+.movie-rating.plus16 { background: #f97316; color: #fff; }
+.movie-rating.plus18 { background: #ef4444; color: #fff; }
+
+.movie-genre {
+    font-size: 0.8rem;
+    color: #fca5a5;
+}
+
+.movie-synopsis {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Horarios de la pelicula */
+.movie-showtimes {
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.movie-showtimes-title {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.movie-showtimes-title .cinema-name {
+    color: #fca5a5;
+    font-weight: 600;
+}
+
+.showtime-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.showtime-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.showtime-chip:hover {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    border-color: transparent;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.showtime-chip .time {
+    font-size: 0.95rem;
+}
+
+.showtime-chip .format {
+    font-size: 0.65rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.showtime-chip .price {
+    font-size: 0.7rem;
+    color: #4ade80;
+    margin-top: 0.15rem;
+}
+
+/* Multiples cines */
+.movie-cinema-group {
+    margin-bottom: 1rem;
+}
+
+.movie-cinema-group:last-child {
+    margin-bottom: 0;
+}
+
+.cinema-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.1);
+}
+
+.cinema-group-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #fca5a5;
+}
+
+.cinema-group-address {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+/* ===========================================
+   VISTA POR CINES
+   =========================================== */
+
+.cinema-section {
+    margin-bottom: 2rem;
+}
+
+.cinema-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background: linear-gradient(145deg, rgba(40, 30, 45, 0.95), rgba(25, 20, 30, 0.98));
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 16px 16px 0 0;
+    gap: 1rem;
+}
+
+.cinema-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: rgba(239, 68, 68, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.cinema-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cinema-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.cinema-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 0.25rem;
+}
+
+.cinema-address {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cinema-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.cinema-feature {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    font-weight: 500;
+}
+
+.cinema-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+.cinema-action-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: all 0.2s ease;
+}
+
+.cinema-action-btn.phone {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+}
+
+.cinema-action-btn.phone:hover {
+    background: #22c55e;
+    color: #fff;
+}
+
+.cinema-action-btn.map {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+}
+
+.cinema-action-btn.map:hover {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.cinema-movies {
+    background: linear-gradient(145deg, rgba(25, 20, 30, 0.95), rgba(18, 15, 22, 0.98));
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    padding: 1rem;
+}
+
+.cinema-movies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+/* Mini card de pelicula dentro de cine */
+.movie-mini-card {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.movie-mini-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+}
+
+.movie-mini-poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+}
+
+.movie-mini-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-mini-info {
+    padding: 0.75rem;
+}
+
+.movie-mini-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+}
+
+.movie-mini-times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.movie-mini-time {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    font-weight: 500;
+}
+
+/* ===========================================
+   ESTADOS
+   =========================================== */
+
+.cine-empty {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: #94a3b8;
+}
+
+.cine-empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.cine-empty-text {
+    font-size: 1rem;
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.cine-empty-hint {
+    font-size: 0.85rem;
+    color: #475569;
+}
+
+/* Loading */
+.cine-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem;
+}
+
+/* ===========================================
+   SIDEBAR WIDGETS - CINE
+   =========================================== */
+
+.cine-widget {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.12), rgba(20, 20, 30, 0.95));
+    border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.cine-widget .widget-title {
+    color: #ef4444;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* Widget de proximos estrenos */
+.upcoming-movie {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.upcoming-movie:last-child {
+    margin-bottom: 0;
+}
+
+.upcoming-movie:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.upcoming-poster {
+    width: 50px;
+    height: 75px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.upcoming-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upcoming-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.upcoming-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.upcoming-date {
+    font-size: 0.75rem;
+    color: #fca5a5;
+}
+
+/* ===========================================
+   MODAL DE PELICULA
+   =========================================== */
+
+.movie-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: none;
+}
+
+.movie-modal.active {
+    display: block;
+}
+
+.movie-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(5px);
+}
+
+.movie-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: linear-gradient(145deg, rgba(30, 25, 35, 0.98), rgba(20, 15, 25, 0.99));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(239, 68, 68, 0.15);
+}
+
+.movie-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.movie-modal-close:hover {
+    background: #ef4444;
+    color: #fff;
+}
+
+.movie-modal-header {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+}
+
+.movie-modal-poster {
+    width: 150px;
+    height: 225px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.movie-modal-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movie-modal-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.movie-modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+    padding-right: 2rem;
+}
+
+.movie-modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.movie-modal-director {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+}
+
+.movie-modal-director strong {
+    color: #fca5a5;
+}
+
+.movie-modal-synopsis {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.movie-modal-trailer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.25rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.movie-modal-trailer-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+.movie-modal-showtimes {
+    padding: 1.5rem;
+}
+
+.movie-modal-showtimes-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    margin-bottom: 1rem;
+}
+
+.modal-cinema-group {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modal-cinema-group:last-child {
+    margin-bottom: 0;
+}
+
+.modal-cinema-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fca5a5;
+    margin-bottom: 0.25rem;
+}
+
+.modal-cinema-address {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.modal-showtime-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.modal-showtime-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    transition: all 0.2s ease;
+}
+
+.modal-showtime-chip:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.modal-showtime-chip .time {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.modal-showtime-chip .format {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    margin-top: 0.15rem;
+}
+
+.modal-showtime-chip .price {
+    font-size: 0.8rem;
+    color: #4ade80;
+    font-weight: 600;
+    margin-top: 0.25rem;
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 768px) {
+    .cine-movies-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .movie-card-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .movie-poster {
+        width: 120px;
+        height: 180px;
+    }
+
+    .cinema-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cinema-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .cinema-movies-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cine-date-selector {
+        justify-content: flex-start;
+    }
+
+    /* Modal responsive */
+    .movie-modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .movie-modal-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .movie-modal-poster {
+        width: 120px;
+        height: 180px;
+    }
+
+    .movie-modal-title {
+        font-size: 1.25rem;
+        padding-right: 0;
+    }
+
+    .movie-modal-meta {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .cinema-movies-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .movie-mini-info {
+        padding: 0.5rem;
+    }
+}
