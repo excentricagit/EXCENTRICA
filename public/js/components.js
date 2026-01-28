@@ -287,6 +287,47 @@ const Components = {
         `;
     },
 
+    // Crear card de video
+    videoCard(video) {
+        // Extraer ID de YouTube
+        const getYouTubeId = (url) => {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
+        };
+
+        const videoId = getYouTubeId(video.video_url);
+        const thumbnail = videoId
+            ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+            : (video.thumbnail_url || CONFIG.PLACEHOLDER_IMAGE);
+        const views = video.view_count || 0;
+        const likes = video.like_count || 0;
+
+        return `
+            <article class="video-card">
+                <a href="/video.html?id=${video.id}" class="video-card-link">
+                    <div class="video-card-thumbnail">
+                        <img src="${thumbnail}" alt="${Utils.escapeHtml(video.title)}"
+                             onerror="Utils.handleImageError(this)">
+                        <div class="video-card-play-btn">
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="video-card-info">
+                        <h3 class="video-card-title">${Utils.escapeHtml(video.title)}</h3>
+                        <div class="video-card-meta">
+                            <span>👁️ ${views.toLocaleString()} vistas</span>
+                            ${likes > 0 ? `<span>❤️ ${likes.toLocaleString()}</span>` : ''}
+                        </div>
+                        <div class="video-card-date">${Utils.timeAgo(video.created_at)}</div>
+                    </div>
+                </a>
+            </article>
+        `;
+    },
+
     // Crear paginación
     pagination(current, total, onPageChange) {
         if (total <= 1) return '';

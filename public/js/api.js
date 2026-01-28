@@ -196,6 +196,15 @@ class ApiService {
         return this.get(`/api/videos/${id}`);
     }
 
+    // ========== PLAYLISTS ==========
+    async getPlaylists(params = {}) {
+        return this.get('/api/playlists', params);
+    }
+
+    async getPlaylistById(id) {
+        return this.get(`/api/playlists/${id}`);
+    }
+
     // ========== CATEGORIES ==========
     async getCategories(section = null) {
         const params = section ? { section } : {};

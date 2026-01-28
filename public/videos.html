@@ -5,26 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Videos - Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/videos.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
 </head>
 <body>
-    <!-- Sidebar de Navegación Lateral Fijo -->
+    <!-- Sidebar de Navegacion Lateral Fijo -->
     <nav class="sidebar-nav">
         <a href="/" class="sidebar-nav-item">
             <span class="icon">🏠</span>
             <span>Inicio</span>
         </a>
-
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-section-title">Explorar</div>
-
         <a href="/noticias.html" class="sidebar-nav-item">
             <span class="icon">📰</span>
             <span>Noticias</span>
         </a>
         <a href="/mercaderia.html" class="sidebar-nav-item">
             <span class="icon">🛒</span>
-            <span>Mercadería</span>
+            <span>Mercaderia</span>
         </a>
         <a href="/eventos.html" class="sidebar-nav-item">
             <span class="icon">📅</span>
@@ -34,14 +33,11 @@
             <span class="icon">🎥</span>
             <span>Videos</span>
         </a>
-
         <div class="sidebar-divider"></div>
-
         <div class="sidebar-section-title">Servicios</div>
-
         <a href="/gastronomia.html" class="sidebar-nav-item">
             <span class="icon">🍽️</span>
-            <span>Gastronomía</span>
+            <span>Gastronomia</span>
         </a>
         <a href="/alojamiento.html" class="sidebar-nav-item">
             <span class="icon">🏨</span>
@@ -59,9 +55,7 @@
             <span class="icon">📍</span>
             <span>Turismo</span>
         </a>
-
         <div class="sidebar-divider"></div>
-
         <a href="/cine.html" class="sidebar-nav-item">
             <span class="icon">🎬</span>
             <span>Cine</span>
@@ -70,7 +64,6 @@
             <span class="icon">📞</span>
             <span>Contacto</span>
         </a>
-
     </nav>
 
     <header class="header">
@@ -79,9 +72,8 @@
                 <img src="/assets/logo.png" alt="Logo" style="height: 28px; width: auto;"> Excentrica
             </a>
             <div class="header-search">
-                <input type="search" placeholder="Buscar en Excentrica..." />
+                <input type="search" id="global-search" placeholder="Buscar en Excentrica..." />
             </div>
-            <div class="user-menu"></div>
             <button class="menu-toggle"><span></span><span></span><span></span></button>
         </div>
     </header>
@@ -89,68 +81,58 @@
     <main class="main">
         <div class="layout-sidebar">
             <div class="content">
-                <div class="page-header">
-                    <h1 class="page-title">🎥 Videos</h1>
-                    <p class="page-subtitle">Contenido audiovisual de Santiago del Estero</p>
-                </div>
-
-                <!-- Filtros -->
-                <div class="d-flex gap-3 mb-4 flex-wrap">
-                    <input type="text" id="search-input" placeholder="Buscar videos..."
-                           class="form-control" style="max-width:250px;">
-                    <select id="category-filter" class="form-control" style="max-width:200px;">
-                        <option value="">Todas las categorías</option>
-                    </select>
-                </div>
-
-                <!-- Grid de videos -->
-                <div id="videos-grid" class="grid grid-3">
+                <!-- Contenedor de playlists y videos -->
+                <div id="videos-content">
                     <div class="text-center p-5"><div class="spinner spinner-lg mx-auto"></div></div>
                 </div>
-
-                <!-- Paginación -->
-                <div id="pagination" class="mt-4"></div>
             </div>
 
             <!-- Sidebar derecho -->
             <aside class="sidebar">
                 <!-- Widget de usuario -->
-                <div class="widget" id="user-widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
-                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Mi Cuenta</div>
+                <div class="widget widget-usuario">
+                    <div class="widget-title">
+                        <span class="widget-title-icon">👤</span>
+                        Mi Cuenta
+                    </div>
                     <div id="user-widget-content">
-                        <p style="color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.75rem;">Inicia sesion para acceder a todas las funciones.</p>
-                        <button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); color: #fff;" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
-                        <button class="btn btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
+                        <p class="widget-text">Inicia sesion para acceder a todas las funciones.</p>
+                        <button class="btn-widget-primary" onclick="window.location.href='/login.html'">
+                            Iniciar Sesion
+                        </button>
+                        <button class="btn-widget-secondary" onclick="window.location.href='/registro.html'">
+                            Crear Cuenta
+                        </button>
                     </div>
                 </div>
 
-                <!-- Widget de contenido patrocinado -->
-                <div class="widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
-                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Contenido Patrocinado</div>
-                    <div id="sponsored-widget">
-                        <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem;">
-                            <p style="color: #f1f5f9; font-size: 0.9rem; margin-bottom: 0.25rem; font-weight: 600;">Tu negocio puede estar aqui</p>
-                            <p style="color: #cbd5e1; font-size: 0.8rem;">Contactanos para promocionar tu empresa</p>
+                <!-- Widget de publicidad -->
+                <div class="widget widget-ad">
+                    <div class="widget-ad-shine"></div>
+                    <div class="widget-ad-content">
+                        <div class="widget-title widget-title-ad">
+                            <span class="widget-title-icon">📣</span>
+                            Publicidad
                         </div>
-                        <a href="/contacto.html" class="btn btn-sm btn-block" style="background: transparent; border: 1px solid #a855f7; color: #e2e8f0;">Quiero anunciar</a>
+                        <div id="ad-widget-content"></div>
                     </div>
                 </div>
 
                 <!-- Widget de redes sociales -->
-                <div class="widget" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(20, 20, 30, 0.95)); border: 1px solid rgba(168, 85, 247, 0.25);">
-                    <div class="widget-title" style="color: #a855f7; text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);">Seguinos</div>
-                    <div style="display: flex; gap: 1rem; justify-content: center; padding: 0.5rem 0;">
-                        <a href="https://facebook.com/excentrica" target="_blank" rel="noopener" title="Facebook" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                <div class="widget widget-social">
+                    <div class="widget-title">
+                        <span class="widget-title-icon">🌐</span>
+                        Seguinos
+                    </div>
+                    <div class="social-icons">
+                        <a href="https://facebook.com/excentrica" target="_blank" rel="noopener" title="Facebook" class="social-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                         </a>
-                        <a href="https://instagram.com/excentricaok" target="_blank" rel="noopener" title="Instagram" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        <a href="https://instagram.com/excentricaok" target="_blank" rel="noopener" title="Instagram" class="social-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
                         </a>
-                        <a href="https://open.spotify.com/user/excentrica" target="_blank" rel="noopener" title="Spotify" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-                        </a>
-                        <a href="https://youtube.com/revistaexcentrica" target="_blank" rel="noopener" title="YouTube" style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.3); transition: all 0.3s;">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="#a855f7"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        <a href="https://youtube.com/revistaexcentrica" target="_blank" rel="noopener" title="YouTube" class="social-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                         </a>
                     </div>
                 </div>
@@ -172,79 +154,177 @@
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
+    <script src="/js/ads-player.js"></script>
     <script>
-        let currentPage = 1;
-
-        async function loadVideos(page = 1) {
-            currentPage = page;
-            const search = document.getElementById('search-input').value;
-            const category = document.getElementById('category-filter').value;
-
-            Components.showLoading('#videos-grid');
-
-            try {
-                const response = await api.getVideos({ page, limit: 12, search, category });
-                const container = document.getElementById('videos-grid');
-
-                if (response.success && response.data.videos.length > 0) {
-                    container.innerHTML = response.data.videos.map(v => Components.videoCard(v)).join('');
-                    document.getElementById('pagination').innerHTML = Components.pagination(
-                        response.data.pagination.page,
-                        response.data.pagination.pages,
-                        'loadVideos'
-                    );
-                } else {
-                    Components.showEmpty(container, 'No hay videos disponibles', '🎥');
-                    document.getElementById('pagination').innerHTML = '';
-                }
-            } catch (e) {
-                Components.showError('#videos-grid', 'Error cargando videos');
-            }
-
-            Utils.updateUrl({ page: page > 1 ? page : null, category: category || null, search: search || null });
+        // Helper para obtener YouTube ID
+        function getYouTubeId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+            return match ? match[1] : null;
         }
 
-        const debouncedSearch = Utils.debounce(() => loadVideos(1), 500);
+        // Renderizar video card compacto
+        function renderVideoCard(video) {
+            const videoId = getYouTubeId(video.video_url);
+            const thumbnail = videoId
+                ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+                : '/images/placeholder.svg';
+            const views = video.view_count || 0;
 
-        // Actualizar widget de usuario
-        function updateUserWidget() {
-            const user = auth.getUser();
-            const userWidget = document.getElementById('user-widget-content');
-            if (user && userWidget) {
-                let panelButtons = '';
-                if (user.role === 'admin') {
-                    panelButtons += `<a href="/admin/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;">Panel Admin</a>`;
-                    panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
-                    panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
-                } else if (user.role === 'editor' || user.role === 'periodista') {
-                    panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
-                } else if (user.role === 'publicista') {
-                    panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
-                } else if (user.role === 'videoeditor') {
-                    panelButtons += `<a href="/videoeditor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;">Panel Videos</a>`;
+            return `
+                <a href="/video.html?id=${video.id}" class="video-card-compact">
+                    <div class="video-card-thumb">
+                        <img src="${thumbnail}" alt="${Utils.escapeHtml(video.title)}" onerror="this.src='/images/placeholder.svg'">
+                        <div class="video-card-play">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="video-card-body">
+                        <h3 class="video-card-title">${Utils.escapeHtml(video.title)}</h3>
+                        <div class="video-card-stats">
+                            <span>👁️ ${views.toLocaleString()}</span>
+                            <span>${Utils.timeAgo(video.created_at)}</span>
+                        </div>
+                    </div>
+                </a>
+            `;
+        }
+
+        // Renderizar seccion de playlist
+        function renderPlaylistSection(playlist, videos) {
+            if (videos.length === 0) return '';
+
+            return `
+                <section class="video-playlist-section">
+                    <div class="playlist-header">
+                        <h2 class="playlist-title">
+                            <span class="playlist-icon">📁</span>
+                            ${Utils.escapeHtml(playlist.name)}
+                        </h2>
+                        <span class="playlist-count">${videos.length} videos</span>
+                    </div>
+                    <div class="video-grid">
+                        ${videos.map(v => renderVideoCard(v)).join('')}
+                    </div>
+                </section>
+            `;
+        }
+
+        // Renderizar seccion de videos sin playlist
+        function renderUncategorizedSection(videos) {
+            if (videos.length === 0) return '';
+
+            return `
+                <section class="video-playlist-section">
+                    <div class="playlist-header">
+                        <h2 class="playlist-title">
+                            <span class="playlist-icon">🎬</span>
+                            Todos los Videos
+                        </h2>
+                        <span class="playlist-count">${videos.length} videos</span>
+                    </div>
+                    <div class="video-grid">
+                        ${videos.map(v => renderVideoCard(v)).join('')}
+                    </div>
+                </section>
+            `;
+        }
+
+        // Cargar contenido
+        async function loadContent() {
+            const container = document.getElementById('videos-content');
+
+            try {
+                // Cargar playlists y videos en paralelo
+                const [playlistsRes, videosRes] = await Promise.all([
+                    api.getPlaylists(),
+                    api.getVideos({ limit: 100 })
+                ]);
+
+                const playlists = playlistsRes.success ? (playlistsRes.data?.playlists || playlistsRes.data || []) : [];
+                const allVideos = videosRes.success ? (videosRes.data?.videos || []) : [];
+
+                if (allVideos.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="icon">🎥</div>
+                            <p>No hay videos disponibles</p>
+                        </div>
+                    `;
+                    return;
                 }
 
-                userWidget.innerHTML = `
-                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
-                    <a href="/perfil.html" class="btn btn-block mb-2" style="background: rgba(168, 85, 247, 0.2); border: 1px solid rgba(168, 85, 247, 0.4); color: #e2e8f0;">Mi Perfil</a>
-                    ${panelButtons}
-                    <button class="btn btn-block" style="background: transparent; border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
+                let html = '';
+
+                // Si hay playlists, mostrar videos por playlist
+                if (playlists.length > 0) {
+                    for (const playlist of playlists) {
+                        // Obtener videos de esta playlist
+                        try {
+                            const playlistVideos = await api.getPlaylistById(playlist.id);
+                            const videos = playlistVideos.success ? (playlistVideos.data?.videos || []) : [];
+                            html += renderPlaylistSection(playlist, videos);
+                        } catch (e) {
+                            console.error('Error loading playlist:', playlist.id, e);
+                        }
+                    }
+                }
+
+                // Mostrar todos los videos al final
+                html += renderUncategorizedSection(allVideos);
+
+                container.innerHTML = html || `
+                    <div class="empty-state">
+                        <div class="icon">🎥</div>
+                        <p>No hay videos disponibles</p>
+                    </div>
+                `;
+
+            } catch (e) {
+                console.error('Error loading videos:', e);
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>Error:</strong> No se pudieron cargar los videos
+                    </div>
                 `;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await App.loadCategories('category-filter', 'videos');
+        // Actualizar widget de usuario
+        function updateUserWidget() {
+            const user = auth.getUser();
+            const widget = document.getElementById('user-widget-content');
+            if (!widget) return;
 
-            const params = Utils.getUrlParams();
-            if (params.category) document.getElementById('category-filter').value = params.category;
-            if (params.search) document.getElementById('search-input').value = params.search;
+            if (user) {
+                let panelButtons = '';
+                if (user.role === 'admin') {
+                    panelButtons += `<button class="btn-widget-primary" style="background: linear-gradient(135deg, #ef4444, #dc2626);" onclick="window.location.href='/admin/'">Panel Admin</button>`;
+                }
+                if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
+                    panelButtons += `<button class="btn-widget-primary" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+                }
+                if (user.role === 'admin' || user.role === 'publicista') {
+                    panelButtons += `<button class="btn-widget-primary" style="background: linear-gradient(135deg, #f59e0b, #d97706);" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
+                }
+                if (user.role === 'admin' || user.role === 'videoeditor') {
+                    panelButtons += `<button class="btn-widget-primary" style="background: linear-gradient(135deg, #ec4899, #db2777);" onclick="window.location.href='/videoeditor/'">Panel Videos</button>`;
+                }
 
-            loadVideos(parseInt(params.page) || 1);
+                widget.innerHTML = `
+                    <p style="color: #e2e8f0; font-weight: 500; margin-bottom: 0.75rem; text-align: center;">Hola, ${Utils.escapeHtml(user.name ? user.name.split(' ')[0] : user.email)}</p>
+                    <button class="btn-widget-secondary" onclick="window.location.href='/perfil.html'">Mi Perfil</button>
+                    ${panelButtons}
+                    <button class="btn-widget-secondary" style="border-color: rgba(239, 68, 68, 0.5); color: #f87171;" onclick="auth.logout()">Cerrar Sesion</button>
+                `;
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            loadContent();
             updateUserWidget();
-
-            document.getElementById('search-input').addEventListener('input', debouncedSearch);
-            document.getElementById('category-filter').addEventListener('change', () => loadVideos(1));
+            initAdsPlayer('ad-widget-content', 'sidebar');
         });
     </script>
 </body>
