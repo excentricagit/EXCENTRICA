@@ -133,14 +133,37 @@ async function subscribeToEvent(eventId, e) {
             if (btn) {
                 btn.innerHTML = `<span>✓</span> ${data.status === 'confirmado' ? 'Inscrito' : 'Pendiente'}`;
                 btn.classList.add('subscribed');
+                btn.disabled = true;
+            }
+
+            // Para eventos pagos (pendientes), mostrar boton de WhatsApp en la card
+            if (!data.is_free && data.status === 'pendiente' && btn) {
+                // Buscar el evento para obtener datos de contacto
+                const eventResponse = await api.getEventById(eventId);
+                if (eventResponse.success && eventResponse.data) {
+                    const event = eventResponse.data;
+                    const whatsappUrl = getWhatsAppUrl(event);
+                    if (whatsappUrl) {
+                        // Verificar si ya existe un boton de WhatsApp
+                        const actionsContainer = btn.parentElement;
+                        const existingWhatsapp = actionsContainer?.querySelector('.btn-event-whatsapp');
+                        if (!existingWhatsapp && actionsContainer) {
+                            const whatsappBtn = document.createElement('a');
+                            whatsappBtn.className = 'btn-event-whatsapp';
+                            whatsappBtn.href = whatsappUrl;
+                            whatsappBtn.target = '_blank';
+                            whatsappBtn.innerHTML = '<span>💬</span> WhatsApp';
+                            // Insertar despues del boton de suscripcion
+                            btn.insertAdjacentElement('afterend', whatsappBtn);
+                        }
+                    }
+                }
             }
 
             if (data.is_free) {
                 Components.toast('Inscripcion confirmada! Tu codigo: ' + data.registration_code, 'success', 5000);
             } else {
-                Components.toast('Inscripcion registrada. Abriendo detalles...', 'info', 3000);
-                // Para eventos pagos, abrir el modal para mostrar el boton de WhatsApp
-                setTimeout(() => openEventModal(eventId), 500);
+                Components.toast('Inscripcion registrada. Contacta por WhatsApp para coordinar.', 'info', 5000);
             }
 
             if (featuredEvent && featuredEvent.id === eventId) {
