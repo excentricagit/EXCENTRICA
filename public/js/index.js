@@ -299,7 +299,7 @@ function getYouTubeVideoId(url) {
 // Render sorteo card - Premium design
 function renderSorteoCard(sorteo) {
     const imageUrl = sorteo.image_url || '/images/placeholder.svg';
-    const participantCount = sorteo.participant_count || 0;
+    const participantCount = sorteo.participants_count || sorteo.participant_count || 0;
 
     // Calculate if ending soon (within 3 days)
     const drawDate = new Date(sorteo.draw_date);
@@ -715,23 +715,34 @@ async function loadPoi() {
 // Load sorteos
 async function loadSorteos() {
     try {
+        console.log('[Sorteos] Loading...');
         const sorteosResponse = await api.getSorteos({ status: 'active', limit: 6 });
+        console.log('[Sorteos] Response:', sorteosResponse);
+
         const sorteosGrid = document.getElementById('sorteos-grid');
         const sorteosSection = document.getElementById('sorteos-section');
 
-        if (!sorteosGrid) return;
+        if (!sorteosGrid) {
+            console.log('[Sorteos] Grid element not found!');
+            return;
+        }
 
         const sorteosData = extractArray(sorteosResponse, 'sorteos', 'items');
+        console.log('[Sorteos] Extracted data:', sorteosData.length, 'items');
 
         if (sorteosData.length > 0) {
+            console.log('[Sorteos] Rendering', sorteosData.length, 'sorteos');
             sorteosGrid.innerHTML = sorteosData.map(s => renderSorteoCard(s)).join('');
-            if (sorteosSection) sorteosSection.style.display = 'block';
+            if (sorteosSection) {
+                sorteosSection.style.display = 'block';
+                console.log('[Sorteos] Section shown!');
+            }
         } else {
-            // Hide section if no sorteos
+            console.log('[Sorteos] No sorteos to display');
             if (sorteosSection) sorteosSection.style.display = 'none';
         }
     } catch (e) {
-        console.error('Error loading sorteos:', e);
+        console.error('[Sorteos] Error loading:', e);
         const sorteosSection = document.getElementById('sorteos-section');
         if (sorteosSection) sorteosSection.style.display = 'none';
     }

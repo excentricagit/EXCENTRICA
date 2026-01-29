@@ -40,7 +40,7 @@ function getCountdown(drawDate) {
 // Render sorteo card
 function renderSorteoCard(sorteo) {
     const imageUrl = sorteo.image_url || '/images/placeholder.svg';
-    const participantCount = sorteo.participant_count || 0;
+    const participantCount = sorteo.participants_count || sorteo.participant_count || 0;
 
     // Calculate status
     const drawDate = new Date(sorteo.draw_date);
@@ -178,8 +178,8 @@ async function loadSorteos() {
             throw new Error(response.error || 'Error al cargar sorteos');
         }
 
-        const sorteos = response.data?.sorteos || response.data?.items || [];
-        const total = response.data?.pagination?.total || sorteos.length;
+        const sorteos = Array.isArray(response.data) ? response.data : (response.data?.sorteos || response.data?.items || []);
+        const total = sorteos.length;
 
         if (sorteos.length > 0) {
             grid.innerHTML = sorteos.map(s => renderSorteoCard(s)).join('');
@@ -187,8 +187,8 @@ async function loadSorteos() {
             emptyState.style.display = 'none';
             resultsCount.textContent = total;
 
-            // Render pagination
-            renderPagination(response.data?.pagination);
+            // Hide pagination for now (backend doesn't support it yet)
+            document.getElementById('pagination').innerHTML = '';
         } else {
             grid.style.display = 'none';
             emptyState.style.display = 'block';
@@ -252,20 +252,21 @@ window.changePage = function(page) {
 // Load stats
 async function loadStats() {
     try {
-        // Get active sorteos count
-        const activeResponse = await api.getSorteos({ status: 'active', limit: 1 });
-        const activeCount = activeResponse.data?.pagination?.total || 0;
+        // Get active sorteos
+        const activeResponse = await api.getSorteos({ status: 'active', limit: 100 });
+        const sorteos = Array.isArray(activeResponse.data) ? activeResponse.data : (activeResponse.data?.sorteos || activeResponse.data?.items || []);
+
+        const activeCount = sorteos.length;
         document.getElementById('stat-active').textContent = activeCount;
 
         // Get total participants (sum from all active sorteos)
-        const allActive = await api.getSorteos({ status: 'active', limit: 100 });
-        const sorteos = allActive.data?.sorteos || allActive.data?.items || [];
-        const totalParticipants = sorteos.reduce((sum, s) => sum + (s.participant_count || 0), 0);
+        const totalParticipants = sorteos.reduce((sum, s) => sum + (s.participants_count || s.participant_count || 0), 0);
         document.getElementById('stat-participants').textContent = totalParticipants;
 
         // Get winners count (completed sorteos)
-        const completedResponse = await api.getSorteos({ status: 'completed', limit: 1 });
-        const winnersCount = completedResponse.data?.pagination?.total || 0;
+        const completedResponse = await api.getSorteos({ status: 'completed', limit: 100 });
+        const completedSorteos = Array.isArray(completedResponse.data) ? completedResponse.data : (completedResponse.data?.sorteos || completedResponse.data?.items || []);
+        const winnersCount = completedSorteos.length;
         document.getElementById('stat-winners').textContent = winnersCount;
 
     } catch (e) {

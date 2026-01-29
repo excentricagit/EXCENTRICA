@@ -136,7 +136,7 @@ function renderSorteo() {
     }
 
     // Participants count
-    document.getElementById('sorteo-participants').textContent = `${sorteo.participant_count || 0} participantes`;
+    document.getElementById('sorteo-participants').textContent = `${sorteo.participants_count || sorteo.participant_count || 0} participantes`;
 
     // Main content
     document.getElementById('sorteo-prize').textContent = `🎁 ${sorteo.prize || sorteo.prize_description || 'Premio sorpresa'}`;

@@ -1,6 +1,6 @@
 // EXCENTRICA - Service Worker
 // Version para control de actualizaciones
-const SW_VERSION = '1.0.1';
+const SW_VERSION = '1.0.3';
 
 const OFFLINE_PAGE = `
 <!DOCTYPE html>
