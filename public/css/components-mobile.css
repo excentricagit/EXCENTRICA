@@ -1,0 +1,1112 @@
+/* EXCENTRICA - Components Mobile CSS */
+/* Cards, botones, forms y componentes UI */
+
+/* ============================================
+   CARDS
+   ============================================ */
+.mobile-card {
+    display: block;
+    background: var(--bg-secondary);
+    border-radius: var(--mobile-card-radius);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: var(--transition-fast);
+    border: 1px solid var(--border-color);
+}
+
+.mobile-card:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+.mobile-card-image {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 */
+    background: var(--bg-tertiary);
+    overflow: hidden;
+}
+
+.mobile-card-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mobile-card-body {
+    padding: var(--mobile-card-padding);
+}
+
+.mobile-card-category {
+    display: inline-block;
+    font-size: 0.6875rem;
+    color: var(--primary-light);
+    margin-bottom: 0.375rem;
+}
+
+.mobile-card-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.375rem;
+    line-height: 1.3;
+}
+
+.mobile-card-excerpt {
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.mobile-card-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.mobile-card-badge {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+.mobile-card-date-badge {
+    position: absolute;
+    bottom: 0.5rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.mobile-card-play-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 48px;
+    height: 48px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: #fff;
+}
+
+/* Card precio */
+.mobile-card-price {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.mobile-card-price .price-current {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.mobile-card-price .price-original {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+/* ============================================
+   FEED GRID
+   ============================================ */
+.mobile-feed-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mobile-gap);
+}
+
+.mobile-load-more {
+    padding: 1rem;
+    text-align: center;
+}
+
+.mobile-btn-load-more {
+    padding: 0.75rem 2rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.mobile-btn-load-more:active {
+    background: var(--bg-quaternary);
+}
+
+/* ============================================
+   CATEGORIAS GRID
+   ============================================ */
+.mobile-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.875rem;
+}
+
+.mobile-category-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.95) 0%, rgba(20, 20, 28, 0.98) 100%);
+    border: 1px solid rgba(160, 32, 240, 0.15);
+    border-radius: 16px;
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    min-height: 120px;
+}
+
+.mobile-category-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-purple) 0%, var(--accent-orange) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-category-card:active {
+    transform: scale(0.97);
+    border-color: rgba(160, 32, 240, 0.4);
+}
+
+.mobile-category-card:active::before {
+    opacity: 1;
+}
+
+/* Colores por categoria */
+.mobile-category-card[data-category="noticias"] { --cat-color: #A020F0; }
+.mobile-category-card[data-category="eventos"] { --cat-color: #FF6B35; }
+.mobile-category-card[data-category="mercaderia"] { --cat-color: #00D4AA; }
+.mobile-category-card[data-category="videos"] { --cat-color: #FF3366; }
+.mobile-category-card[data-category="gastronomia"] { --cat-color: #FFB800; }
+.mobile-category-card[data-category="alojamiento"] { --cat-color: #00B4D8; }
+.mobile-category-card[data-category="transporte"] { --cat-color: #7C3AED; }
+.mobile-category-card[data-category="servicios"] { --cat-color: #10B981; }
+.mobile-category-card[data-category="turismo"] { --cat-color: #F472B6; }
+.mobile-category-card[data-category="cine"] { --cat-color: #EF4444; }
+
+.mobile-category-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--cat-color, #A020F0) 0%, rgba(160, 32, 240, 0.6) 100%);
+    border-radius: 12px;
+    margin-bottom: 0.875rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-category-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: #fff;
+    stroke-width: 2;
+}
+
+.mobile-category-name {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    letter-spacing: -0.01em;
+}
+
+.mobile-category-desc {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 400;
+}
+
+/* Subtitulo de pagina */
+.mobile-page-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Header especial para categorias */
+.mobile-header-categories {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem var(--mobile-padding);
+    background: linear-gradient(180deg, var(--bg-primary) 0%, rgba(15, 15, 21, 0.95) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.mobile-header-categories-logo {
+    flex-shrink: 0;
+}
+
+.mobile-header-categories-logo img {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+}
+
+.mobile-header-categories-text {
+    flex: 1;
+}
+
+.mobile-header-categories-text h1 {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin: 0;
+}
+
+.mobile-header-categories-text p {
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.45);
+    font-weight: 400;
+    margin: 0.125rem 0 0;
+}
+
+.mobile-main-categories {
+    padding-top: 0 !important;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.mobile-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-btn:active {
+    transform: scale(0.97);
+}
+
+.mobile-btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    box-shadow: var(--glow-primary);
+}
+
+.mobile-btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.mobile-btn-accent {
+    background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+    color: #000;
+}
+
+.mobile-btn-danger {
+    background: var(--danger);
+    color: #fff;
+}
+
+.mobile-btn-block {
+    display: flex;
+    width: 100%;
+}
+
+.mobile-btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8125rem;
+}
+
+.mobile-btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+.mobile-form-group {
+    margin-bottom: 1rem;
+}
+
+.mobile-form-label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.mobile-form-input,
+.mobile-form-textarea,
+.mobile-form-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 16px; /* Previene zoom iOS */
+    transition: var(--transition-fast);
+}
+
+.mobile-form-input::placeholder,
+.mobile-form-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.mobile-form-input:focus,
+.mobile-form-textarea:focus,
+.mobile-form-select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--bg-quaternary);
+}
+
+.mobile-form-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.mobile-form-error {
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--danger);
+}
+
+/* ============================================
+   PERFIL
+   ============================================ */
+.mobile-profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.mobile-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+}
+
+.mobile-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mobile-profile-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.mobile-profile-email {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+.mobile-profile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 1rem;
+}
+
+/* ============================================
+   TOAST
+   ============================================ */
+.mobile-toast {
+    position: fixed;
+    bottom: calc(var(--mobile-bottom-nav-height) + 1rem + var(--mobile-safe-area-bottom));
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    padding: 0.75rem 1.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.mobile-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.mobile-toast-success {
+    border-color: var(--success);
+}
+
+.mobile-toast-error {
+    border-color: var(--danger);
+}
+
+/* ============================================
+   DETALLE
+   ============================================ */
+.mobile-detail-image {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: var(--bg-tertiary);
+    object-fit: cover;
+}
+
+.mobile-detail-content {
+    padding: var(--mobile-padding);
+}
+
+.mobile-detail-title {
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.mobile-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+.mobile-detail-body {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.mobile-detail-body p {
+    margin-bottom: 1rem;
+}
+
+.mobile-detail-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: var(--mobile-padding);
+    border-top: 1px solid var(--border-color);
+}
+
+/* ============================================
+   LISTA
+   ============================================ */
+.mobile-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-list-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.mobile-list-item:last-child {
+    border-bottom: none;
+}
+
+.mobile-list-icon {
+    font-size: 1.25rem;
+}
+
+.mobile-list-text {
+    flex: 1;
+}
+
+.mobile-list-arrow {
+    color: var(--text-muted);
+}
+
+/* ============================================
+   COLECTIVO CARDS
+   ============================================ */
+.mobile-card-colectivo {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    padding: 0;
+}
+
+.mobile-card-colectivo .mobile-card-bus-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    padding: 1rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.mobile-card-colectivo .mobile-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mobile-card-colectivo .mobile-card-excerpt {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+/* ============================================
+   CINE CARDS (Movie cards for mobile)
+   ============================================ */
+.cine-movie-card {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border-color);
+}
+
+.cine-movie-poster {
+    width: 80px;
+    min-width: 80px;
+    height: 120px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--bg-tertiary);
+}
+
+.cine-movie-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.cine-movie-title {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+}
+
+.cine-movie-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.cine-showtimes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin-top: auto;
+}
+
+.cine-showtime {
+    padding: 0.25rem 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* ============================================
+   EVENTO CARDS - Botones inscripción
+   ============================================ */
+.mobile-card-evento {
+    cursor: pointer;
+}
+
+.mobile-card-price-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.mobile-card-price-badge.free {
+    background: var(--success);
+}
+
+.mobile-card-event-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.mobile-btn-event {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.mobile-btn-event:active {
+    transform: scale(0.95);
+}
+
+.mobile-btn-event-subscribe {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    flex: 1;
+}
+
+.mobile-btn-event-subscribed {
+    background: var(--bg-tertiary);
+    color: var(--success);
+    border: 1px solid var(--success);
+    flex: 1;
+}
+
+.mobile-btn-event-login {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    flex: 1;
+}
+
+.mobile-btn-event-whatsapp {
+    background: #25D366;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.mobile-btn-event-whatsapp svg {
+    flex-shrink: 0;
+}
+
+.mobile-btn-event-whatsapp:active {
+    background: #1da851;
+}
+
+/* ============================================
+   MODAL DE REGISTRO DE EVENTO
+   ============================================ */
+.mobile-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.mobile-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mobile-modal-content {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 360px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.mobile-modal-overlay.active .mobile-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.mobile-modal-header {
+    text-align: center;
+    padding: 1.5rem 1.5rem 1rem;
+}
+
+.mobile-modal-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.mobile-modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.mobile-modal-body {
+    padding: 0 1.5rem 1.5rem;
+}
+
+.registration-event-info {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.registration-event-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+}
+
+.registration-event-detail {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0.25rem 0;
+}
+
+.registration-code-box {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 12px;
+    padding: 1.25rem;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.registration-code-label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.registration-code-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: monospace;
+    letter-spacing: 2px;
+    margin-bottom: 0.75rem;
+    word-break: break-all;
+}
+
+.registration-code-copy {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.registration-code-copy:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.95);
+}
+
+.registration-pending-notice,
+.registration-confirmed-notice {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+
+.registration-pending-notice p,
+.registration-confirmed-notice p {
+    margin: 0.25rem 0;
+}
+
+.mobile-btn-whatsapp-large {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: #25D366;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.mobile-btn-whatsapp-large:active {
+    background: #1da851;
+    transform: scale(0.98);
+}
+
+.mobile-btn-whatsapp-large svg {
+    flex-shrink: 0;
+}
+
+.mobile-modal-close {
+    display: block;
+    width: calc(100% - 3rem);
+    margin: 0 1.5rem 1.5rem;
+    padding: 0.875rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.mobile-modal-close:active {
+    background: var(--bg-quaternary);
+    transform: scale(0.98);
+}
+
+/* ============================================
+   PERFIL - TARJETAS DE INSCRIPCION
+   ============================================ */
+.mobile-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mobile-empty-small {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.mobile-empty-small p {
+    margin: 0 0 1rem;
+}
+
+.profile-registration-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.profile-registration-card.confirmed {
+    border-color: var(--success);
+    border-left: 3px solid var(--success);
+}
+
+.profile-registration-card.pending {
+    border-color: var(--warning);
+    border-left: 3px solid var(--warning);
+}
+
+.profile-registration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.profile-registration-price {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.profile-registration-price.free {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-registration-status {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.profile-registration-status.confirmed {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--success);
+}
+
+.profile-registration-status.pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--warning);
+}
+
+.profile-registration-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+}
+
+.profile-registration-date,
+.profile-registration-location {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+    margin: 0.25rem 0;
+}
+
+.profile-registration-code-box {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 8px;
+    padding: 0.875rem;
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.profile-registration-code-label {
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+
+.profile-registration-code {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: monospace;
+    letter-spacing: 1px;
+    flex: 1;
+}
+
+.profile-registration-copy {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.profile-registration-copy:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.95);
+}
+
+.profile-registration-whatsapp {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: #25D366;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.profile-registration-whatsapp:active {
+    background: #1da851;
+    transform: scale(0.98);
+}
+
+.profile-registration-whatsapp svg {
+    flex-shrink: 0;
+}

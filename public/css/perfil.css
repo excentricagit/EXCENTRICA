@@ -255,20 +255,3 @@
     color: #f87171;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    .profile-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    .event-registration-card {
-        flex-direction: column;
-    }
-    .event-registration-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
-}

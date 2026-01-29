@@ -193,7 +193,7 @@ const Utils = {
         return div.innerHTML;
     },
 
-    // Formatear número
+    // Formatear número (compacto para likes, views, etc)
     formatNumber(num) {
         if (num >= 1000000) {
             return (num / 1000000).toFixed(1) + 'M';
@@ -202,6 +202,12 @@ const Utils = {
             return (num / 1000).toFixed(1) + 'K';
         }
         return num.toString();
+    },
+
+    // Formatear precio (con separador de miles)
+    formatPrice(num) {
+        if (!num && num !== 0) return '0';
+        return Math.round(num).toLocaleString('es-AR');
     },
 
     // Validar email

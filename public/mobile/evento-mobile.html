@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <title>Evento - Excentrica</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+</head>
+<body class="mobile-app">
+    <div id="install-banner"></div>
+    <header id="mobile-header"></header>
+
+    <main id="mobile-main">
+        <div id="evento-content">
+            <div class="mobile-loading"><div class="mobile-spinner"></div></div>
+        </div>
+    </main>
+
+    <nav id="mobile-bottom-nav"></nav>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        let currentEvento = null;
+
+        async function loadEvento() {
+            const container = document.getElementById('evento-content');
+            const id = Utils.getUrlParam('id');
+
+            if (!id) {
+                MobileUI.showError(container, 'Evento no encontrado');
+                return;
+            }
+
+            // Cargar inscripciones del usuario
+            await loadMobileEventRegistrations();
+
+            try {
+                const response = await Api.getEventById(id);
+                const evento = response.data || response;
+
+                if (!evento) {
+                    MobileUI.showError(container, 'Evento no encontrado');
+                    return;
+                }
+
+                currentEvento = evento;
+                document.title = evento.title + ' - Excentrica';
+
+                const image = evento.image_url || CONFIG.PLACEHOLDER_IMAGE;
+                const eventDate = evento.event_date ? Utils.formatDate(evento.event_date) : '';
+                const eventTime = evento.event_time || '';
+                const isFree = !evento.price || evento.price === 0;
+                const priceText = isFree ? 'Gratis' : Utils.formatPrice(evento.price);
+
+                // Verificar estado de inscripcion
+                const registration = window.mobileEventRegistrations[evento.id];
+                const isLoggedIn = Auth && Auth.isAuthenticated();
+
+                let subscribeSection = '';
+                if (registration) {
+                    const statusText = registration.status === 'confirmado' ? 'Confirmada' : 'Pendiente';
+                    const statusColor = registration.status === 'confirmado' ? 'var(--success)' : 'var(--warning)';
+                    subscribeSection = '<div style="margin-top: 1rem; padding: 1rem; background: var(--bg-tertiary); border-radius: 8px; border-left: 4px solid ' + statusColor + ';">' +
+                        '<div style="font-weight: 600; color: ' + statusColor + '; margin-bottom: 0.5rem;">✓ Inscripcion ' + statusText + '</div>' +
+                        (registration.registration_code ? '<div style="font-size: 0.875rem; color: var(--text-secondary);">Tu codigo: <strong>' + registration.registration_code + '</strong></div>' : '') +
+                        (registration.status === 'pendiente' ? '<div style="font-size: 0.8125rem; color: var(--text-muted); margin-top: 0.5rem;">Contacta por WhatsApp para confirmar tu inscripcion.</div>' : '') +
+                        '</div>';
+                } else if (isLoggedIn) {
+                    subscribeSection = '<div style="margin-top: 1rem;">' +
+                        '<button id="btn-subscribe-detail" onclick="subscribeFromDetail()" class="mobile-btn mobile-btn-primary mobile-btn-block">' +
+                        '📝 Inscribirse a este evento</button></div>';
+                } else {
+                    subscribeSection = '<div style="margin-top: 1rem;">' +
+                        '<button onclick="window.location.href=\'/mobile/login-mobile.html\'" class="mobile-btn mobile-btn-secondary mobile-btn-block">' +
+                        '🔒 Inicia sesion para inscribirte</button></div>';
+                }
+
+                // Boton WhatsApp
+                let whatsappBtn = '';
+                if ((evento.whatsapp || evento.phone) && (!registration || registration.status === 'pendiente')) {
+                    const phone = (evento.whatsapp || evento.phone).replace(/\D/g, '');
+                    const fullPhone = phone.startsWith('54') ? phone : '54' + phone;
+                    const msgText = registration
+                        ? 'Hola! Me inscribi al evento "' + evento.title + '" y mi inscripcion esta pendiente. Como coordino?'
+                        : 'Hola! Estoy interesado en el evento "' + evento.title + '". Podrian darme mas informacion?';
+                    const msg = encodeURIComponent(msgText);
+                    whatsappBtn = '<a href="https://wa.me/' + fullPhone + '?text=' + msg + '" target="_blank" class="mobile-btn mobile-btn-block" style="background: #25D366; color: #fff; text-decoration: none; margin-bottom: 0.5rem;">' +
+                        '💬 Consultar por WhatsApp</a>';
+                }
+
+                let html = '<img src="' + image + '" alt="" class="mobile-detail-image" onerror="this.src=\'' + CONFIG.PLACEHOLDER_IMAGE + '\'">' +
+                    '<div class="mobile-detail-content">' +
+                    '<h1 class="mobile-detail-title">' + Utils.escapeHtml(evento.title) + '</h1>' +
+                    '<div class="mobile-detail-meta">';
+
+                if (eventDate) html += '<span>📅 ' + eventDate + '</span>';
+                if (eventTime) html += '<span>🕐 ' + eventTime + '</span>';
+                if (evento.location) html += '<span>📍 ' + Utils.escapeHtml(evento.location) + '</span>';
+
+                html += '</div>' +
+                    '<div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-secondary); border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">' +
+                    '<span style="color: var(--text-muted); font-size: 0.8125rem;">Entrada</span>' +
+                    '<div style="font-size: 1.25rem; font-weight: 700; color: ' + (isFree ? 'var(--success)' : 'var(--accent)') + ';">' + priceText + '</div>' +
+                    '</div>' +
+                    subscribeSection;
+
+                if (evento.description) {
+                    html += '<div class="mobile-detail-body" style="margin-top: 1rem;">' + evento.description + '</div>';
+                }
+
+                html += '</div>' +
+                    '<div class="mobile-detail-actions" style="flex-wrap: wrap;">' +
+                    whatsappBtn;
+
+                if (evento.location) {
+                    html += '<button onclick="mobileMap(\'' + Utils.escapeHtml(evento.location).replace(/'/g, "\\'") + '\')" class="mobile-btn mobile-btn-secondary" style="flex: 1;">📍 Ver mapa</button>';
+                }
+
+                html += '<button onclick="mobileShare(\'' + Utils.escapeHtml(evento.title).replace(/'/g, "\\'") + '\', \'' + eventDate + '\', window.location.href)" class="mobile-btn mobile-btn-secondary" style="flex: 1;">📤 Compartir</button>' +
+                    '<button onclick="mobileGoBack()" class="mobile-btn mobile-btn-secondary" style="flex: 1;">← Volver</button>' +
+                    '</div>';
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading evento:', error);
+                MobileUI.showError(container, 'Error al cargar el evento');
+            }
+        }
+
+        async function subscribeFromDetail() {
+            if (!currentEvento) return;
+
+            const btn = document.getElementById('btn-subscribe-detail');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ Procesando...';
+            }
+
+            try {
+                const response = await Api.registerToEvent(currentEvento.id);
+
+                if (response.success) {
+                    const data = response.data;
+
+                    window.mobileEventRegistrations[currentEvento.id] = {
+                        status: data.status,
+                        registration_code: data.registration_code
+                    };
+
+                    if (data.status === 'confirmado') {
+                        MobileUI.toast('Inscripcion confirmada! Tu codigo: ' + data.registration_code, 'success');
+                    } else {
+                        MobileUI.toast('Inscripcion registrada. Contacta por WhatsApp para confirmar.', 'info');
+                    }
+
+                    // Recargar para mostrar el nuevo estado
+                    loadEvento();
+                }
+            } catch (error) {
+                console.error('Error subscribing:', error);
+                MobileUI.toast(error.message || 'Error al inscribirse', 'error');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '📝 Inscribirse a este evento';
+                }
+            }
+        }
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: loadEvento
+        });
+    </script>
+</body>
+</html>

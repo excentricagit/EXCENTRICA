@@ -151,22 +151,3 @@
     font-size: 0.8rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .ads-player-video {
-        padding-bottom: 75%; /* Mas cuadrado en mobile */
-    }
-
-    .ads-player-title {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.8rem;
-    }
-
-    .ads-player-empty {
-        padding: 1.5rem 1rem;
-    }
-
-    .ads-player-empty-icon {
-        font-size: 2rem;
-    }
-}

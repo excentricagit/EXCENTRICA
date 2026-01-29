@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Videos - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page mobile-videos">
+
+            <!-- Header Videos -->
+            <div class="videos-header">
+                <div class="videos-header-top">
+                    <h1>Videos</h1>
+                    <span id="videos-count" class="videos-count"></span>
+                </div>
+                <p class="videos-subtitle">Contenido audiovisual de Santiago</p>
+            </div>
+
+            <!-- Playlists -->
+            <div id="playlists-container"></div>
+
+            <!-- Todos los videos -->
+            <div class="videos-section">
+                <div class="videos-section-header">
+                    <h2>Todos los Videos</h2>
+                </div>
+                <div id="videos-grid" class="videos-grid">
+                    <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+                </div>
+            </div>
+
+            <!-- Cargar mas -->
+            <div id="load-more-container" class="videos-load-more" style="display: none;">
+                <button id="btn-load-more" class="videos-btn-load">
+                    Cargar mas videos
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        const VideosPage = {
+            videos: [],
+            playlists: [],
+            page: 1,
+            hasMore: true,
+            loading: false,
+
+            async init() {
+                await Promise.all([
+                    this.loadPlaylists(),
+                    this.loadVideos(true)
+                ]);
+                this.setupLoadMore();
+            },
+
+            getYouTubeId(url) {
+                if (!url) return null;
+                const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+                return match ? match[1] : null;
+            },
+
+            async loadPlaylists() {
+                try {
+                    const response = await Api.getPlaylists();
+                    if (response.success && response.data) {
+                        this.playlists = response.data.playlists || response.data || [];
+                    } else if (Array.isArray(response.data)) {
+                        this.playlists = response.data;
+                    }
+
+                    if (this.playlists.length > 0) {
+                        await this.renderPlaylists();
+                    }
+                } catch (e) {
+                    console.error('Error loading playlists:', e);
+                }
+            },
+
+            async renderPlaylists() {
+                const container = document.getElementById('playlists-container');
+                let html = '';
+
+                for (const playlist of this.playlists) {
+                    try {
+                        const playlistData = await Api.getPlaylistById(playlist.id);
+                        const videos = playlistData.success ? (playlistData.data?.videos || []) : [];
+
+                        if (videos.length > 0) {
+                            html += `
+                                <div class="videos-playlist-section">
+                                    <div class="videos-section-header">
+                                        <div class="videos-playlist-title">
+                                            <span class="videos-playlist-icon">📁</span>
+                                            <h2>${Utils.escapeHtml(playlist.name)}</h2>
+                                        </div>
+                                        <span class="videos-playlist-count">${videos.length} videos</span>
+                                    </div>
+                                    <div class="videos-playlist-scroll">
+                                        ${videos.map(v => this.renderPlaylistCard(v)).join('')}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    } catch (e) {
+                        console.error('Error loading playlist:', playlist.id, e);
+                    }
+                }
+
+                container.innerHTML = html;
+            },
+
+            renderPlaylistCard(video) {
+                const videoId = this.getYouTubeId(video.video_url);
+                const thumbnail = videoId
+                    ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+                    : '/images/placeholder.jpg';
+                const views = video.view_count || 0;
+
+                return `
+                    <a href="/mobile/video-mobile.html?id=${video.id}" class="videos-playlist-card">
+                        <div class="videos-playlist-card-thumb" style="background-image: url('${thumbnail}')">
+                            <div class="videos-play-btn">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                            ${views > 0 ? `<span class="videos-views-badge">${Utils.formatNumber(views)}</span>` : ''}
+                        </div>
+                        <h3>${Utils.escapeHtml(video.title)}</h3>
+                    </a>
+                `;
+            },
+
+            setupLoadMore() {
+                const btn = document.getElementById('btn-load-more');
+                btn.addEventListener('click', () => this.loadVideos(false));
+            },
+
+            async loadVideos(reset = false) {
+                if (this.loading) return;
+                this.loading = true;
+
+                const grid = document.getElementById('videos-grid');
+                const loadMoreContainer = document.getElementById('load-more-container');
+
+                if (reset) {
+                    grid.innerHTML = '<div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>';
+                }
+
+                try {
+                    const response = await Api.getVideos({
+                        page: this.page,
+                        limit: 12,
+                        status: 'published'
+                    });
+
+                    if (response.success && response.data && response.data.videos) {
+                        const newVideos = response.data.videos;
+                        this.videos = reset ? newVideos : [...this.videos, ...newVideos];
+                        this.hasMore = newVideos.length === 12;
+                        this.page++;
+
+                        this.render();
+
+                        // Actualizar contador
+                        const total = response.data.pagination?.total || this.videos.length;
+                        document.getElementById('videos-count').textContent = `${total} videos`;
+                    } else {
+                        if (reset) {
+                            grid.innerHTML = '<p class="videos-empty">No hay videos disponibles</p>';
+                            document.getElementById('videos-count').textContent = '0 videos';
+                        }
+                    }
+
+                    loadMoreContainer.style.display = this.hasMore ? 'block' : 'none';
+
+                } catch (error) {
+                    console.error('Error loading videos:', error);
+                    if (reset) {
+                        grid.innerHTML = '<p class="videos-empty">Error al cargar videos</p>';
+                    }
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            render() {
+                const grid = document.getElementById('videos-grid');
+
+                if (this.videos.length === 0) {
+                    grid.innerHTML = '<p class="videos-empty">No hay videos disponibles</p>';
+                    return;
+                }
+
+                grid.innerHTML = this.videos.map(v => this.renderCard(v)).join('');
+            },
+
+            renderCard(video) {
+                const videoId = this.getYouTubeId(video.video_url);
+                const thumbnail = videoId
+                    ? `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+                    : '/images/placeholder.jpg';
+                const views = video.view_count || 0;
+
+                return `
+                    <a href="/mobile/video-mobile.html?id=${video.id}" class="videos-card">
+                        <div class="videos-card-thumb" style="background-image: url('${thumbnail}')">
+                            <div class="videos-play-btn">
+                                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                            <div class="videos-card-duration">
+                                ${Utils.timeAgo(video.created_at)}
+                            </div>
+                        </div>
+                        <div class="videos-card-info">
+                            <h3>${Utils.escapeHtml(video.title)}</h3>
+                            <div class="videos-card-meta">
+                                ${views > 0 ? `<span>${Utils.formatNumber(views)} vistas</span>` : ''}
+                                ${video.category_name ? `<span>${video.category_name}</span>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }
+        };
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: () => VideosPage.init()
+        });
+    </script>
+</body>
+</html>

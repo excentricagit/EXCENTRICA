@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Eventos - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page">
+            <div class="mobile-page-header" style="text-align: center;">
+                <h1 class="mobile-page-title" style="display: inline-block; background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">📅 Eventos</h1>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 0.25rem;">Inscribite y no te pierdas nada</p>
+            </div>
+            <div id="feed-container">
+                <div class="mobile-loading">
+                    <div class="mobile-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/feed-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        MobileApp.init({
+            page: 'categorias',
+            onReady: async () => {
+                // Cargar inscripciones del usuario primero
+                await loadMobileEventRegistrations();
+
+                // Luego cargar el feed de eventos
+                MobileCategoryFeed.init(
+                    '#feed-container',
+                    'eventos',
+                    (params) => Api.getEvents({ ...params, status: 'published', upcoming: 1 })
+                );
+            }
+        });
+    </script>
+</body>
+</html>

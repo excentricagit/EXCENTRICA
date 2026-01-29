@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <title>Buscar - Excentrica</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app">
+    <div id="install-banner"></div>
+    <header id="mobile-header"></header>
+
+    <main id="mobile-main">
+        <div class="mobile-page">
+            <div class="mobile-search-results-header">
+                <h1 class="mobile-page-title">
+                    🔍 <span class="mobile-search-query" id="search-query"></span>
+                </h1>
+                <span class="mobile-search-count" id="search-count"></span>
+            </div>
+            <div id="search-results">
+                <div class="mobile-loading"><div class="mobile-spinner"></div></div>
+            </div>
+        </div>
+    </main>
+
+    <nav id="mobile-bottom-nav"></nav>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        async function search() {
+            const query = Utils.getUrlParam('q');
+            const container = document.getElementById('search-results');
+            const queryEl = document.getElementById('search-query');
+            const countEl = document.getElementById('search-count');
+
+            if (!query) {
+                queryEl.textContent = 'Buscar';
+                MobileUI.showEmpty(container, '🔍', 'Escribe algo', 'Usa la barra de busqueda arriba');
+                return;
+            }
+
+            queryEl.textContent = query;
+            document.title = `${query} - Buscar en Excentrica`;
+
+            // Actualizar input de busqueda
+            const searchInput = document.getElementById('mobile-search-input');
+            if (searchInput) searchInput.value = query;
+
+            try {
+                // Buscar en multiples endpoints
+                const [newsRes, productsRes, eventsRes] = await Promise.allSettled([
+                    Api.get('/api/news', { search: query, limit: 10, status: 'published' }),
+                    Api.get('/api/products', { search: query, limit: 10, status: 'approved' }),
+                    Api.get('/api/events', { search: query, limit: 10, status: 'published' })
+                ]);
+
+                const newsItems = newsRes.status === 'fulfilled' ? (newsRes.value.data || []) : [];
+                const productItems = productsRes.status === 'fulfilled' ? (productsRes.value.data || []) : [];
+                const eventItems = eventsRes.status === 'fulfilled' ? (eventsRes.value.data || []) : [];
+
+                const totalResults = newsItems.length + productItems.length + eventItems.length;
+                countEl.textContent = `${totalResults} resultado${totalResults !== 1 ? 's' : ''}`;
+
+                if (totalResults === 0) {
+                    MobileUI.showEmpty(container, '🔍', 'Sin resultados', `No encontramos "${query}"`);
+                    return;
+                }
+
+                let html = '<div class="mobile-feed-grid">';
+
+                // Noticias
+                newsItems.forEach(item => {
+                    html += MobileUI.cardNoticia(item);
+                });
+
+                // Productos
+                productItems.forEach(item => {
+                    html += MobileUI.cardProducto(item);
+                });
+
+                // Eventos
+                eventItems.forEach(item => {
+                    html += MobileUI.cardEvento(item);
+                });
+
+                html += '</div>';
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error searching:', error);
+                MobileUI.showError(container, 'Error al buscar');
+            }
+        }
+
+        MobileApp.init({
+            page: 'home',
+            onReady: search
+        });
+    </script>
+</body>
+</html>

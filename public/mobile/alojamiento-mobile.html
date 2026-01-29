@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Alojamiento - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page mobile-aloja">
+
+            <!-- Header Alojamiento -->
+            <div class="aloja-header">
+                <div class="aloja-header-top">
+                    <h1>Alojamiento</h1>
+                    <span id="aloja-count" class="aloja-count"></span>
+                </div>
+                <p class="aloja-subtitle">Donde hospedarte en Santiago</p>
+            </div>
+
+            <!-- Destacados (si hay) -->
+            <div id="featured-container"></div>
+
+            <!-- Filtros de tipo -->
+            <div id="type-filters" class="aloja-filters">
+                <!-- Se cargan desde ALOJA_TYPES -->
+            </div>
+
+            <!-- Filtro de zona -->
+            <div class="aloja-zone-filter">
+                <select id="zone-filter" class="aloja-zone-select">
+                    <option value="">📍 Todas las zonas</option>
+                </select>
+            </div>
+
+            <!-- Lista de alojamientos -->
+            <div id="aloja-list" class="aloja-list">
+                <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+            </div>
+
+            <!-- Cargar mas -->
+            <div id="load-more-container" class="aloja-load-more" style="display: none;">
+                <button id="btn-load-more" class="aloja-btn-load">
+                    Ver mas alojamientos
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        // Tipos de alojamiento predefinidos (igual que desktop)
+        const ALOJA_TYPES = [
+            { slug: '', name: 'Todos', icon: '🏨' },
+            { slug: 'hotel', name: 'Hotel', icon: '🏨' },
+            { slug: 'apart-hotel', name: 'Apart Hotel', icon: '🏢' },
+            { slug: 'hostel', name: 'Hostel', icon: '🛏️' },
+            { slug: 'cabanas', name: 'Cabañas', icon: '🏡' },
+            { slug: 'departamento', name: 'Depto', icon: '🏠' },
+            { slug: 'camping', name: 'Camping', icon: '⛺' }
+        ];
+
+        // Amenidades
+        const AMENITY_MAP = {
+            'wifi': '📶',
+            'parking': '🅿️',
+            'pool': '🏊',
+            'breakfast': '🍳',
+            'ac': '❄️',
+            'tv': '📺'
+        };
+
+        const AlojaPage = {
+            items: [],
+            page: 1,
+            hasMore: true,
+            loading: false,
+            currentType: '',
+            currentZone: '',
+
+            async init() {
+                this.renderTypeFilters();
+                this.setupFilters();
+                await this.loadZones();
+                this.loadFeatured();
+                this.loadItems(true);
+                this.setupLoadMore();
+            },
+
+            async loadZones() {
+                try {
+                    const response = await Api.getZones();
+                    if (response.success && response.data) {
+                        const zones = response.data;
+                        const select = document.getElementById('zone-filter');
+                        zones.forEach(zone => {
+                            const option = document.createElement('option');
+                            option.value = zone.id;
+                            option.textContent = zone.name;
+                            select.appendChild(option);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error loading zones:', e);
+                }
+            },
+
+            renderTypeFilters() {
+                const container = document.getElementById('type-filters');
+                container.innerHTML = ALOJA_TYPES.map(type => `
+                    <button class="aloja-filter-chip ${type.slug === '' ? 'active' : ''}" data-type="${type.slug}">
+                        ${type.icon} ${type.name}
+                    </button>
+                `).join('');
+            },
+
+            setupFilters() {
+                // Filtro de tipo
+                document.getElementById('type-filters').addEventListener('click', (e) => {
+                    const chip = e.target.closest('.aloja-filter-chip');
+                    if (!chip) return;
+
+                    document.querySelectorAll('#type-filters .aloja-filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    this.currentType = chip.dataset.type;
+                    this.resetAndLoad();
+                });
+
+                // Filtro de zona
+                document.getElementById('zone-filter').addEventListener('change', (e) => {
+                    this.currentZone = e.target.value;
+                    this.resetAndLoad();
+                });
+            },
+
+            async loadFeatured() {
+                try {
+                    const response = await Api.getAccommodations({ featured: 1, limit: 5 });
+                    if (response.success && response.data && response.data.items && response.data.items.length > 0) {
+                        this.renderFeatured(response.data.items);
+                    }
+                } catch (e) {
+                    console.error('Error loading featured:', e);
+                }
+            },
+
+            renderFeatured(items) {
+                const container = document.getElementById('featured-container');
+                container.innerHTML = `
+                    <div class="aloja-featured-section">
+                        <div class="aloja-section-header">
+                            <h2>⭐ Destacados</h2>
+                        </div>
+                        <div class="aloja-featured-scroll">
+                            ${items.map(item => this.renderFeaturedCard(item)).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderFeaturedCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const typeInfo = ALOJA_TYPES.find(t => t.slug === item.accommodation_type) || { icon: '🏨', name: 'Hotel' };
+                const stars = this.renderStars(item.stars);
+                return `
+                    <a href="/mobile/local-mobile.html?type=accommodation&id=${item.id}" class="aloja-featured-card">
+                        <div class="aloja-featured-img" style="background-image: url('${image}')">
+                            <span class="aloja-featured-badge">Destacado</span>
+                        </div>
+                        <div class="aloja-featured-info">
+                            <h3>${Utils.escapeHtml(item.name)}</h3>
+                            <div class="aloja-featured-meta">
+                                <span>${typeInfo.icon}</span>
+                                ${stars ? `<span class="aloja-stars">${stars}</span>` : ''}
+                            </div>
+                        </div>
+                    </a>
+                `;
+            },
+
+            renderStars(num) {
+                const stars = parseInt(num) || 0;
+                if (stars === 0) return '';
+                let html = '';
+                for (let i = 0; i < stars; i++) {
+                    html += '★';
+                }
+                return html;
+            },
+
+            resetAndLoad() {
+                this.items = [];
+                this.page = 1;
+                this.hasMore = true;
+                this.loadItems(true);
+            },
+
+            setupLoadMore() {
+                document.getElementById('btn-load-more').addEventListener('click', () => this.loadItems(false));
+            },
+
+            async loadItems(reset = false) {
+                if (this.loading) return;
+                this.loading = true;
+
+                const list = document.getElementById('aloja-list');
+                const loadMoreContainer = document.getElementById('load-more-container');
+
+                if (reset) {
+                    list.innerHTML = '<div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>';
+                }
+
+                try {
+                    const params = {
+                        page: this.page,
+                        limit: 10
+                    };
+
+                    if (this.currentType) {
+                        params.accommodation_type = this.currentType;
+                    }
+
+                    if (this.currentZone) {
+                        params.zone_id = this.currentZone;
+                    }
+
+                    const response = await Api.getAccommodations(params);
+
+                    if (response.success && response.data && response.data.items) {
+                        const newItems = response.data.items;
+                        this.items = reset ? newItems : [...this.items, ...newItems];
+                        this.hasMore = newItems.length === 10;
+                        this.page++;
+
+                        this.render();
+
+                        const total = response.data.pagination?.total || this.items.length;
+                        document.getElementById('aloja-count').textContent = `${total} alojamientos`;
+                    } else {
+                        if (reset) {
+                            list.innerHTML = '<p class="aloja-empty">No hay alojamientos disponibles</p>';
+                            document.getElementById('aloja-count').textContent = '0 alojamientos';
+                        }
+                    }
+
+                    loadMoreContainer.style.display = this.hasMore ? 'block' : 'none';
+
+                } catch (error) {
+                    console.error('Error loading items:', error);
+                    if (reset) {
+                        list.innerHTML = '<p class="aloja-empty">Error al cargar alojamientos</p>';
+                    }
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            render() {
+                const list = document.getElementById('aloja-list');
+
+                if (this.items.length === 0) {
+                    list.innerHTML = '<p class="aloja-empty">No hay alojamientos disponibles</p>';
+                    return;
+                }
+
+                list.innerHTML = this.items.map(item => this.renderCard(item)).join('');
+            },
+
+            parseAmenities(amenities) {
+                if (!amenities) return [];
+                if (typeof amenities === 'string') {
+                    try { return JSON.parse(amenities); } catch(e) { return []; }
+                }
+                return amenities;
+            },
+
+            renderCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const typeInfo = ALOJA_TYPES.find(t => t.slug === item.accommodation_type) || { icon: '🏨', name: 'Hotel' };
+                const stars = this.renderStars(item.stars);
+                const amenities = this.parseAmenities(item.amenities);
+
+                // Mostrar hasta 4 amenidades
+                const amenityIcons = amenities.slice(0, 4).map(a => AMENITY_MAP[a] || '').filter(Boolean).join(' ');
+
+                return `
+                    <a href="/mobile/local-mobile.html?type=accommodation&id=${item.id}" class="aloja-card">
+                        <div class="aloja-card-img" style="background-image: url('${image}')">
+                            ${item.featured ? '<span class="aloja-card-featured">⭐</span>' : ''}
+                            ${stars ? `<span class="aloja-card-stars">${stars}</span>` : ''}
+                        </div>
+                        <div class="aloja-card-content">
+                            <div class="aloja-card-header">
+                                <h3>${Utils.escapeHtml(item.name)}</h3>
+                            </div>
+                            <p class="aloja-card-type">${typeInfo.icon} ${typeInfo.name}</p>
+                            ${amenityIcons ? `<div class="aloja-card-amenities">${amenityIcons}</div>` : ''}
+                            ${item.zone_name ? `<p class="aloja-card-zone">📍 ${item.zone_name}</p>` : ''}
+                        </div>
+                        <div class="aloja-card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </a>
+                `;
+            }
+        };
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: () => AlojaPage.init()
+        });
+    </script>
+</body>
+</html>

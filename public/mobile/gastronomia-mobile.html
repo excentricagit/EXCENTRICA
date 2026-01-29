@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Gastronomia - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page mobile-gastro">
+
+            <!-- Header Gastronomia -->
+            <div class="gastro-header">
+                <div class="gastro-header-top">
+                    <h1>Gastronomia</h1>
+                    <span id="gastro-count" class="gastro-count"></span>
+                </div>
+                <p class="gastro-subtitle">Donde comer en Santiago</p>
+            </div>
+
+            <!-- Destacados (si hay) -->
+            <div id="featured-container"></div>
+
+            <!-- Filtros de tipo -->
+            <div id="type-filters" class="gastro-filters">
+                <!-- Se cargan desde GASTRO_TYPES -->
+            </div>
+
+            <!-- Filtros servicios -->
+            <div id="service-filters" class="gastro-filters gastro-filters-services">
+                <button class="gastro-filter-chip service active" data-service="all">
+                    Todos
+                </button>
+                <button class="gastro-filter-chip service" data-service="delivery">
+                    🛵 Delivery
+                </button>
+                <button class="gastro-filter-chip service" data-service="takeaway">
+                    🥡 Take Away
+                </button>
+            </div>
+
+            <!-- Filtro de zona -->
+            <div class="gastro-zone-filter">
+                <select id="zone-filter" class="gastro-zone-select">
+                    <option value="">📍 Todas las zonas</option>
+                </select>
+            </div>
+
+            <!-- Lista de locales -->
+            <div id="gastro-list" class="gastro-list">
+                <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+            </div>
+
+            <!-- Cargar mas -->
+            <div id="load-more-container" class="gastro-load-more" style="display: none;">
+                <button id="btn-load-more" class="gastro-btn-load">
+                    Ver mas locales
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        // Tipos de gastronomia predefinidos (igual que desktop)
+        const GASTRO_TYPES = [
+            { slug: '', name: 'Todos', icon: '🍽️' },
+            { slug: 'parrilla', name: 'Parrilla', icon: '🔥' },
+            { slug: 'restaurante', name: 'Restaurante', icon: '🍴' },
+            { slug: 'bar', name: 'Bar', icon: '🍺' },
+            { slug: 'cafeteria', name: 'Cafeteria', icon: '☕' },
+            { slug: 'pizzeria', name: 'Pizzeria', icon: '🍕' },
+            { slug: 'comida-rapida', name: 'Rapida', icon: '🍔' },
+            { slug: 'heladeria', name: 'Heladeria', icon: '🍦' },
+            { slug: 'rotiseria', name: 'Rotiseria', icon: '🍗' },
+            { slug: 'empanadas', name: 'Empanadas', icon: '🥟' }
+        ];
+
+        const GastroPage = {
+            items: [],
+            page: 1,
+            hasMore: true,
+            loading: false,
+            currentType: '',
+            currentService: 'all',
+            currentZone: '',
+
+            async init() {
+                this.renderTypeFilters();
+                this.setupFilters();
+                await this.loadZones();
+                this.loadFeatured();
+                this.loadItems(true);
+                this.setupLoadMore();
+            },
+
+            async loadZones() {
+                try {
+                    const response = await Api.getZones();
+                    if (response.success && response.data) {
+                        const zones = response.data;
+                        const select = document.getElementById('zone-filter');
+                        zones.forEach(zone => {
+                            const option = document.createElement('option');
+                            option.value = zone.id;
+                            option.textContent = zone.name;
+                            select.appendChild(option);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error loading zones:', e);
+                }
+            },
+
+            renderTypeFilters() {
+                const container = document.getElementById('type-filters');
+                container.innerHTML = GASTRO_TYPES.map(type => `
+                    <button class="gastro-filter-chip type ${type.slug === '' ? 'active' : ''}" data-type="${type.slug}">
+                        ${type.icon} ${type.name}
+                    </button>
+                `).join('');
+            },
+
+            setupFilters() {
+                // Filtros de tipo
+                document.getElementById('type-filters').addEventListener('click', (e) => {
+                    const chip = e.target.closest('.gastro-filter-chip.type');
+                    if (!chip) return;
+
+                    document.querySelectorAll('#type-filters .gastro-filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    this.currentType = chip.dataset.type;
+                    this.resetAndLoad();
+                });
+
+                // Filtros de servicio
+                document.getElementById('service-filters').addEventListener('click', (e) => {
+                    const chip = e.target.closest('.gastro-filter-chip.service');
+                    if (!chip) return;
+
+                    document.querySelectorAll('#service-filters .gastro-filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    this.currentService = chip.dataset.service;
+                    this.resetAndLoad();
+                });
+
+                // Filtro de zona
+                document.getElementById('zone-filter').addEventListener('change', (e) => {
+                    this.currentZone = e.target.value;
+                    this.resetAndLoad();
+                });
+            },
+
+            async loadFeatured() {
+                try {
+                    const response = await Api.getGastronomy({ featured: 1, limit: 5 });
+                    if (response.success && response.data && response.data.items && response.data.items.length > 0) {
+                        this.renderFeatured(response.data.items);
+                    }
+                } catch (e) {
+                    console.error('Error loading featured:', e);
+                }
+            },
+
+            renderFeatured(items) {
+                const container = document.getElementById('featured-container');
+                container.innerHTML = `
+                    <div class="gastro-featured-section">
+                        <div class="gastro-section-header">
+                            <h2>⭐ Destacados</h2>
+                        </div>
+                        <div class="gastro-featured-scroll">
+                            ${items.map(item => this.renderFeaturedCard(item)).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderFeaturedCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const typeInfo = GASTRO_TYPES.find(t => t.slug === item.specialties) || { icon: '🍽️', name: 'Restaurante' };
+                return `
+                    <a href="/mobile/local-mobile.html?type=gastronomy&id=${item.id}" class="gastro-featured-card">
+                        <div class="gastro-featured-img" style="background-image: url('${image}')">
+                            <span class="gastro-featured-badge">Destacado</span>
+                        </div>
+                        <div class="gastro-featured-info">
+                            <h3>${Utils.escapeHtml(item.name)}</h3>
+                            <span>${typeInfo.icon} ${typeInfo.name}</span>
+                        </div>
+                    </a>
+                `;
+            },
+
+            resetAndLoad() {
+                this.items = [];
+                this.page = 1;
+                this.hasMore = true;
+                this.loadItems(true);
+            },
+
+            setupLoadMore() {
+                document.getElementById('btn-load-more').addEventListener('click', () => this.loadItems(false));
+            },
+
+            async loadItems(reset = false) {
+                if (this.loading) return;
+                this.loading = true;
+
+                const list = document.getElementById('gastro-list');
+                const loadMoreContainer = document.getElementById('load-more-container');
+
+                if (reset) {
+                    list.innerHTML = '<div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>';
+                }
+
+                try {
+                    const params = {
+                        page: this.page,
+                        limit: 10
+                    };
+
+                    // Filtro por tipo (specialties)
+                    if (this.currentType) {
+                        params.specialties = this.currentType;
+                    }
+
+                    // Filtro por servicio
+                    if (this.currentService === 'delivery') {
+                        params.has_delivery = 1;
+                    } else if (this.currentService === 'takeaway') {
+                        params.has_takeaway = 1;
+                    }
+
+                    // Filtro por zona
+                    if (this.currentZone) {
+                        params.zone_id = this.currentZone;
+                    }
+
+                    const response = await Api.getGastronomy(params);
+
+                    if (response.success && response.data && response.data.items) {
+                        const newItems = response.data.items;
+                        this.items = reset ? newItems : [...this.items, ...newItems];
+                        this.hasMore = newItems.length === 10;
+                        this.page++;
+
+                        this.render();
+
+                        const total = response.data.pagination?.total || this.items.length;
+                        document.getElementById('gastro-count').textContent = `${total} locales`;
+                    } else {
+                        if (reset) {
+                            list.innerHTML = '<p class="gastro-empty">No hay locales disponibles</p>';
+                            document.getElementById('gastro-count').textContent = '0 locales';
+                        }
+                    }
+
+                    loadMoreContainer.style.display = this.hasMore ? 'block' : 'none';
+
+                } catch (error) {
+                    console.error('Error loading items:', error);
+                    if (reset) {
+                        list.innerHTML = '<p class="gastro-empty">Error al cargar locales</p>';
+                    }
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            render() {
+                const list = document.getElementById('gastro-list');
+
+                if (this.items.length === 0) {
+                    list.innerHTML = '<p class="gastro-empty">No hay locales disponibles</p>';
+                    return;
+                }
+
+                list.innerHTML = this.items.map(item => this.renderCard(item)).join('');
+            },
+
+            renderCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const hasDelivery = item.has_delivery === 1;
+                const hasTakeaway = item.has_takeaway === 1;
+                const typeInfo = GASTRO_TYPES.find(t => t.slug === item.specialties) || { icon: '🍽️', name: 'Restaurante' };
+
+                // Precio visual
+                let priceIndicator = '';
+                if (item.price_range) {
+                    const prices = { 'bajo': '$', 'medio': '$$', 'alto': '$$$' };
+                    priceIndicator = prices[item.price_range] || '';
+                }
+
+                return `
+                    <a href="/mobile/local-mobile.html?type=gastronomy&id=${item.id}" class="gastro-card">
+                        <div class="gastro-card-img" style="background-image: url('${image}')">
+                            ${item.featured ? '<span class="gastro-card-featured">⭐</span>' : ''}
+                        </div>
+                        <div class="gastro-card-content">
+                            <div class="gastro-card-header">
+                                <h3>${Utils.escapeHtml(item.name)}</h3>
+                                ${priceIndicator ? `<span class="gastro-card-price">${priceIndicator}</span>` : ''}
+                            </div>
+                            <p class="gastro-card-category">${typeInfo.icon} ${typeInfo.name}</p>
+                            <div class="gastro-card-badges">
+                                ${hasDelivery ? '<span class="gastro-badge delivery">🛵 Delivery</span>' : ''}
+                                ${hasTakeaway ? '<span class="gastro-badge takeaway">🥡 Take Away</span>' : ''}
+                            </div>
+                            ${item.zone_name ? `<p class="gastro-card-zone">📍 ${item.zone_name}</p>` : ''}
+                        </div>
+                        <div class="gastro-card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </a>
+                `;
+            }
+        };
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: () => GastroPage.init()
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <title>Video - Excentrica</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <style>
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body class="mobile-app">
+    <div id="install-banner"></div>
+    <header id="mobile-header"></header>
+
+    <main id="mobile-main">
+        <div id="video-content">
+            <div class="mobile-loading"><div class="mobile-spinner"></div></div>
+        </div>
+    </main>
+
+    <nav id="mobile-bottom-nav"></nav>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        async function loadVideo() {
+            const container = document.getElementById('video-content');
+            const id = Utils.getUrlParam('id');
+
+            if (!id) {
+                MobileUI.showError(container, 'Video no encontrado');
+                return;
+            }
+
+            try {
+                const response = await Api.get(`/api/videos/${id}`);
+                const video = response.data || response;
+
+                if (!video) {
+                    MobileUI.showError(container, 'Video no encontrado');
+                    return;
+                }
+
+                document.title = `${video.title} - Excentrica`;
+
+                const videoId = Utils.getYouTubeId(video.video_url);
+                const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : '';
+
+                container.innerHTML = `
+                    ${embedUrl ? `
+                        <div class="video-container">
+                            <iframe src="${embedUrl}" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+                        </div>
+                    ` : ''}
+
+                    <div class="mobile-detail-content">
+                        <h1 class="mobile-detail-title">${Utils.escapeHtml(video.title)}</h1>
+
+                        <div class="mobile-detail-meta">
+                            <span>🎥 Video</span>
+                            <span>📅 ${Utils.timeAgo(video.created_at)}</span>
+                        </div>
+
+                        ${video.description ? `
+                            <div class="mobile-detail-body">
+                                <p>${Utils.escapeHtml(video.description)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="mobile-detail-actions">
+                        <button onclick="mobileShare('${Utils.escapeHtml(video.title)}', '', window.location.href)" class="mobile-btn mobile-btn-secondary" style="flex: 1;">
+                            📤 Compartir
+                        </button>
+                        <button onclick="mobileGoBack()" class="mobile-btn mobile-btn-secondary" style="flex: 1;">
+                            ← Volver
+                        </button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading video:', error);
+                MobileUI.showError(container, 'Error al cargar el video');
+            }
+        }
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: loadVideo
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Turismo - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page mobile-turismo">
+
+            <!-- Header Turismo -->
+            <div class="turismo-header">
+                <div class="turismo-header-top">
+                    <h1>Turismo</h1>
+                    <span id="turismo-count" class="turismo-count"></span>
+                </div>
+                <p class="turismo-subtitle">Descubre Santiago del Estero</p>
+            </div>
+
+            <!-- Destacados (si hay) -->
+            <div id="featured-container"></div>
+
+            <!-- Filtros de categoria -->
+            <div id="category-filters" class="turismo-filters">
+                <button class="turismo-filter-chip active" data-category="">
+                    📍 Todos
+                </button>
+                <!-- Se cargan desde API -->
+            </div>
+
+            <!-- Filtro de zona -->
+            <div class="turismo-zone-filter">
+                <select id="zone-filter" class="turismo-zone-select">
+                    <option value="">📍 Todas las zonas</option>
+                </select>
+            </div>
+
+            <!-- Lista de lugares -->
+            <div id="turismo-list" class="turismo-list">
+                <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+            </div>
+
+            <!-- Cargar mas -->
+            <div id="load-more-container" class="turismo-load-more" style="display: none;">
+                <button id="btn-load-more" class="turismo-btn-load">
+                    Ver mas lugares
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Bottom Sheet para detalle -->
+    <div id="poi-sheet" class="turismo-sheet">
+        <div class="turismo-sheet-overlay" onclick="TurismoPage.closeSheet()"></div>
+        <div class="turismo-sheet-content">
+            <div class="turismo-sheet-handle"></div>
+            <div id="poi-detail" class="poi-detail">
+                <!-- Contenido dinamico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        // Iconos para categorias de turismo
+        const CATEGORY_ICONS = {
+            'museo': '🏛️',
+            'parque': '🌳',
+            'plaza': '🏞️',
+            'iglesia': '⛪',
+            'monumento': '🗿',
+            'rio': '🏊',
+            'termas': '♨️',
+            'laguna': '🌊',
+            'reserva': '🦜',
+            'cerro': '⛰️',
+            'mirador': '🔭',
+            'ruinas': '🏚️',
+            'historico': '📜',
+            'arquitectura': '🏗️',
+            'naturaleza': '🌿',
+            'aventura': '🧗',
+            'cultural': '🎭',
+            'religioso': '🕯️',
+            'default': '📍'
+        };
+
+        function getCategoryIcon(name) {
+            if (!name) return CATEGORY_ICONS.default;
+            const lower = name.toLowerCase();
+            for (const key in CATEGORY_ICONS) {
+                if (lower.includes(key)) return CATEGORY_ICONS[key];
+            }
+            return CATEGORY_ICONS.default;
+        }
+
+        const TurismoPage = {
+            items: [],
+            categories: [],
+            page: 1,
+            hasMore: true,
+            loading: false,
+            currentCategory: '',
+            currentZone: '',
+
+            async init() {
+                await Promise.all([
+                    this.loadCategories(),
+                    this.loadZones()
+                ]);
+                this.setupFilters();
+                this.loadFeatured();
+                this.loadItems(true);
+                this.setupLoadMore();
+            },
+
+            async loadCategories() {
+                try {
+                    const response = await Api.getCategories('puntos-interes');
+                    if (response.success && response.data) {
+                        this.categories = response.data;
+                        this.renderCategoryFilters();
+                    }
+                } catch (e) {
+                    console.error('Error loading categories:', e);
+                }
+            },
+
+            async loadZones() {
+                try {
+                    const response = await Api.getZones();
+                    if (response.success && response.data) {
+                        const select = document.getElementById('zone-filter');
+                        response.data.forEach(zone => {
+                            const option = document.createElement('option');
+                            option.value = zone.id;
+                            option.textContent = zone.name;
+                            select.appendChild(option);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error loading zones:', e);
+                }
+            },
+
+            renderCategoryFilters() {
+                const container = document.getElementById('category-filters');
+                let html = `
+                    <button class="turismo-filter-chip active" data-category="">
+                        📍 Todos
+                    </button>
+                `;
+
+                this.categories.forEach(cat => {
+                    const icon = getCategoryIcon(cat.name);
+                    html += `
+                        <button class="turismo-filter-chip" data-category="${cat.id}">
+                            ${icon} ${Utils.escapeHtml(cat.name)}
+                        </button>
+                    `;
+                });
+
+                container.innerHTML = html;
+            },
+
+            setupFilters() {
+                // Filtro de categoria
+                document.getElementById('category-filters').addEventListener('click', (e) => {
+                    const chip = e.target.closest('.turismo-filter-chip');
+                    if (!chip) return;
+
+                    document.querySelectorAll('#category-filters .turismo-filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    this.currentCategory = chip.dataset.category;
+                    this.resetAndLoad();
+                });
+
+                // Filtro de zona
+                document.getElementById('zone-filter').addEventListener('change', (e) => {
+                    this.currentZone = e.target.value;
+                    this.resetAndLoad();
+                });
+            },
+
+            async loadFeatured() {
+                try {
+                    const response = await Api.getPoi({ featured: true, limit: 6 });
+                    if (response.success && response.data && response.data.items) {
+                        const featured = response.data.items.filter(p => p.featured);
+                        if (featured.length > 0) {
+                            this.renderFeatured(featured);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading featured:', e);
+                }
+            },
+
+            renderFeatured(items) {
+                const container = document.getElementById('featured-container');
+                container.innerHTML = `
+                    <div class="turismo-featured-section">
+                        <div class="turismo-section-header">
+                            <h2>⭐ Lugares Destacados</h2>
+                        </div>
+                        <div class="turismo-featured-scroll">
+                            ${items.map(item => this.renderFeaturedCard(item)).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderFeaturedCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const icon = getCategoryIcon(item.category_name);
+                const entryText = item.entry_fee ? `$${Number(item.entry_fee).toLocaleString('es-AR')}` : 'Gratis';
+                return `
+                    <div class="turismo-featured-card" onclick="TurismoPage.showDetail(${item.id})">
+                        <div class="turismo-featured-img" style="background-image: url('${image}')">
+                            <span class="turismo-featured-badge">Destacado</span>
+                            <span class="turismo-featured-entry">${item.entry_fee ? '🎫' : '🆓'} ${entryText}</span>
+                        </div>
+                        <div class="turismo-featured-info">
+                            <h3>${Utils.escapeHtml(item.name)}</h3>
+                            <span>${icon} ${item.category_name || 'Lugar'}</span>
+                        </div>
+                    </div>
+                `;
+            },
+
+            resetAndLoad() {
+                this.items = [];
+                this.page = 1;
+                this.hasMore = true;
+                this.loadItems(true);
+            },
+
+            setupLoadMore() {
+                document.getElementById('btn-load-more').addEventListener('click', () => this.loadItems(false));
+            },
+
+            async loadItems(reset = false) {
+                if (this.loading) return;
+                this.loading = true;
+
+                const list = document.getElementById('turismo-list');
+                const loadMoreContainer = document.getElementById('load-more-container');
+
+                if (reset) {
+                    list.innerHTML = '<div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>';
+                }
+
+                try {
+                    const params = {
+                        page: this.page,
+                        limit: 10
+                    };
+
+                    if (this.currentCategory) {
+                        params.category_id = this.currentCategory;
+                    }
+
+                    if (this.currentZone) {
+                        params.zone_id = this.currentZone;
+                    }
+
+                    const response = await Api.getPoi(params);
+
+                    if (response.success && response.data && response.data.items) {
+                        const newItems = response.data.items;
+                        this.items = reset ? newItems : [...this.items, ...newItems];
+                        this.hasMore = newItems.length === 10;
+                        this.page++;
+
+                        this.render();
+
+                        const total = response.data.pagination?.total || this.items.length;
+                        document.getElementById('turismo-count').textContent = `${total} lugares`;
+                    } else {
+                        if (reset) {
+                            list.innerHTML = '<p class="turismo-empty">No hay lugares disponibles</p>';
+                            document.getElementById('turismo-count').textContent = '0 lugares';
+                        }
+                    }
+
+                    loadMoreContainer.style.display = this.hasMore ? 'block' : 'none';
+
+                } catch (error) {
+                    console.error('Error loading items:', error);
+                    if (reset) {
+                        list.innerHTML = '<p class="turismo-empty">Error al cargar lugares</p>';
+                    }
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            render() {
+                const list = document.getElementById('turismo-list');
+
+                if (this.items.length === 0) {
+                    list.innerHTML = '<p class="turismo-empty">No hay lugares disponibles</p>';
+                    return;
+                }
+
+                list.innerHTML = this.items.map(item => this.renderCard(item)).join('');
+            },
+
+            getMapsLink(poi) {
+                if (!poi.latitude || !poi.longitude) return null;
+                return `https://www.google.com/maps?q=${poi.latitude},${poi.longitude}`;
+            },
+
+            getDirectionsLink(poi) {
+                if (!poi.latitude || !poi.longitude) return null;
+                return `https://www.google.com/maps/dir/?api=1&destination=${poi.latitude},${poi.longitude}`;
+            },
+
+            renderCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const icon = getCategoryIcon(item.category_name);
+                const hasLocation = item.latitude && item.longitude;
+                const entryText = item.entry_fee ? `$${Number(item.entry_fee).toLocaleString('es-AR')}` : 'Gratis';
+                const entryClass = item.entry_fee ? 'paid' : 'free';
+
+                return `
+                    <div class="turismo-card" onclick="TurismoPage.showDetail(${item.id})">
+                        <div class="turismo-card-img" style="background-image: url('${image}')">
+                            ${item.featured ? '<span class="turismo-card-featured">⭐</span>' : ''}
+                            <span class="turismo-card-entry ${entryClass}">${item.entry_fee ? '🎫' : '🆓'} ${entryText}</span>
+                        </div>
+                        <div class="turismo-card-content">
+                            <h3>${Utils.escapeHtml(item.name)}</h3>
+                            <p class="turismo-card-category">${icon} ${item.category_name || 'Lugar'}</p>
+                            ${item.description ? `<p class="turismo-card-desc">${Utils.escapeHtml(item.description.substring(0, 80))}${item.description.length > 80 ? '...' : ''}</p>` : ''}
+                            <div class="turismo-card-meta">
+                                ${item.zone_name ? `<span>📍 ${item.zone_name}</span>` : ''}
+                                ${hasLocation ? '<span class="turismo-card-location">🗺️ Ver mapa</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="turismo-card-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 18l6-6-6-6"/>
+                            </svg>
+                        </div>
+                    </div>
+                `;
+            },
+
+            async showDetail(poiId) {
+                const sheet = document.getElementById('poi-sheet');
+                const detail = document.getElementById('poi-detail');
+
+                // Mostrar loading
+                detail.innerHTML = `
+                    <div class="poi-detail-loading">
+                        <div class="mobile-spinner-sm"></div>
+                        <p>Cargando...</p>
+                    </div>
+                `;
+                sheet.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                try {
+                    const response = await Api.getPoiById(poiId);
+                    if (!response.success || !response.data) {
+                        throw new Error('POI no encontrado');
+                    }
+
+                    const poi = response.data;
+                    const image = poi.image_url || '/images/placeholder.jpg';
+                    const icon = getCategoryIcon(poi.category_name);
+                    const hasLocation = poi.latitude && poi.longitude;
+                    const entryText = poi.entry_fee ? `$${Number(poi.entry_fee).toLocaleString('es-AR')}` : 'Entrada Gratuita';
+
+                    // Botones de accion
+                    let actionButtons = '';
+                    if (hasLocation) {
+                        actionButtons += `
+                            <a href="${this.getMapsLink(poi)}" target="_blank" rel="noopener" class="poi-action-btn map">
+                                🗺️ Ver en mapa
+                            </a>
+                            <a href="${this.getDirectionsLink(poi)}" target="_blank" rel="noopener" class="poi-action-btn directions">
+                                🧭 Como llegar
+                            </a>
+                        `;
+                    }
+                    if (poi.phone) {
+                        actionButtons += `
+                            <a href="tel:${poi.phone}" class="poi-action-btn phone">
+                                📞 Llamar
+                            </a>
+                        `;
+                    }
+                    if (poi.website) {
+                        actionButtons += `
+                            <a href="${poi.website}" target="_blank" rel="noopener" class="poi-action-btn website">
+                                🌐 Sitio web
+                            </a>
+                        `;
+                    }
+
+                    detail.innerHTML = `
+                        <div class="poi-detail-image" style="background-image: url('${image}')">
+                            ${poi.featured ? '<span class="poi-detail-badge">⭐ Destacado</span>' : ''}
+                            ${poi.category_name ? `<span class="poi-detail-category">${icon} ${Utils.escapeHtml(poi.category_name)}</span>` : ''}
+                        </div>
+                        <div class="poi-detail-body">
+                            <h2 class="poi-detail-title">${Utils.escapeHtml(poi.name)}</h2>
+
+                            <div class="poi-detail-info">
+                                ${poi.zone_name ? `
+                                    <div class="poi-info-item">
+                                        <span class="poi-info-icon">📍</span>
+                                        <span>${Utils.escapeHtml(poi.zone_name)}</span>
+                                    </div>
+                                ` : ''}
+                                <div class="poi-info-item ${poi.entry_fee ? 'paid' : 'free'}">
+                                    <span class="poi-info-icon">${poi.entry_fee ? '🎫' : '🆓'}</span>
+                                    <span>${entryText}</span>
+                                </div>
+                                ${poi.schedule ? `
+                                    <div class="poi-info-item">
+                                        <span class="poi-info-icon">🕐</span>
+                                        <span>${Utils.escapeHtml(poi.schedule)}</span>
+                                    </div>
+                                ` : ''}
+                                ${poi.address ? `
+                                    <div class="poi-info-item">
+                                        <span class="poi-info-icon">🏠</span>
+                                        <span>${Utils.escapeHtml(poi.address)}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            ${poi.description ? `
+                                <div class="poi-detail-description">
+                                    <h3>Descripcion</h3>
+                                    <p>${Utils.escapeHtml(poi.description)}</p>
+                                </div>
+                            ` : ''}
+
+                            ${actionButtons ? `
+                                <div class="poi-detail-actions">
+                                    ${actionButtons}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error('Error loading POI detail:', e);
+                    detail.innerHTML = `
+                        <div class="poi-detail-error">
+                            <span>❌</span>
+                            <p>Error al cargar el lugar</p>
+                            <button onclick="TurismoPage.showDetail(${poiId})">Reintentar</button>
+                        </div>
+                    `;
+                }
+            },
+
+            closeSheet() {
+                const sheet = document.getElementById('poi-sheet');
+                sheet.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        };
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: () => TurismoPage.init()
+        });
+    </script>
+</body>
+</html>

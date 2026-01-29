@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Producto - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <style>
+        .product-images {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .product-images img {
+            width: 100%;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+            aspect-ratio: 1;
+            object-fit: cover;
+            background: var(--bg-tertiary);
+        }
+        .product-price-box {
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .product-price-current {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .product-price-original {
+            font-size: 1rem;
+            color: var(--text-muted);
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+        }
+        .product-condition {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div id="producto-content">
+            <div class="mobile-loading">
+                <div class="mobile-spinner"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        async function loadProducto() {
+            const container = document.getElementById('producto-content');
+            const id = Utils.getUrlParam('id');
+
+            if (!id) {
+                MobileUI.showError(container, 'Producto no encontrado');
+                return;
+            }
+
+            try {
+                const response = await Api.getProductById(id);
+                const producto = response.data || response;
+
+                if (!producto) {
+                    MobileUI.showError(container, 'Producto no encontrado');
+                    return;
+                }
+
+                document.title = `${producto.title} - Excentrica`;
+
+                const frontImage = producto.front_image_url || producto.image_url || CONFIG.PLACEHOLDER_IMAGE;
+                const backImage = producto.back_image_url;
+                const price = Utils.formatPrice(producto.price);
+                const hasDiscount = producto.original_price && producto.original_price > producto.price;
+                const condition = producto.condition === 'new' ? 'Nuevo' : 'Usado';
+
+                let imagesHtml = `<img src="${frontImage}" alt="" onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">`;
+                if (backImage) {
+                    imagesHtml += `<img src="${backImage}" alt="" onerror="this.style.display='none'">`;
+                }
+
+                container.innerHTML = `
+                    <div class="product-images">
+                        ${imagesHtml}
+                    </div>
+
+                    <div class="mobile-detail-content">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                            <span class="product-condition">${condition}</span>
+                            ${producto.category_name ? `<span style="color: var(--text-muted); font-size: 0.8125rem;">${producto.category_name}</span>` : ''}
+                        </div>
+
+                        <h1 class="mobile-detail-title">${Utils.escapeHtml(producto.title)}</h1>
+
+                        <div class="product-price-box">
+                            <span class="product-price-current">${price}</span>
+                            ${hasDiscount ? `<span class="product-price-original">${Utils.formatPrice(producto.original_price)}</span>` : ''}
+                        </div>
+
+                        ${producto.description ? `
+                            <div class="mobile-detail-body">
+                                <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">Descripcion</h3>
+                                <p>${Utils.escapeHtml(producto.description)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="mobile-detail-actions" style="flex-wrap: wrap;">
+                        ${producto.whatsapp ? `
+                            <button onclick="mobileWhatsApp('${producto.whatsapp}', 'Hola! Me interesa: ${Utils.escapeHtml(producto.title)}')" class="mobile-btn mobile-btn-primary" style="flex: 1; min-width: 45%;">
+                                💬 WhatsApp
+                            </button>
+                        ` : ''}
+                        ${producto.phone ? `
+                            <button onclick="mobileCall('${producto.phone}')" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 45%;">
+                                📞 Llamar
+                            </button>
+                        ` : ''}
+                        <button onclick="mobileShare('${Utils.escapeHtml(producto.title)}', '${price}', window.location.href)" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 45%;">
+                            📤 Compartir
+                        </button>
+                        <button onclick="mobileGoBack()" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 45%;">
+                            ← Volver
+                        </button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading producto:', error);
+                MobileUI.showError(container, 'Error al cargar el producto');
+            }
+        }
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: loadProducto
+        });
+    </script>
+</body>
+</html>

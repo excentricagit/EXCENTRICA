@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
+    <title>Servicios - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page mobile-servicios">
+
+            <!-- Header Servicios -->
+            <div class="servicios-header">
+                <div class="servicios-header-top">
+                    <h1>Servicios</h1>
+                    <span id="servicios-count" class="servicios-count"></span>
+                </div>
+                <p class="servicios-subtitle">Profesionales en Santiago</p>
+            </div>
+
+            <!-- Destacados (si hay) -->
+            <div id="featured-container"></div>
+
+            <!-- Filtros de categoria -->
+            <div id="category-filters" class="servicios-filters">
+                <button class="servicios-filter-chip active" data-category="">
+                    🔧 Todos
+                </button>
+                <!-- Se cargan desde API -->
+            </div>
+
+            <!-- Filtro de zona -->
+            <div class="servicios-zone-filter">
+                <select id="zone-filter" class="servicios-zone-select">
+                    <option value="">📍 Todas las zonas</option>
+                </select>
+            </div>
+
+            <!-- Lista de servicios -->
+            <div id="servicios-list" class="servicios-list">
+                <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+            </div>
+
+            <!-- Cargar mas -->
+            <div id="load-more-container" class="servicios-load-more" style="display: none;">
+                <button id="btn-load-more" class="servicios-btn-load">
+                    Ver mas servicios
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        // Iconos para categorias de servicios
+        const CATEGORY_ICONS = {
+            'electricista': '⚡',
+            'plomero': '🔧',
+            'gasista': '🔥',
+            'albañil': '🧱',
+            'pintor': '🎨',
+            'carpintero': '🪚',
+            'mecanico': '🔩',
+            'cerrajero': '🔐',
+            'jardinero': '🌿',
+            'limpieza': '🧹',
+            'mudanza': '📦',
+            'abogado': '⚖️',
+            'contador': '📊',
+            'medico': '🏥',
+            'veterinario': '🐾',
+            'profesor': '📚',
+            'informatica': '💻',
+            'fotografo': '📷',
+            'diseñador': '🖌️',
+            'default': '🔧'
+        };
+
+        function getCategoryIcon(name) {
+            if (!name) return CATEGORY_ICONS.default;
+            const lower = name.toLowerCase();
+            for (const key in CATEGORY_ICONS) {
+                if (lower.includes(key)) return CATEGORY_ICONS[key];
+            }
+            return CATEGORY_ICONS.default;
+        }
+
+        const ServiciosPage = {
+            items: [],
+            categories: [],
+            page: 1,
+            hasMore: true,
+            loading: false,
+            currentCategory: '',
+            currentZone: '',
+
+            async init() {
+                await Promise.all([
+                    this.loadCategories(),
+                    this.loadZones()
+                ]);
+                this.setupFilters();
+                this.loadFeatured();
+                this.loadItems(true);
+                this.setupLoadMore();
+            },
+
+            async loadCategories() {
+                try {
+                    const response = await Api.getCategories('servicios');
+                    if (response.success && response.data) {
+                        this.categories = response.data;
+                        this.renderCategoryFilters();
+                    }
+                } catch (e) {
+                    console.error('Error loading categories:', e);
+                }
+            },
+
+            async loadZones() {
+                try {
+                    const response = await Api.getZones();
+                    if (response.success && response.data) {
+                        const select = document.getElementById('zone-filter');
+                        response.data.forEach(zone => {
+                            const option = document.createElement('option');
+                            option.value = zone.id;
+                            option.textContent = zone.name;
+                            select.appendChild(option);
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error loading zones:', e);
+                }
+            },
+
+            renderCategoryFilters() {
+                const container = document.getElementById('category-filters');
+                let html = `
+                    <button class="servicios-filter-chip active" data-category="">
+                        🔧 Todos
+                    </button>
+                `;
+
+                this.categories.forEach(cat => {
+                    const icon = getCategoryIcon(cat.name);
+                    html += `
+                        <button class="servicios-filter-chip" data-category="${cat.id}">
+                            ${icon} ${Utils.escapeHtml(cat.name)}
+                        </button>
+                    `;
+                });
+
+                container.innerHTML = html;
+            },
+
+            setupFilters() {
+                // Filtro de categoria
+                document.getElementById('category-filters').addEventListener('click', (e) => {
+                    const chip = e.target.closest('.servicios-filter-chip');
+                    if (!chip) return;
+
+                    document.querySelectorAll('#category-filters .servicios-filter-chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    this.currentCategory = chip.dataset.category;
+                    this.resetAndLoad();
+                });
+
+                // Filtro de zona
+                document.getElementById('zone-filter').addEventListener('change', (e) => {
+                    this.currentZone = e.target.value;
+                    this.resetAndLoad();
+                });
+            },
+
+            async loadFeatured() {
+                try {
+                    const response = await Api.getServices({ featured: true, limit: 5 });
+                    if (response.success && response.data && response.data.items) {
+                        const featured = response.data.items.filter(s => s.featured);
+                        if (featured.length > 0) {
+                            this.renderFeatured(featured);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading featured:', e);
+                }
+            },
+
+            renderFeatured(items) {
+                const container = document.getElementById('featured-container');
+                container.innerHTML = `
+                    <div class="servicios-featured-section">
+                        <div class="servicios-section-header">
+                            <h2>⭐ Destacados</h2>
+                        </div>
+                        <div class="servicios-featured-scroll">
+                            ${items.map(item => this.renderFeaturedCard(item)).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderFeaturedCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const icon = getCategoryIcon(item.category_name);
+                return `
+                    <a href="/mobile/local-mobile.html?type=services&id=${item.id}" class="servicios-featured-card">
+                        <div class="servicios-featured-img" style="background-image: url('${image}')">
+                            <span class="servicios-featured-badge">Destacado</span>
+                        </div>
+                        <div class="servicios-featured-info">
+                            <h3>${Utils.escapeHtml(item.title)}</h3>
+                            <span>${icon} ${item.category_name || 'Servicio'}</span>
+                        </div>
+                    </a>
+                `;
+            },
+
+            resetAndLoad() {
+                this.items = [];
+                this.page = 1;
+                this.hasMore = true;
+                this.loadItems(true);
+            },
+
+            setupLoadMore() {
+                document.getElementById('btn-load-more').addEventListener('click', () => this.loadItems(false));
+            },
+
+            async loadItems(reset = false) {
+                if (this.loading) return;
+                this.loading = true;
+
+                const list = document.getElementById('servicios-list');
+                const loadMoreContainer = document.getElementById('load-more-container');
+
+                if (reset) {
+                    list.innerHTML = '<div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>';
+                }
+
+                try {
+                    const params = {
+                        page: this.page,
+                        limit: 10
+                    };
+
+                    if (this.currentCategory) {
+                        params.category_id = this.currentCategory;
+                    }
+
+                    if (this.currentZone) {
+                        params.zone_id = this.currentZone;
+                    }
+
+                    const response = await Api.getServices(params);
+
+                    if (response.success && response.data && response.data.items) {
+                        const newItems = response.data.items;
+                        this.items = reset ? newItems : [...this.items, ...newItems];
+                        this.hasMore = newItems.length === 10;
+                        this.page++;
+
+                        this.render();
+
+                        const total = response.data.pagination?.total || this.items.length;
+                        document.getElementById('servicios-count').textContent = `${total} servicios`;
+                    } else {
+                        if (reset) {
+                            list.innerHTML = '<p class="servicios-empty">No hay servicios disponibles</p>';
+                            document.getElementById('servicios-count').textContent = '0 servicios';
+                        }
+                    }
+
+                    loadMoreContainer.style.display = this.hasMore ? 'block' : 'none';
+
+                } catch (error) {
+                    console.error('Error loading items:', error);
+                    if (reset) {
+                        list.innerHTML = '<p class="servicios-empty">Error al cargar servicios</p>';
+                    }
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            render() {
+                const list = document.getElementById('servicios-list');
+
+                if (this.items.length === 0) {
+                    list.innerHTML = '<p class="servicios-empty">No hay servicios disponibles</p>';
+                    return;
+                }
+
+                list.innerHTML = this.items.map(item => this.renderCard(item)).join('');
+            },
+
+            getWhatsAppLink(service) {
+                const phone = service.whatsapp || service.phone;
+                if (!phone) return null;
+                const cleanPhone = phone.replace(/\D/g, '');
+                const fullPhone = cleanPhone.startsWith('549') ? cleanPhone : `549${cleanPhone}`;
+                return `https://wa.me/${fullPhone}?text=${encodeURIComponent(`Hola! Vi "${service.title}" en Excentrica y me interesa.`)}`;
+            },
+
+            renderCard(item) {
+                const image = item.image_url || '/images/placeholder.jpg';
+                const icon = getCategoryIcon(item.category_name);
+                const whatsappLink = this.getWhatsAppLink(item);
+
+                return `
+                    <div class="servicios-card">
+                        <a href="/mobile/local-mobile.html?type=services&id=${item.id}" class="servicios-card-main">
+                            <div class="servicios-card-img" style="background-image: url('${image}')">
+                                ${item.featured ? '<span class="servicios-card-featured">⭐</span>' : ''}
+                            </div>
+                            <div class="servicios-card-content">
+                                <h3>${Utils.escapeHtml(item.title)}</h3>
+                                <p class="servicios-card-category">${icon} ${item.category_name || 'Servicio'}</p>
+                                ${item.description ? `<p class="servicios-card-desc">${Utils.escapeHtml(item.description.substring(0, 60))}${item.description.length > 60 ? '...' : ''}</p>` : ''}
+                                <div class="servicios-card-meta">
+                                    ${item.zone_name ? `<span>📍 ${item.zone_name}</span>` : ''}
+                                    ${item.price_from ? `<span class="servicios-card-price">Desde $${Number(item.price_from).toLocaleString('es-AR')}</span>` : ''}
+                                </div>
+                            </div>
+                        </a>
+                        ${whatsappLink ? `
+                            <a href="${whatsappLink}" target="_blank" rel="noopener" class="servicios-card-whatsapp" onclick="event.stopPropagation()">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </a>
+                        ` : ''}
+                    </div>
+                `;
+            }
+        };
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: () => ServiciosPage.init()
+        });
+    </script>
+</body>
+</html>

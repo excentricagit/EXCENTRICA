@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <title>Cine - Excentrica</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+</head>
+<body class="mobile-app">
+    <div id="install-banner"></div>
+    <header id="mobile-header"></header>
+
+    <main id="mobile-main">
+        <div class="mobile-page">
+            <div class="mobile-page-header">
+                <h1 class="mobile-page-title">🎬 Cartelera de Cine</h1>
+            </div>
+            <div id="cine-container">
+                <div class="mobile-loading"><div class="mobile-spinner"></div></div>
+            </div>
+        </div>
+    </main>
+
+    <nav id="mobile-bottom-nav"></nav>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        async function loadCartelera() {
+            const container = document.getElementById('cine-container');
+
+            try {
+                const today = new Date().toISOString().split('T')[0];
+                const response = await Api.getShowtimes({ date: today });
+                // La API devuelve un array directo en data
+                const showtimes = Array.isArray(response.data) ? response.data : [];
+
+                // Agrupar por pelicula
+                const movieMap = {};
+                showtimes.forEach(st => {
+                    if (!movieMap[st.movie_id]) {
+                        movieMap[st.movie_id] = {
+                            id: st.movie_id,
+                            title: st.movie_title || 'Sin titulo',
+                            poster_url: st.poster_url,
+                            duration: st.duration,
+                            rating: st.rating,
+                            showtimes: []
+                        };
+                    }
+                    movieMap[st.movie_id].showtimes.push({
+                        time: st.show_time,
+                        cinema: st.cinema_name,
+                        format: st.format,
+                        language: st.language
+                    });
+                });
+                const movies = Object.values(movieMap);
+
+                if (!movies.length) {
+                    MobileUI.showEmpty(container, '🎬', 'Sin funciones', 'No hay peliculas hoy');
+                    return;
+                }
+
+                let html = '';
+                movies.forEach(movie => {
+                    const poster = movie.poster_url || CONFIG.PLACEHOLDER_IMAGE;
+                    const showtimes = movie.showtimes || [];
+
+                    html += `
+                        <div class="cine-movie-card">
+                            <img src="${poster}" alt="" class="cine-movie-poster" onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">
+                            <div class="cine-movie-info">
+                                <div class="cine-movie-title">${Utils.escapeHtml(movie.title)}</div>
+                                <div class="cine-movie-meta">
+                                    ${movie.duration ? movie.duration + ' min' : ''}
+                                    ${movie.rating ? ' • ' + movie.rating : ''}
+                                </div>
+                                <div class="cine-showtimes">
+                                    ${showtimes.map(st => `<span class="cine-showtime">${st.time}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading cartelera:', error);
+                MobileUI.showError(container, 'Error al cargar cartelera');
+            }
+        }
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: loadCartelera
+        });
+    </script>
+</body>
+</html>

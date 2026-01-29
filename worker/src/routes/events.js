@@ -41,8 +41,9 @@ export async function handleGetEvents(request, env) {
         }
 
         if (upcoming === '1') {
-            query += " AND e.event_date >= date('now')";
-            countQuery += " AND event_date >= date('now')";
+            // Filtrar eventos que aún no han pasado (considerando fecha Y hora)
+            query += " AND datetime(e.event_date || ' ' || COALESCE(e.event_time, '23:59')) >= datetime('now')";
+            countQuery += " AND datetime(event_date || ' ' || COALESCE(event_time, '23:59')) >= datetime('now')";
         }
 
         if (dateTo) {

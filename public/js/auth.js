@@ -177,3 +177,4 @@ class AuthService {
 
 // Crear instancia global
 const auth = new AuthService();
+const Auth = auth; // Alias para compatibilidad con mobile

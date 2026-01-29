@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <title>Local - Excentrica</title>
+
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+</head>
+<body class="mobile-app">
+    <div id="install-banner"></div>
+    <header id="mobile-header"></header>
+
+    <main id="mobile-main">
+        <div id="local-content">
+            <div class="mobile-loading"><div class="mobile-spinner"></div></div>
+        </div>
+    </main>
+
+    <nav id="mobile-bottom-nav"></nav>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        const typeConfig = {
+            gastronomy: { icon: '🍽️', label: 'Gastronomia', endpoint: '/api/gastronomy' },
+            gastronomia: { icon: '🍽️', label: 'Gastronomia', endpoint: '/api/gastronomy' },
+            accommodation: { icon: '🏨', label: 'Alojamiento', endpoint: '/api/accommodations' },
+            alojamiento: { icon: '🏨', label: 'Alojamiento', endpoint: '/api/accommodations' },
+            transport: { icon: '🚌', label: 'Transporte', endpoint: '/api/transport' },
+            transporte: { icon: '🚌', label: 'Transporte', endpoint: '/api/transport' },
+            services: { icon: '🔧', label: 'Servicios', endpoint: '/api/services' },
+            servicios: { icon: '🔧', label: 'Servicios', endpoint: '/api/services' },
+            tourism: { icon: '📍', label: 'Turismo', endpoint: '/api/points-of-interest' },
+            turismo: { icon: '📍', label: 'Turismo', endpoint: '/api/points-of-interest' }
+        };
+
+        async function loadLocal() {
+            const container = document.getElementById('local-content');
+            const id = Utils.getUrlParam('id');
+            const type = Utils.getUrlParam('type') || 'gastronomia';
+
+            if (!id) {
+                MobileUI.showError(container, 'Local no encontrado');
+                return;
+            }
+
+            const config = typeConfig[type] || typeConfig.gastronomia;
+
+            try {
+                const response = await Api.get(`${config.endpoint}/${id}`);
+                const local = response.data || response;
+
+                if (!local) {
+                    MobileUI.showError(container, 'Local no encontrado');
+                    return;
+                }
+
+                document.title = `${local.name} - Excentrica`;
+
+                const image = local.image_url || CONFIG.PLACEHOLDER_IMAGE;
+
+                container.innerHTML = `
+                    <img src="${image}" alt="" class="mobile-detail-image" onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">
+
+                    <div class="mobile-detail-content">
+                        <span style="color: var(--primary-light); font-size: 0.8125rem;">${config.icon} ${config.label}</span>
+                        <h1 class="mobile-detail-title">${Utils.escapeHtml(local.name)}</h1>
+
+                        <div class="mobile-detail-meta">
+                            ${local.address ? `<span>📍 ${Utils.escapeHtml(local.address)}</span>` : ''}
+                            ${local.phone ? `<span>📞 ${local.phone}</span>` : ''}
+                        </div>
+
+                        ${local.description ? `
+                            <div class="mobile-detail-body">
+                                <p>${Utils.escapeHtml(local.description)}</p>
+                            </div>
+                        ` : ''}
+
+                        ${local.schedule ? `
+                            <div style="margin-top: 1rem;">
+                                <h3 style="font-size: 0.9375rem; margin-bottom: 0.5rem;">🕐 Horarios</h3>
+                                <p style="color: var(--text-secondary); font-size: 0.875rem;">${Utils.escapeHtml(local.schedule)}</p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="mobile-detail-actions" style="flex-wrap: wrap;">
+                        ${local.website ? `
+                            <a href="${local.website}" target="_blank" rel="noopener" class="mobile-btn mobile-btn-primary" style="flex: 1; min-width: 45%; text-decoration: none; text-align: center;">
+                                🌐 Sitio Web
+                            </a>
+                        ` : ''}
+                        ${local.whatsapp || local.phone ? `
+                            <button onclick="mobileWhatsApp('${local.whatsapp || local.phone}', 'Hola! Vi ${Utils.escapeHtml(local.name)} en Excentrica')" class="mobile-btn ${local.website ? 'mobile-btn-secondary' : 'mobile-btn-primary'}" style="flex: 1; min-width: 45%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                WhatsApp
+                            </button>
+                        ` : ''}
+                        ${local.phone ? `
+                            <button onclick="mobileCall('${local.phone}')" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 45%;">
+                                📞 Llamar
+                            </button>
+                        ` : ''}
+                        ${local.address ? `
+                            <button onclick="mobileMap('${Utils.escapeHtml(local.address)}')" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 45%;">
+                                📍 Ver mapa
+                            </button>
+                        ` : ''}
+                        <button onclick="mobileShare('${Utils.escapeHtml(local.name)}', '', window.location.href)" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 45%;">
+                            📤 Compartir
+                        </button>
+                        <button onclick="mobileGoBack()" class="mobile-btn mobile-btn-secondary" style="flex: 1; min-width: 100%;">
+                            ← Volver
+                        </button>
+                    </div>
+                `;
+
+            } catch (error) {
+                console.error('Error loading local:', error);
+                MobileUI.showError(container, 'Error al cargar');
+            }
+        }
+
+        MobileApp.init({
+            page: 'categorias',
+            onReady: loadLocal
+        });
+    </script>
+</body>
+</html>

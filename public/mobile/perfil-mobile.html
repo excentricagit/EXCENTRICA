@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.svg">
+    <title>Perfil - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app mobile-page-profile">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div id="profile-content">
+            <div class="mobile-loading">
+                <div class="mobile-spinner"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        async function renderProfile() {
+            const container = document.getElementById('profile-content');
+            const user = MobileApp.getUser();
+
+            if (!user) {
+                // Usuario no logueado
+                container.innerHTML = `
+                    <div class="mobile-profile-header">
+                        <div class="mobile-profile-avatar">
+                            <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+                                👤
+                            </div>
+                        </div>
+                        <h2 class="mobile-profile-name">Bienvenido</h2>
+                        <p class="mobile-profile-email">Inicia sesion para acceder a tu cuenta</p>
+                    </div>
+                    <div class="mobile-profile-actions">
+                        <a href="/mobile/login-mobile.html" class="mobile-btn mobile-btn-primary mobile-btn-block">
+                            Iniciar Sesion
+                        </a>
+                        <a href="/mobile/registro-mobile.html" class="mobile-btn mobile-btn-secondary mobile-btn-block">
+                            Crear Cuenta
+                        </a>
+                    </div>
+                `;
+            } else {
+                // Usuario logueado
+                const avatarContent = user.avatar_url
+                    ? `<img src="${user.avatar_url}" alt="">`
+                    : `<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">👤</div>`;
+
+                container.innerHTML = `
+                    <div class="mobile-profile-header">
+                        <div class="mobile-profile-avatar">
+                            ${avatarContent}
+                        </div>
+                        <h2 class="mobile-profile-name">${Utils.escapeHtml(user.name || user.email)}</h2>
+                        <p class="mobile-profile-email">${Utils.escapeHtml(user.email)}</p>
+                    </div>
+
+                    <div class="mobile-page" style="padding-top: 0;">
+                        <div class="mobile-section">
+                            <h3 class="mobile-section-title">📅 Mis Inscripciones</h3>
+                            <div id="my-registrations">
+                                <div class="mobile-loading">
+                                    <div class="mobile-spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mobile-profile-actions" style="margin-top: 1rem;">
+                        <button onclick="mobileLogout()" class="mobile-btn mobile-btn-danger mobile-btn-block">
+                            Cerrar Sesion
+                        </button>
+                    </div>
+                `;
+
+                // Cargar inscripciones
+                loadMyRegistrations();
+            }
+        }
+
+        async function loadMyRegistrations() {
+            const container = document.getElementById('my-registrations');
+
+            try {
+                const response = await Api.getMyEventRegistrations({ upcoming: 1 });
+
+                if (response.success && response.data && response.data.registrations) {
+                    const registrations = response.data.registrations;
+
+                    if (registrations.length === 0) {
+                        container.innerHTML = `
+                            <div class="mobile-empty-small">
+                                <p>No tienes inscripciones a eventos proximos</p>
+                                <a href="/mobile/eventos-mobile.html" class="mobile-btn mobile-btn-primary mobile-btn-sm">Ver Eventos</a>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    container.innerHTML = registrations.map(reg => renderRegistrationCard(reg)).join('');
+                } else {
+                    container.innerHTML = '<p class="text-muted text-center">No se pudieron cargar las inscripciones</p>';
+                }
+            } catch (e) {
+                console.error('Error loading registrations:', e);
+                container.innerHTML = '<p class="text-muted text-center">Error al cargar inscripciones</p>';
+            }
+        }
+
+        function renderRegistrationCard(reg) {
+            const isConfirmed = reg.registration_status === 'confirmado';
+            const statusClass = isConfirmed ? 'confirmed' : 'pending';
+            const statusText = isConfirmed ? 'Confirmado' : 'Pendiente';
+            const eventDate = reg.event_date ? Utils.formatDate(reg.event_date) : '';
+            const eventTime = reg.event_time || '';
+
+            // Precio o etiqueta gratis
+            const isFree = !reg.price || reg.price === 0;
+            const priceTag = isFree
+                ? '<span class="profile-registration-price free">Gratis</span>'
+                : `<span class="profile-registration-price">$${Utils.formatPrice(reg.price)}</span>`;
+
+            // WhatsApp button solo para pendientes
+            let whatsappBtn = '';
+            if (!isConfirmed && (reg.whatsapp || reg.phone)) {
+                const contact = reg.whatsapp || reg.phone;
+                const cleanNumber = contact.replace(/\D/g, '');
+                const message = encodeURIComponent(`Hola! Me inscribi al evento "${reg.title}" y mi codigo es: ${reg.registration_code}. Quedo a la espera de confirmacion.`);
+                whatsappBtn = `
+                    <a href="https://wa.me/${cleanNumber}?text=${message}" target="_blank" class="profile-registration-whatsapp">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                        </svg>
+                        Consultar por WhatsApp
+                    </a>
+                `;
+            }
+
+            return `
+                <div class="profile-registration-card ${statusClass}">
+                    <div class="profile-registration-header">
+                        ${priceTag}
+                        <span class="profile-registration-status ${statusClass}">${statusText}</span>
+                    </div>
+                    <h4 class="profile-registration-title">${Utils.escapeHtml(reg.title)}</h4>
+                    ${eventDate ? `<p class="profile-registration-date">📅 ${eventDate}${eventTime ? ' - ' + eventTime : ''}</p>` : ''}
+                    ${reg.location ? `<p class="profile-registration-location">📍 ${Utils.escapeHtml(reg.location)}</p>` : ''}
+                    <div class="profile-registration-code-box">
+                        <span class="profile-registration-code-label">Codigo de entrada</span>
+                        <span class="profile-registration-code">${reg.registration_code}</span>
+                        <button class="profile-registration-copy" onclick="copyCode('${reg.registration_code}')">Copiar</button>
+                    </div>
+                    ${whatsappBtn}
+                </div>
+            `;
+        }
+
+        async function copyCode(code) {
+            try {
+                await navigator.clipboard.writeText(code);
+                MobileUI.toast('Codigo copiado', 'success');
+            } catch (e) {
+                const textArea = document.createElement('textarea');
+                textArea.value = code;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                MobileUI.toast('Codigo copiado', 'success');
+            }
+        }
+
+        MobileApp.init({
+            page: 'perfil',
+            onReady: renderProfile
+        });
+    </script>
+</body>
+</html>

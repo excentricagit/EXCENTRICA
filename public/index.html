@@ -4,11 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Excentrica - Santiago del Estero</title>
+    <!-- Redireccion Mobile -->
+    <script>
+        (function() {
+            // Detectar dispositivo movil por user agent
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            var isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(ua.toLowerCase());
+            // Detectar por ancho de pantalla
+            var isMobileWidth = window.innerWidth <= 768 || screen.width <= 768;
+            // Si es movil y no estamos ya en /mobile/, redirigir
+            if ((isMobileUA || isMobileWidth) && window.location.pathname.indexOf('/mobile/') === -1) {
+                window.location.replace('/mobile/index-mobile.html');
+            }
+        })();
+    </script>
     <meta name="description" content="Red social y marketplace de Santiago del Estero, Argentina. Noticias, eventos, productos y mas.">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/index.css">
     <link rel="stylesheet" href="/css/ads-player.css">
-    <link rel="icon" href="/images/favicon.ico">
+    <link rel="icon" href="/images/favicon.png">
 </head>
 <body>
     <!-- Sidebar de Navegacion Lateral Fijo -->

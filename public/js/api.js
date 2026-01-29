@@ -187,6 +187,11 @@ class ApiService {
         return this.get(`/api/admin/event-registrations/verify/${code}`);
     }
 
+    // Admin - Eliminar registro de evento
+    async deleteEventRegistration(registrationId) {
+        return this.delete(`/api/admin/event-registrations/${registrationId}`);
+    }
+
     // ========== VIDEOS ==========
     async getVideos(params = {}) {
         return this.get('/api/videos', params);
@@ -850,3 +855,4 @@ class ApiService {
 
 // Crear instancia global
 const api = new ApiService();
+const Api = api; // Alias para compatibilidad con mobile

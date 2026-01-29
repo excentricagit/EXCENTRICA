@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.svg">
+    <title>Crear Cuenta - Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app mobile-page-auth">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page">
+            <div style="text-align: center; padding: 1.5rem 0;">
+                <img src="/assets/logo.png" alt="Excentrica" style="height: 48px; margin-bottom: 1rem;">
+                <h1 class="mobile-page-title">Crear Cuenta</h1>
+            </div>
+
+            <form id="register-form">
+                <div class="mobile-form-group">
+                    <label class="mobile-form-label">Nombre</label>
+                    <input type="text" id="name" class="mobile-form-input" placeholder="Tu nombre" required>
+                </div>
+
+                <div class="mobile-form-group">
+                    <label class="mobile-form-label">Email</label>
+                    <input type="email" id="email" class="mobile-form-input" placeholder="tu@email.com" required>
+                </div>
+
+                <div class="mobile-form-group">
+                    <label class="mobile-form-label">Contraseña</label>
+                    <input type="password" id="password" class="mobile-form-input" placeholder="Minimo 6 caracteres" required minlength="6">
+                </div>
+
+                <div class="mobile-form-group">
+                    <label class="mobile-form-label">Confirmar Contraseña</label>
+                    <input type="password" id="password2" class="mobile-form-input" placeholder="Repite tu contraseña" required>
+                </div>
+
+                <div id="error-message" style="display: none; color: var(--danger); font-size: 0.875rem; margin-bottom: 1rem; text-align: center;"></div>
+
+                <button type="submit" class="mobile-btn mobile-btn-primary mobile-btn-block" id="submit-btn">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1.5rem;">
+                <p style="color: var(--text-muted); font-size: 0.875rem;">
+                    Ya tienes cuenta?
+                    <a href="/mobile/login-mobile.html" style="color: var(--primary);">Iniciar sesion</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        // Si ya esta logueado, redirigir
+        if (MobileApp.isLoggedIn()) {
+            window.location.href = '/mobile/perfil-mobile.html';
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;
+            const errorEl = document.getElementById('error-message');
+            const submitBtn = document.getElementById('submit-btn');
+
+            // Validar contraseñas
+            if (password !== password2) {
+                errorEl.textContent = 'Las contraseñas no coinciden';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            errorEl.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creando cuenta...';
+
+            try {
+                const response = await Api.register({ name, email, password });
+
+                if (response.token) {
+                    Auth.saveToken(response.token);
+                    if (response.user) {
+                        Auth.saveUser(response.user);
+                    }
+                    window.location.href = '/mobile/index-mobile.html';
+                } else {
+                    // Registro exitoso pero sin auto-login
+                    MobileUI.toast('Cuenta creada! Inicia sesion', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/mobile/login-mobile.html';
+                    }, 1500);
+                }
+            } catch (error) {
+                errorEl.textContent = error.message || 'Error al crear la cuenta';
+                errorEl.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Crear Cuenta';
+            }
+        });
+
+        MobileApp.init({ page: 'perfil' });
+    </script>
+</body>
+</html>

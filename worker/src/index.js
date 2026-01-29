@@ -33,7 +33,8 @@ import { handleGetEvents, handleGetEventById, handleAdminGetEvents, handleAdminC
 // Event Registrations routes
 import {
     handleEventRegister, handleEventUnregister, handleGetMyEventRegistrations, handleCheckEventRegistration,
-    handleAdminGetEventRegistrations, handleAdminUpdateRegistrationStatus, handleAdminGetEventRegistrationStats, handleVerifyRegistrationCode
+    handleAdminGetEventRegistrations, handleAdminUpdateRegistrationStatus, handleAdminDeleteEventRegistration,
+    handleAdminGetEventRegistrationStats, handleVerifyRegistrationCode
 } from './routes/event-registrations.js';
 
 // Videos routes
@@ -270,6 +271,7 @@ const routes = [
     // Admin - Event Registrations
     { method: 'GET', path: '/api/admin/event-registrations', handler: handleAdminGetEventRegistrations },
     { method: 'PUT', path: '/api/admin/event-registrations/:id', handler: (req, env, params) => handleAdminUpdateRegistrationStatus(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/event-registrations/:id', handler: (req, env, params) => handleAdminDeleteEventRegistration(req, env, params.id) },
     { method: 'GET', path: '/api/admin/events/:id/registrations/stats', handler: (req, env, params) => handleAdminGetEventRegistrationStats(req, env, params.id) },
     { method: 'GET', path: '/api/admin/event-registrations/verify/:code', handler: (req, env, params) => handleVerifyRegistrationCode(req, env, params.code) },
 

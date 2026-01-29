@@ -279,12 +279,6 @@
     border-color: rgba(52, 211, 153, 0.5);
 }
 
-/* Responsive featured */
-@media (max-width: 640px) {
-    .turismo-featured-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* ===========================================
    CHIPS DE CATEGORIAS
@@ -1194,64 +1188,3 @@
     color: #a7f3d0;
 }
 
-/* ===========================================
-   RESPONSIVE
-   =========================================== */
-
-@media (max-width: 768px) {
-    .turismo-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .turismo-filter-bar {
-        flex-direction: column;
-    }
-
-    .turismo-filter-wrapper {
-        max-width: 100%;
-    }
-
-    .turismo-filter-bar .form-control {
-        width: 100%;
-    }
-
-    .turismo-page-header {
-        padding: 1.5rem 0 1rem 0;
-    }
-
-    .turismo-page-title {
-        font-size: 1.4rem;
-    }
-
-    /* Modal responsive */
-    .poi-modal-content {
-        width: 95%;
-        max-height: 95vh;
-        border-radius: 16px;
-    }
-
-    .poi-modal-image {
-        height: 200px;
-    }
-
-    .poi-modal-body {
-        padding: 1.25rem;
-        max-height: calc(95vh - 200px);
-    }
-
-    .poi-modal-title {
-        font-size: 1.3rem;
-    }
-
-    .poi-modal-actions {
-        flex-direction: column;
-    }
-
-    .poi-modal-action-btn {
-        width: 100%;
-    }
-
-    .poi-modal-action-btn.map {
-        min-width: auto;
-    }
-}

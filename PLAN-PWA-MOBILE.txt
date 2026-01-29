@@ -19,34 +19,34 @@ ARCHIVOS A CREAR (MODULAR - Max 500 lineas c/u)
 ├── sw.js                           <- Service Worker basico (~50 lineas)
 │
 ├── mobile/                         <- Carpeta con HTMLs mobile
-│   ├── index.html                  <- Home feed (~100 lineas)
-│   ├── categorias.html             <- Menu secciones (~80 lineas)
-│   ├── perfil.html                 <- Perfil usuario (~80 lineas)
-│   ├── publicar.html               <- Form periodista (~120 lineas)
-│   ├── noticias.html               <- Lista noticias (~80 lineas)
-│   ├── mercaderia.html             <- Lista productos (~80 lineas)
-│   ├── eventos.html                <- Lista eventos (~80 lineas)
-│   ├── videos.html                 <- Lista videos (~80 lineas)
-│   ├── gastronomia.html            <- Restaurantes (~80 lineas)
-│   ├── alojamiento.html            <- Alojamientos (~80 lineas)
-│   ├── transporte.html             <- Transportes (~80 lineas)
-│   ├── servicios.html              <- Servicios (~80 lineas)
-│   ├── turismo.html                <- Puntos interes (~80 lineas)
-│   ├── cine.html                   <- Cartelera (~80 lineas)
-│   └── contacto.html               <- Contacto (~60 lineas)
+│   ├── index-mobile.html           <- Home feed (~100 lineas)
+│   ├── categorias-mobile.html      <- Menu secciones (~80 lineas)
+│   ├── perfil-mobile.html          <- Perfil usuario (~80 lineas)
+│   ├── publicar-mobile.html        <- Form periodista (~120 lineas)
+│   ├── noticias-mobile.html        <- Lista noticias (~80 lineas)
+│   ├── mercaderia-mobile.html      <- Lista productos (~80 lineas)
+│   ├── eventos-mobile.html         <- Lista eventos (~80 lineas)
+│   ├── videos-mobile.html          <- Lista videos (~80 lineas)
+│   ├── gastronomia-mobile.html     <- Restaurantes (~80 lineas)
+│   ├── alojamiento-mobile.html     <- Alojamientos (~80 lineas)
+│   ├── transporte-mobile.html      <- Transportes (~80 lineas)
+│   ├── servicios-mobile.html       <- Servicios (~80 lineas)
+│   ├── turismo-mobile.html         <- Puntos interes (~80 lineas)
+│   ├── cine-mobile.html            <- Cartelera (~80 lineas)
+│   └── contacto-mobile.html        <- Contacto (~60 lineas)
 │
 ├── css/
-│   ├── mobile-base.css             <- Variables, reset, tipografia (~150 lineas)
-│   ├── mobile-layout.css           <- Header, bottom nav, estructura (~200 lineas)
-│   ├── mobile-components.css       <- Cards, botones, forms (~250 lineas)
-│   └── mobile-pages.css            <- Estilos especificos paginas (~200 lineas)
+│   ├── base-mobile.css             <- Variables, reset, tipografia (~150 lineas)
+│   ├── layout-mobile.css           <- Header, bottom nav, estructura (~200 lineas)
+│   ├── components-mobile.css       <- Cards, botones, forms (~250 lineas)
+│   └── pages-mobile.css            <- Estilos especificos paginas (~200 lineas)
 │
 └── js/
-    ├── pwa.js                      <- Install prompt, offline (~100 lineas)
-    ├── mobile-app.js               <- Init, router, estado (~150 lineas)
-    ├── mobile-nav.js               <- Header y bottom nav (~150 lineas)
-    ├── mobile-feed.js              <- Logica del feed home (~200 lineas)
-    └── mobile-ui.js                <- Componentes UI (cards, loaders) (~200 lineas)
+    ├── pwa-mobile.js               <- Install prompt, offline (~100 lineas)
+    ├── app-mobile.js               <- Init, router, estado (~150 lineas)
+    ├── nav-mobile.js               <- Header y bottom nav (~150 lineas)
+    ├── feed-mobile.js              <- Logica del feed home (~200 lineas)
+    └── ui-mobile.js                <- Componentes UI (cards, loaders) (~200 lineas)
 
 
 ================================================================================
@@ -188,7 +188,7 @@ MANIFEST.JSON
   "name": "Excentrica",
   "short_name": "Excentrica",
   "description": "Red social y marketplace de Santiago del Estero",
-  "start_url": "/mobile/index.html",
+  "start_url": "/mobile/index-mobile.html",
   "display": "standalone",
   "background_color": "#0f0f15",
   "theme_color": "#ef4444",
@@ -205,7 +205,7 @@ DETECCION MOBILE Y REDIRECCION
 
 En index.html (desktop), agregar script que:
 1. Detecta si es mobile (user agent o screen width < 768px)
-2. Si es mobile → redirige a /mobile/index.html
+2. Si es mobile → redirige a /mobile/index-mobile.html
 3. Si es desktop → queda en index.html normal
 
 
@@ -229,9 +229,9 @@ Cada HTML mobile sigue esta estructura:
     <link rel="stylesheet" href="/css/main.css">
 
     <!-- CSS Mobile (nuevos) -->
-    <link rel="stylesheet" href="/css/mobile-base.css">
-    <link rel="stylesheet" href="/css/mobile-layout.css">
-    <link rel="stylesheet" href="/css/mobile-components.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
 </head>
 <body class="mobile-app">
 
@@ -256,10 +256,10 @@ Cada HTML mobile sigue esta estructura:
     <script src="/js/utils.js"></script>
 
     <!-- Scripts mobile nuevos -->
-    <script src="/js/pwa.js"></script>
-    <script src="/js/mobile-nav.js"></script>
-    <script src="/js/mobile-ui.js"></script>
-    <script src="/js/mobile-app.js"></script>
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
 
     <script>
         MobileApp.init({ page: 'home' });
@@ -281,30 +281,30 @@ FASE 1 - Base PWA (~30 min)
 
 FASE 2 - Estructura Mobile (~1 hora)
 ------------------------------------
-4. css/mobile-base.css (variables, reset)
-5. css/mobile-layout.css (header, bottom nav, main)
-6. js/pwa.js (install banner, offline)
-7. js/mobile-nav.js (renderiza header y bottom nav)
-8. js/mobile-app.js (init, estado global)
+4. css/base-mobile.css (variables, reset)
+5. css/layout-mobile.css (header, bottom nav, main)
+6. js/pwa-mobile.js (install banner, offline)
+7. js/nav-mobile.js (renderiza header y bottom nav)
+8. js/app-mobile.js (init, estado global)
 
 FASE 3 - Paginas Core (~1 hora)
 -------------------------------
-9.  mobile/index.html (home feed)
-10. mobile/categorias.html (menu secciones)
-11. mobile/perfil.html (usuario)
-12. js/mobile-feed.js (logica del feed)
-13. js/mobile-ui.js (cards, componentes)
-14. css/mobile-components.css (cards, botones)
+9.  mobile/index-mobile.html (home feed)
+10. mobile/categorias-mobile.html (menu secciones)
+11. mobile/perfil-mobile.html (usuario)
+12. js/feed-mobile.js (logica del feed)
+13. js/ui-mobile.js (cards, componentes)
+14. css/components-mobile.css (cards, botones)
 
 FASE 4 - Periodista (~30 min)
 -----------------------------
-15. mobile/publicar.html (form noticia)
-16. Logica especifica en mobile-app.js
+15. mobile/publicar-mobile.html (form noticia)
+16. Logica especifica en app-mobile.js
 
 FASE 5 - Secciones (~2 horas)
 -----------------------------
-17-27. Resto de secciones mobile (noticias, mercaderia, etc)
-28. css/mobile-pages.css (estilos especificos)
+17-27. Resto de secciones mobile (noticias-mobile, mercaderia-mobile, etc)
+28. css/pages-mobile.css (estilos especificos)
 
 FASE 6 - Integracion (~30 min)
 ------------------------------

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#A020F0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.svg">
+    <title>Excentrica</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/base-mobile.css">
+    <link rel="stylesheet" href="/css/layout-mobile.css">
+    <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
+</head>
+<body class="mobile-app mobile-page-home">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido principal -->
+    <main id="mobile-main">
+        <div class="mobile-page mobile-home">
+
+            <!-- Hero / Bienvenida -->
+            <section class="mobile-home-hero">
+                <div class="mobile-home-hero-content">
+                    <h1>Bienvenido a <span>Excentrica</span></h1>
+                    <p>Todo lo que pasa en tu ciudad, en un solo lugar</p>
+                </div>
+            </section>
+
+            <!-- Eventos Proximos -->
+            <section class="mobile-home-section">
+                <div class="mobile-home-section-header">
+                    <h2>Eventos</h2>
+                    <a href="/mobile/eventos-mobile.html" class="mobile-home-section-link">Ver todos</a>
+                </div>
+                <div id="section-eventos" class="mobile-home-scroll">
+                    <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+                </div>
+            </section>
+
+            <!-- Noticias -->
+            <section class="mobile-home-section">
+                <div class="mobile-home-section-header">
+                    <h2>Noticias</h2>
+                    <a href="/mobile/noticias-mobile.html" class="mobile-home-section-link">Ver todas</a>
+                </div>
+                <div id="section-noticias" class="mobile-home-grid">
+                    <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+                </div>
+            </section>
+
+            <!-- Videos -->
+            <section class="mobile-home-section">
+                <div class="mobile-home-section-header">
+                    <h2>Videos</h2>
+                    <a href="/mobile/videos-mobile.html" class="mobile-home-section-link">Ver todos</a>
+                </div>
+                <div id="section-videos" class="mobile-home-scroll">
+                    <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+                </div>
+            </section>
+
+            <!-- Mercaderia -->
+            <section class="mobile-home-section">
+                <div class="mobile-home-section-header">
+                    <h2>Mercaderia</h2>
+                    <a href="/mobile/mercaderia-mobile.html" class="mobile-home-section-link">Ver todo</a>
+                </div>
+                <div id="section-productos" class="mobile-home-scroll">
+                    <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+                </div>
+            </section>
+
+            <!-- Categorias rapidas -->
+            <section class="mobile-home-section">
+                <div class="mobile-home-section-header">
+                    <h2>Explorar</h2>
+                    <a href="/mobile/categorias-mobile.html" class="mobile-home-section-link">Ver todo</a>
+                </div>
+                <div class="mobile-home-categories">
+                    <a href="/mobile/gastronomia-mobile.html" class="mobile-home-cat" style="--cat-color: #FFB800;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+                        </svg>
+                        <span>Gastronomia</span>
+                    </a>
+                    <a href="/mobile/alojamiento-mobile.html" class="mobile-home-cat" style="--cat-color: #00B4D8;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/>
+                        </svg>
+                        <span>Alojamiento</span>
+                    </a>
+                    <a href="/mobile/transporte-mobile.html" class="mobile-home-cat" style="--cat-color: #7C3AED;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="3" y="6" width="18" height="12" rx="2"/><path d="M2 12h20"/>
+                        </svg>
+                        <span>Transporte</span>
+                    </a>
+                    <a href="/mobile/servicios-mobile.html" class="mobile-home-cat" style="--cat-color: #10B981;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4m11-11h-4M5 12H1m16.66-5.66l-2.83 2.83m-5.66 5.66l-2.83 2.83m0-11.32l2.83 2.83m5.66 5.66l2.83 2.83"/>
+                        </svg>
+                        <span>Servicios</span>
+                    </a>
+                    <a href="/mobile/turismo-mobile.html" class="mobile-home-cat" style="--cat-color: #F472B6;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        <span>Turismo</span>
+                    </a>
+                    <a href="/mobile/cine-mobile.html" class="mobile-home-cat" style="--cat-color: #EF4444;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <rect x="2" y="2" width="20" height="20" rx="2"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/>
+                        </svg>
+                        <span>Cine</span>
+                    </a>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
+    <script src="/js/pwa-mobile.js"></script>
+    <script src="/js/nav-mobile.js"></script>
+    <script src="/js/ui-mobile.js"></script>
+    <script src="/js/app-mobile.js"></script>
+
+    <script>
+        // Cargar secciones del home
+        async function loadHomeSections() {
+            await Promise.allSettled([
+                loadEventos(),
+                loadNoticias(),
+                loadVideos(),
+                loadProductos()
+            ]);
+        }
+
+        async function loadEventos() {
+            const container = document.getElementById('section-eventos');
+            try {
+                const response = await Api.getEvents({ limit: 6, upcoming: 1 });
+                if (response.success && response.data && response.data.events && response.data.events.length > 0) {
+                    container.innerHTML = response.data.events.map(e => cardEventoCompact(e)).join('');
+                } else {
+                    container.innerHTML = '<p class="mobile-home-empty">No hay eventos proximos</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p class="mobile-home-empty">Error al cargar</p>';
+            }
+        }
+
+        async function loadNoticias() {
+            const container = document.getElementById('section-noticias');
+            try {
+                const response = await Api.getNews({ limit: 4, status: 'published' });
+                if (response.success && response.data && response.data.news && response.data.news.length > 0) {
+                    container.innerHTML = response.data.news.map(n => cardNoticiaCompact(n)).join('');
+                } else {
+                    container.innerHTML = '<p class="mobile-home-empty">No hay noticias</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p class="mobile-home-empty">Error al cargar</p>';
+            }
+        }
+
+        async function loadVideos() {
+            const container = document.getElementById('section-videos');
+            try {
+                const response = await Api.getVideos({ limit: 6 });
+                if (response.success && response.data && response.data.videos && response.data.videos.length > 0) {
+                    container.innerHTML = response.data.videos.map(v => cardVideoCompact(v)).join('');
+                } else {
+                    container.innerHTML = '<p class="mobile-home-empty">No hay videos</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p class="mobile-home-empty">Error al cargar</p>';
+            }
+        }
+
+        async function loadProductos() {
+            const container = document.getElementById('section-productos');
+            try {
+                const response = await Api.getProducts({ limit: 6, status: 'approved' });
+                if (response.success && response.data && response.data.products && response.data.products.length > 0) {
+                    container.innerHTML = response.data.products.map(p => cardProductoCompact(p)).join('');
+                } else {
+                    container.innerHTML = '<p class="mobile-home-empty">No hay productos</p>';
+                }
+            } catch (err) {
+                container.innerHTML = '<p class="mobile-home-empty">Error al cargar</p>';
+            }
+        }
+
+        // Cards compactas para el home
+        function cardEventoCompact(e) {
+            const date = e.event_date ? Utils.formatDate(e.event_date) : '';
+            const img = e.image_url || '/images/placeholder.jpg';
+            return `
+                <a href="/mobile/evento-mobile.html?id=${e.id}" class="mobile-home-card-event">
+                    <div class="mobile-home-card-event-img" style="background-image: url('${img}')"></div>
+                    <div class="mobile-home-card-event-info">
+                        <span class="mobile-home-card-event-date">${date}</span>
+                        <h3>${Utils.escapeHtml(e.title)}</h3>
+                        ${e.location ? `<p>${Utils.escapeHtml(e.location)}</p>` : ''}
+                    </div>
+                </a>
+            `;
+        }
+
+        function cardNoticiaCompact(n) {
+            const img = n.image_url || '/images/placeholder.jpg';
+            const time = n.created_at ? Utils.timeAgo(n.created_at) : '';
+            return `
+                <a href="/mobile/noticia-mobile.html?id=${n.id}" class="mobile-home-card-news">
+                    <div class="mobile-home-card-news-img" style="background-image: url('${img}')"></div>
+                    <div class="mobile-home-card-news-info">
+                        <h3>${Utils.escapeHtml(n.title)}</h3>
+                        <span>${time}</span>
+                    </div>
+                </a>
+            `;
+        }
+
+        function cardVideoCompact(v) {
+            const thumb = v.thumbnail_url || `https://img.youtube.com/vi/${v.youtube_id}/mqdefault.jpg`;
+            return `
+                <a href="/mobile/video-mobile.html?id=${v.id}" class="mobile-home-card-video">
+                    <div class="mobile-home-card-video-thumb" style="background-image: url('${thumb}')">
+                        <div class="mobile-home-card-video-play">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        </div>
+                    </div>
+                    <h3>${Utils.escapeHtml(v.title)}</h3>
+                </a>
+            `;
+        }
+
+        function cardProductoCompact(p) {
+            const img = p.image_url || (p.images ? JSON.parse(p.images)[0] : '/images/placeholder.jpg');
+            const price = p.price ? `$${Utils.formatNumber(p.price)}` : '';
+            return `
+                <a href="/mobile/producto-mobile.html?id=${p.id}" class="mobile-home-card-product">
+                    <div class="mobile-home-card-product-img" style="background-image: url('${img}')"></div>
+                    <div class="mobile-home-card-product-info">
+                        <h3>${Utils.escapeHtml(p.title)}</h3>
+                        ${price ? `<span class="mobile-home-card-product-price">${price}</span>` : ''}
+                    </div>
+                </a>
+            `;
+        }
+
+        MobileApp.init({
+            page: 'home',
+            onReady: loadHomeSections
+        });
+    </script>
+</body>
+</html>

@@ -146,6 +146,9 @@
                                             💬
                                         </a>
                                     ` : ''}
+                                    <button class="btn-delete" onclick="deleteRegistration(${reg.id})" title="Eliminar inscripcion">
+                                        🗑️
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -250,6 +253,21 @@
         } catch (e) {
             console.error('Error rejecting registration:', e);
             Components.toast(e.message || 'Error al rechazar', 'error');
+        }
+    };
+
+    window.deleteRegistration = async function(registrationId) {
+        if (!confirm('¿Seguro que deseas eliminar esta inscripcion? Esta accion no se puede deshacer.')) return;
+
+        try {
+            const response = await api.deleteEventRegistration(registrationId);
+            if (response.success) {
+                Components.toast('Inscripcion eliminada', 'success');
+                loadData();
+            }
+        } catch (e) {
+            console.error('Error deleting registration:', e);
+            Components.toast(e.message || 'Error al eliminar', 'error');
         }
     };
 

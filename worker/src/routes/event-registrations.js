@@ -39,6 +39,15 @@ export async function handleEventRegister(request, env, eventId) {
             return notFound('Evento no encontrado o no disponible');
         }
 
+        // Verificar si el evento ya paso (considerando fecha y hora)
+        const eventDateTime = event.event_date + ' ' + (event.event_time || '23:59');
+        const eventDateObj = new Date(eventDateTime.replace(' ', 'T'));
+        const now = new Date();
+
+        if (eventDateObj < now) {
+            return error('Este evento ya ha finalizado. No es posible inscribirse.', 400);
+        }
+
         // Verificar si ya esta registrado
         const existing = await env.DB.prepare(
             'SELECT id, status FROM event_registrations WHERE user_id = ? AND event_id = ?'
@@ -157,6 +166,8 @@ export async function handleGetMyEventRegistrations(request, env) {
                 e.location,
                 e.address,
                 e.price,
+                e.whatsapp,
+                e.phone,
                 c.name as category_name,
                 z.name as zone_name
             FROM event_registrations er
@@ -173,7 +184,8 @@ export async function handleGetMyEventRegistrations(request, env) {
         }
 
         if (upcoming) {
-            query += " AND e.event_date >= date('now')";
+            // Filtrar eventos que aún no han pasado (considerando fecha Y hora)
+            query += " AND datetime(e.event_date || ' ' || COALESCE(e.event_time, '23:59')) >= datetime('now')";
         }
 
         query += ' ORDER BY e.event_date ASC, e.event_time ASC';
@@ -387,6 +399,39 @@ export async function handleAdminGetEventRegistrationStats(request, env, eventId
 
     } catch (e) {
         return error('Error obteniendo estadisticas: ' + e.message, 500);
+    }
+}
+
+// Eliminar inscripcion (admin/editor)
+export async function handleAdminDeleteEventRegistration(request, env, registrationId) {
+    const { user, error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        // Verificar que el registro existe
+        const registration = await env.DB.prepare(`
+            SELECT er.*, e.author_id as event_author_id
+            FROM event_registrations er
+            JOIN events e ON er.event_id = e.id
+            WHERE er.id = ?
+        `).bind(registrationId).first();
+
+        if (!registration) {
+            return notFound('Registro no encontrado');
+        }
+
+        // Solo el autor del evento o admin puede eliminar
+        if (user.role !== 'admin' && registration.event_author_id !== user.id) {
+            return forbidden('No tienes permiso para eliminar este registro');
+        }
+
+        // Eliminar el registro
+        await env.DB.prepare('DELETE FROM event_registrations WHERE id = ?').bind(registrationId).run();
+
+        return success(null, 'Inscripcion eliminada correctamente');
+
+    } catch (e) {
+        return error('Error eliminando registro: ' + e.message, 500);
     }
 }
 

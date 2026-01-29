@@ -373,19 +373,31 @@
         async function loadCategoriesAndZones() {
             try {
                 const [catResponse, zoneResponse] = await Promise.all([
-                    api.getCategories('products'),
+                    api.getCategories('productos'),
                     api.getZones()
                 ]);
 
-                if (catResponse.success) {
+                // Manejar respuesta de categorias
+                if (catResponse.success && catResponse.data) {
                     categories = catResponse.data;
-                    const catSelect = document.getElementById('category_id');
-                    catSelect.innerHTML = '<option value="">Sin categoria</option>' +
-                        categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                } else if (Array.isArray(catResponse)) {
+                    categories = catResponse;
                 }
 
-                if (zoneResponse.success) {
+                if (categories.length > 0) {
+                    const catSelect = document.getElementById('category_id');
+                    catSelect.innerHTML = '<option value="">Sin categoria</option>' +
+                        categories.map(c => `<option value="${c.id}">${c.icon || ''} ${c.name}</option>`).join('');
+                }
+
+                // Manejar respuesta de zonas
+                if (zoneResponse.success && zoneResponse.data) {
                     zones = zoneResponse.data;
+                } else if (Array.isArray(zoneResponse)) {
+                    zones = zoneResponse;
+                }
+
+                if (zones.length > 0) {
                     const zoneSelect = document.getElementById('zone_id');
                     zoneSelect.innerHTML = '<option value="">Sin zona</option>' +
                         zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');

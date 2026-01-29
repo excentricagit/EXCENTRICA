@@ -249,12 +249,6 @@
     border-color: rgba(251, 191, 36, 0.5);
 }
 
-/* Responsive featured */
-@media (max-width: 640px) {
-    .services-featured-grid {
-        grid-template-columns: 1fr;
-    }
-}
 
 /* Chips de categorias */
 .service-category-chips {
@@ -787,21 +781,3 @@
     padding: 1.5rem 0;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .service-page-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .service-filter-bar {
-        flex-direction: column;
-    }
-
-    .filter-input-wrapper {
-        max-width: 100%;
-    }
-
-    .service-filter-bar .form-control {
-        width: 100%;
-    }
-}

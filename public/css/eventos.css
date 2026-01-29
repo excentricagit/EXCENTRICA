@@ -308,31 +308,6 @@
     font-size: 0.55rem;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-    .events-hero-container {
-        grid-template-columns: 1fr;
-    }
-    .events-hero-left {
-        flex-direction: row;
-    }
-    .events-hero-main .events-hero-image,
-    .events-hero-tertiary .events-hero-image {
-        height: 50px;
-    }
-    .events-hero-featured .events-hero-image {
-        height: 80px;
-    }
-}
-@media (max-width: 600px) {
-    .events-hero-left {
-        flex-direction: column;
-    }
-    .events-hero-main .events-hero-image,
-    .events-hero-tertiary .events-hero-image {
-        height: 60px;
-    }
-}
 
 /* Tabs navigation */
 .events-tabs {
@@ -489,12 +464,6 @@
 }
 .events-grid.list-view {
     grid-template-columns: 1fr;
-}
-@media (max-width: 1024px) {
-    .events-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 640px) {
-    .events-grid { grid-template-columns: 1fr; }
 }
 
 /* Event card mejorada */
@@ -738,14 +707,6 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-}
-@media (max-width: 640px) {
-    .events-grid.list-view .event-card-full {
-        grid-template-columns: 1fr;
-    }
-    .events-grid.list-view .event-card-full-image {
-        height: 120px;
-    }
 }
 
 /* Event Modal */

@@ -1,0 +1,2 @@
+# Cloudflare Pages - No fallback, serve files directly
+# Si un archivo no existe, devuelve 404 (no redirigir a index.html)

@@ -26,6 +26,10 @@
     --accent-dark: #FFB300;             /* Dorado cálido secundario */
     --accent-light: #D4A017;            /* Dorado apagado elegante */
 
+    /* Acentos adicionales (mobile gradients) */
+    --accent-purple: #A020F0;           /* Violeta neon para gradientes */
+    --accent-orange: #FF6B35;           /* Naranja vibrante para gradientes */
+
     /* ============================================
        BORDES, OUTLINES Y SOMBRAS
        ============================================ */

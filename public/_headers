@@ -1,15 +1,49 @@
-# Disable caching for editor HTML files to ensure updates are immediate
+# Disable caching for HTML files
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/mobile/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+/admin/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
 /editor/*.html
   Cache-Control: no-cache, no-store, must-revalidate
   Pragma: no-cache
   Expires: 0
 
-# Allow caching for static assets
+/publicista/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# Root index
+/
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+
+# No cache for CSS and JS during development
 /css/*
-  Cache-Control: public, max-age=31536000
+  Cache-Control: no-cache, must-revalidate
 
 /js/*
-  Cache-Control: public, max-age=31536000
+  Cache-Control: no-cache, must-revalidate
 
+# No cache for manifest (PWA updates)
+/manifest.json
+  Cache-Control: no-cache, must-revalidate
+
+# Short cache for images (1 hour)
 /images/*
-  Cache-Control: public, max-age=31536000
+  Cache-Control: public, max-age=3600
+
+/assets/*
+  Cache-Control: public, max-age=3600
