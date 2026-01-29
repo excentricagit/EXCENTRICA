@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteos y Eventos Recurrentes - Editor Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/editor/editor.css">
+    <style>
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        @media (max-width: 1024px) {
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .sorteo-fields, .recurrente-fields {
+            display: none;
+        }
+        .sorteo-fields.show, .recurrente-fields.show {
+            display: block;
+        }
+        .day-selector {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .day-btn {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-muted);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .day-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .day-btn.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .participant-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+        .participant-card.winner {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .participant-card.disqualified {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        .participant-info {
+            flex: 1;
+        }
+        .participant-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .participant-email {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .winner-badge {
+            background: linear-gradient(135deg, #fcd34d, #f59e0b);
+            color: #000;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+        .preview-weeks {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .preview-week {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .preview-week:last-child {
+            border-bottom: none;
+        }
+        .special-event-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+        .special-event-card:hover {
+            background: var(--bg-primary);
+        }
+        .special-event-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .special-event-type {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .special-event-type.sorteo {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+        }
+        .special-event-type.recurrente {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        .special-event-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            flex: 1;
+        }
+        .special-event-meta {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .special-event-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>&#9889;</span> Excentrica</a>
+                <span class="admin-badge">EDITOR</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/editor/" class="admin-nav-item">
+                    <span class="icon">&#128202;</span> Dashboard
+                </a>
+                <a href="/editor/noticias.html" class="admin-nav-item">
+                    <span class="icon">&#128240;</span> Noticias
+                </a>
+                <a href="/editor/productos.html" class="admin-nav-item">
+                    <span class="icon">&#128722;</span> Productos
+                </a>
+                <a href="/editor/eventos.html" class="admin-nav-item">
+                    <span class="icon">&#128197;</span> Eventos
+                </a>
+                <a href="/editor/sorteos.html" class="admin-nav-item active">
+                    <span class="icon">&#127922;</span> Sorteos
+                </a>
+                <a href="/editor/categorias.html" class="admin-nav-item">
+                    <span class="icon">&#128193;</span> Categorias
+                </a>
+                <a href="/editor/zonas.html" class="admin-nav-item">
+                    <span class="icon">&#128205;</span> Zonas
+                </a>
+                <a href="/editor/cine.html" class="admin-nav-item">
+                    <span class="icon">&#127916;</span> Cine
+                </a>
+                <a href="/editor/gastronomia.html" class="admin-nav-item">
+                    <span class="icon">&#127869;</span> Gastronomia
+                </a>
+                <a href="/editor/alojamiento.html" class="admin-nav-item">
+                    <span class="icon">&#127976;</span> Alojamiento
+                </a>
+                <a href="/editor/transporte.html" class="admin-nav-item">
+                    <span class="icon">&#128652;</span> Transporte
+                </a>
+                <a href="/editor/servicios.html" class="admin-nav-item">
+                    <span class="icon">&#128295;</span> Servicios
+                </a>
+                <a href="/editor/puntos-interes.html" class="admin-nav-item">
+                    <span class="icon">&#128205;</span> Turismo
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">&#127968;</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">&#128682;</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>&#127922; Sorteos y Eventos Recurrentes</h1>
+                <div class="admin-user">
+                    <span id="user-name">Editor</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>&#10133;</span> Nuevo
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Stats -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">&#127922;</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-sorteos">0</span>
+                            <span class="stat-label">Sorteos activos</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">&#128260;</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-recurrentes">0</span>
+                            <span class="stat-label">Eventos recurrentes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">&#128101;</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-participants">0</span>
+                            <span class="stat-label">Participantes totales</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">&#127942;</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-winners">0</span>
+                            <span class="stat-label">Ganadores</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="sorteos">&#127922; Sorteos</button>
+                    <button class="tab-btn" data-tab="recurrentes">&#128260; Eventos Recurrentes</button>
+                </div>
+
+                <!-- Sorteos Tab -->
+                <div class="tab-content active" id="tab-sorteos">
+                    <div class="filters mb-3">
+                        <select id="filter-sorteo-status" class="form-select">
+                            <option value="">Todos los estados</option>
+                            <option value="activo">Activos</option>
+                            <option value="finalizado">Finalizados</option>
+                            <option value="cancelado">Cancelados</option>
+                        </select>
+                    </div>
+                    <div id="sorteos-list">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Recurrentes Tab -->
+                <div class="tab-content" id="tab-recurrentes">
+                    <div class="filters mb-3">
+                        <select id="filter-recurrente-status" class="form-select">
+                            <option value="">Todos los estados</option>
+                            <option value="activo">Activos</option>
+                            <option value="pausado">Pausados</option>
+                            <option value="finalizado">Finalizados</option>
+                        </select>
+                    </div>
+                    <div id="recurrentes-list">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Crear/Editar -->
+    <div class="modal" id="event-modal">
+        <div class="modal-backdrop" onclick="closeModal()"></div>
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="modal-title">Nuevo Evento Especial</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="event-form" onsubmit="saveEvent(event)">
+                <div class="modal-body">
+                    <!-- Tipo de evento -->
+                    <div class="form-group mb-4">
+                        <label class="form-label">Tipo de evento</label>
+                        <div class="d-flex gap-3">
+                            <label class="radio-card">
+                                <input type="radio" name="event_type" value="sorteo" checked onchange="toggleEventType()">
+                                <div class="radio-card-content">
+                                    <span class="radio-card-icon">&#127922;</span>
+                                    <span class="radio-card-label">Sorteo</span>
+                                    <span class="radio-card-desc">Rifa o giveaway con participantes</span>
+                                </div>
+                            </label>
+                            <label class="radio-card">
+                                <input type="radio" name="event_type" value="recurrente" onchange="toggleEventType()">
+                                <div class="radio-card-content">
+                                    <span class="radio-card-icon">&#128260;</span>
+                                    <span class="radio-card-label">Recurrente</span>
+                                    <span class="radio-card-desc">Evento semanal (ej: fiesta cada sabado)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-grid-3">
+                        <!-- Columna 1: Info basica -->
+                        <div>
+                            <h4 class="mb-3">Informacion basica</h4>
+                            <div class="form-group">
+                                <label class="form-label">Titulo *</label>
+                                <input type="text" id="event-title" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Descripcion</label>
+                                <textarea id="event-description" class="form-textarea" rows="3"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Lugar</label>
+                                <input type="text" id="event-location" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Direccion</label>
+                                <input type="text" id="event-address" class="form-input">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Categoria</label>
+                                    <select id="event-category" class="form-select">
+                                        <option value="">Sin categoria</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Zona</label>
+                                    <select id="event-zone" class="form-select">
+                                        <option value="">Sin zona</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna 2: Campos especificos -->
+                        <div>
+                            <!-- Campos Sorteo -->
+                            <div class="sorteo-fields show">
+                                <h4 class="mb-3">&#127922; Detalles del Sorteo</h4>
+                                <div class="form-group">
+                                    <label class="form-label">Descripcion del premio *</label>
+                                    <textarea id="prize-description" class="form-textarea" rows="2"></textarea>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Valor del premio ($)</label>
+                                        <input type="number" id="prize-value" class="form-input" min="0" step="0.01">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Max participantes</label>
+                                        <input type="number" id="max-participants" class="form-input" min="0" placeholder="Ilimitado">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Fecha del sorteo</label>
+                                        <input type="date" id="draw-date" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Hora</label>
+                                        <input type="time" id="draw-time" class="form-input">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Cantidad de ganadores</label>
+                                        <input type="number" id="winners-count" class="form-input" min="1" value="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Fecha limite inscripcion</label>
+                                        <input type="date" id="registration-deadline" class="form-input">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campos Recurrente -->
+                            <div class="recurrente-fields">
+                                <h4 class="mb-3">&#128260; Configuracion Recurrente</h4>
+                                <div class="form-group">
+                                    <label class="form-label">Dia de la semana *</label>
+                                    <div class="day-selector" id="day-selector">
+                                        <button type="button" class="day-btn" data-day="0">Dom</button>
+                                        <button type="button" class="day-btn" data-day="1">Lun</button>
+                                        <button type="button" class="day-btn" data-day="2">Mar</button>
+                                        <button type="button" class="day-btn" data-day="3">Mie</button>
+                                        <button type="button" class="day-btn" data-day="4">Jue</button>
+                                        <button type="button" class="day-btn" data-day="5">Vie</button>
+                                        <button type="button" class="day-btn selected" data-day="6">Sab</button>
+                                    </div>
+                                    <input type="hidden" id="recurrence-day" value="6">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Hora del evento *</label>
+                                    <input type="time" id="recurrence-time" class="form-input" value="21:00">
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Fecha de inicio *</label>
+                                        <input type="date" id="recurrence-start" class="form-input">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Cantidad de semanas</label>
+                                        <input type="number" id="recurrence-weeks" class="form-input" min="1" max="52" value="8">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Precio por evento ($)</label>
+                                    <input type="number" id="event-price" class="form-input" min="0" step="0.01" value="0">
+                                </div>
+                                <div class="preview-weeks" id="preview-weeks">
+                                    <p class="text-muted">Selecciona fecha de inicio para ver la vista previa</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna 3: Contacto e imagen -->
+                        <div>
+                            <h4 class="mb-3">Contacto</h4>
+                            <div class="form-group">
+                                <label class="form-label">Telefono</label>
+                                <input type="tel" id="event-phone" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">WhatsApp</label>
+                                <input type="tel" id="event-whatsapp" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Sitio web</label>
+                                <input type="url" id="event-website" class="form-input">
+                            </div>
+
+                            <h4 class="mb-3 mt-4">Imagen</h4>
+                            <div class="form-group">
+                                <div class="image-upload" id="image-upload">
+                                    <input type="file" id="event-image-input" accept="image/*" onchange="handleImageUpload(event)" style="display: none;">
+                                    <div class="image-preview" id="image-preview" onclick="document.getElementById('event-image-input').click()">
+                                        <span class="image-placeholder">&#128247; Click para subir imagen</span>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="event-image-url">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Estado</label>
+                                <select id="event-status" class="form-select">
+                                    <option value="activo">Activo</option>
+                                    <option value="pausado">Pausado</option>
+                                    <option value="finalizado">Finalizado</option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="save-btn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Participantes del Sorteo -->
+    <div class="modal" id="participants-modal">
+        <div class="modal-backdrop" onclick="closeParticipantsModal()"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>&#128101; Participantes del Sorteo</h3>
+                <button class="modal-close" onclick="closeParticipantsModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="participants-list">
+                    <div class="text-center p-4"><div class="spinner"></div></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeParticipantsModal()">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="select-winners-btn" onclick="selectWinners()">
+                    &#127942; Sortear Ganadores
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/editor/sorteos.js"></script>
+</body>
+</html>

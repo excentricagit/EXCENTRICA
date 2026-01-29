@@ -2,6 +2,10 @@
 
 const ALLOWED_ORIGINS = [
     'https://excentrica.pages.dev',
+    'https://excentricaok.com',
+    'https://www.excentricaok.com',
+    'https://excentrica.com.ar',
+    'https://www.excentrica.com.ar',
     'http://localhost:8080',
     'http://localhost:3000',
     'http://127.0.0.1:8080'

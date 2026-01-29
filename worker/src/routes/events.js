@@ -129,7 +129,7 @@ export async function handleGetEventById(request, env, id) {
 // ADMIN
 
 export async function handleAdminGetEvents(request, env) {
-    const { error: authError } = await requireEditor(request, env);
+    const { user, error: authError } = await requireEditor(request, env);
     if (authError) return authError;
 
     try {
@@ -137,6 +137,7 @@ export async function handleAdminGetEvents(request, env) {
         const page = parseInt(url.searchParams.get('page')) || 1;
         const limit = parseInt(url.searchParams.get('limit')) || 20;
         const status = url.searchParams.get('status') || '';
+        const authorId = url.searchParams.get('author_id') || '';
         const offset = (page - 1) * limit;
 
         let query = `
@@ -149,6 +150,13 @@ export async function handleAdminGetEvents(request, env) {
         `;
         let countQuery = 'SELECT COUNT(*) as total FROM events WHERE 1=1';
         const params = [];
+
+        // Filtrar por autor (para publicistas que solo ven sus propios eventos)
+        if (authorId) {
+            query += ' AND e.author_id = ?';
+            countQuery += ' AND author_id = ?';
+            params.push(authorId);
+        }
 
         if (status) {
             query += ' AND e.status = ?';
@@ -270,5 +278,112 @@ export async function handleAdminDeleteEvent(request, env, id) {
 
     } catch (e) {
         return error('Error eliminando evento: ' + e.message, 500);
+    }
+}
+
+// Crear eventos masivamente (para duplicar semanalmente)
+export async function handleAdminCreateEventsBulk(request, env) {
+    const { user, error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        const { events } = await request.json();
+
+        if (!events || !Array.isArray(events) || events.length === 0) {
+            return error('Se requiere un array de eventos');
+        }
+
+        if (events.length > 52) {
+            return error('Maximo 52 eventos por lote');
+        }
+
+        const createdIds = [];
+
+        for (const eventData of events) {
+            const { title, description, image_url, images, category_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, is_featured, is_special } = eventData;
+
+            if (!title || !event_date) {
+                continue; // Saltar eventos sin datos requeridos
+            }
+
+            const result = await env.DB.prepare(`
+                INSERT INTO events (title, description, image_url, images, category_id, author_id, zone_id, location, address, latitude, longitude, event_date, event_time, end_date, end_time, price, ticket_url, phone, whatsapp, website, status, is_featured, is_special)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `).bind(
+                title,
+                description || null,
+                image_url || null,
+                images ? JSON.stringify(images) : null,
+                category_id || null,
+                user.id,
+                zone_id || null,
+                location || null,
+                address || null,
+                latitude || null,
+                longitude || null,
+                event_date,
+                event_time || null,
+                end_date || null,
+                end_time || null,
+                price || 0,
+                ticket_url || null,
+                phone || null,
+                whatsapp || null,
+                website || null,
+                status || 'approved',
+                is_featured ? 1 : 0,
+                is_special ? 1 : 0
+            ).run();
+
+            createdIds.push(result.meta.last_row_id);
+        }
+
+        return success({
+            created: createdIds.length,
+            ids: createdIds
+        }, `Se crearon ${createdIds.length} eventos`);
+
+    } catch (e) {
+        return error('Error creando eventos: ' + e.message, 500);
+    }
+}
+
+// Eliminar eventos masivamente
+export async function handleAdminDeleteEventsBulk(request, env) {
+    const { user, error: authError } = await requireEditor(request, env);
+    if (authError) return authError;
+
+    try {
+        const { ids } = await request.json();
+
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return error('Se requiere un array de IDs');
+        }
+
+        if (ids.length > 52) {
+            return error('Maximo 52 eventos por lote');
+        }
+
+        let deleted = 0;
+        for (const id of ids) {
+            try {
+                const result = await env.DB.prepare('DELETE FROM events WHERE id = ?').bind(id).run();
+                if (result.meta.changes > 0) {
+                    deleted++;
+                    // Eliminar likes asociados
+                    await env.DB.prepare("DELETE FROM likes WHERE content_type = 'event' AND content_id = ?").bind(id).run();
+                }
+            } catch (e) {
+                console.error(`Error eliminando evento ${id}:`, e);
+            }
+        }
+
+        return success({
+            deleted,
+            requested: ids.length
+        }, `Se eliminaron ${deleted} eventos`);
+
+    } catch (e) {
+        return error('Error eliminando eventos: ' + e.message, 500);
     }
 }

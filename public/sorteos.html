@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteos - Excentrica</title>
+    <meta name="description" content="Participa en nuestros sorteos y gana increibles premios. Sorteos activos en Santiago del Estero.">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/sorteos.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
+</head>
+<body>
+    <!-- Sidebar de Navegacion -->
+    <nav class="sidebar-nav" id="sidebar-nav"></nav>
+
+    <!-- Header -->
+    <header class="header" id="main-header"></header>
+
+    <main class="main">
+        <div class="layout-sidebar">
+            <div class="content">
+                <!-- Hero Section -->
+                <div class="sorteos-hero">
+                    <div class="sorteos-hero-particles"></div>
+                    <div class="sorteos-hero-content">
+                        <span class="sorteos-hero-badge">Participa y Gana</span>
+                        <h1 class="sorteos-hero-title">Sorteos <span class="sorteos-hero-accent">Activos</span></h1>
+                        <p class="sorteos-hero-subtitle">Inscribite gratis y participa por increibles premios. Nuevos sorteos cada semana.</p>
+                        <div class="sorteos-hero-stats">
+                            <div class="sorteos-hero-stat">
+                                <span class="sorteos-hero-stat-number" id="stat-active">0</span>
+                                <span class="sorteos-hero-stat-label">Sorteos Activos</span>
+                            </div>
+                            <div class="sorteos-hero-stat">
+                                <span class="sorteos-hero-stat-number" id="stat-participants">0</span>
+                                <span class="sorteos-hero-stat-label">Participantes</span>
+                            </div>
+                            <div class="sorteos-hero-stat">
+                                <span class="sorteos-hero-stat-number" id="stat-winners">0</span>
+                                <span class="sorteos-hero-stat-label">Ganadores</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="sorteos-tabs">
+                    <button class="sorteos-tab active" data-filter="active">
+                        <span>🎲</span> Activos
+                    </button>
+                    <button class="sorteos-tab" data-filter="ending">
+                        <span>⏰</span> Por terminar
+                    </button>
+                    <button class="sorteos-tab" data-filter="completed">
+                        <span>✓</span> Finalizados
+                    </button>
+                </div>
+
+                <!-- Results bar -->
+                <div class="sorteos-results-bar">
+                    <div class="sorteos-results-count">
+                        Mostrando <strong id="results-count">0</strong> sorteos
+                    </div>
+                </div>
+
+                <!-- Grid de sorteos -->
+                <div id="sorteos-grid" class="sorteos-grid">
+                    <!-- Loading skeletons -->
+                    <div class="sorteo-card-skeleton">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-body">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line medium"></div>
+                        </div>
+                    </div>
+                    <div class="sorteo-card-skeleton">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-body">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line medium"></div>
+                        </div>
+                    </div>
+                    <div class="sorteo-card-skeleton">
+                        <div class="skeleton-image"></div>
+                        <div class="skeleton-body">
+                            <div class="skeleton-line short"></div>
+                            <div class="skeleton-line"></div>
+                            <div class="skeleton-line medium"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Paginacion -->
+                <div id="pagination"></div>
+
+                <!-- Empty state -->
+                <div id="empty-state" class="sorteos-empty" style="display: none;">
+                    <div class="sorteos-empty-icon">🎲</div>
+                    <h3>No hay sorteos disponibles</h3>
+                    <p>Vuelve pronto, estamos preparando nuevos sorteos con increibles premios.</p>
+                </div>
+            </div>
+
+            <!-- Sidebar derecho -->
+            <aside class="sidebar">
+                <!-- Widget de usuario -->
+                <div class="widget widget-usuario" id="user-widget">
+                    <div class="widget-title"><span class="widget-title-icon">👤</span> Mi Cuenta</div>
+                    <div id="user-widget-content">
+                        <p class="widget-text">Inicia sesion para participar en los sorteos</p>
+                        <button class="btn-widget-primary" onclick="window.location.href='/login.html'">Iniciar Sesion</button>
+                        <button class="btn-widget-secondary" onclick="window.location.href='/registro.html'">Crear Cuenta</button>
+                    </div>
+                </div>
+
+                <!-- Widget de mis sorteos -->
+                <div class="widget widget-sorteos" id="my-sorteos-widget" style="display: none;">
+                    <div class="widget-title"><span class="widget-title-icon">🎟️</span> Mis Participaciones</div>
+                    <div id="my-sorteos-content">
+                        <div class="loading"><div class="spinner"></div></div>
+                    </div>
+                </div>
+
+                <!-- Widget de publicidad -->
+                <div class="widget" id="ad-widget">
+                    <div id="ad-widget-content"></div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="main-footer"></footer>
+
+    <!-- Scripts base -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script src="/js/app.js"></script>
+    <!-- Scripts de sorteos -->
+    <script src="/js/sorteos.js"></script>
+    <script src="/js/ads-player.js"></script>
+    <script>
+        // Inicializar componentes de layout
+        Components.initLayout({
+            headerOptions: { searchPlaceholder: 'Buscar sorteos...' }
+        });
+        // Init ads player
+        document.addEventListener('DOMContentLoaded', function() {
+            initAdsPlayer('ad-widget-content', 'sidebar');
+        });
+    </script>
+</body>
+</html>

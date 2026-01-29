@@ -1,0 +1,585 @@
+/* =============================================
+   SORTEO DETAIL PAGE - Estilos de pagina de detalle
+   ============================================= */
+
+.sorteo-detail-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Breadcrumb */
+.sorteo-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+}
+
+.sorteo-breadcrumb a {
+    color: #94a3b8;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.sorteo-breadcrumb a:hover {
+    color: #fbbf24;
+}
+
+/* Loading state */
+.sorteo-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1rem;
+}
+
+.sorteo-loading p {
+    color: #94a3b8;
+}
+
+/* Error state */
+.sorteo-error {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.sorteo-error-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.sorteo-error h2 {
+    font-size: 1.5rem;
+    color: #f1f5f9;
+    margin-bottom: 0.5rem;
+}
+
+.sorteo-error p {
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+}
+
+.btn-back {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+}
+
+/* Hero section */
+.sorteo-detail-hero {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.sorteo-detail-image {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+.sorteo-detail-badges {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.sorteo-detail-badge {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #1f2937;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.4);
+}
+
+.sorteo-detail-badge.ending {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    animation: pulse-badge 1.5s ease-in-out infinite;
+}
+
+.sorteo-detail-badge.completed {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: #fff;
+}
+
+@keyframes pulse-badge {
+    0%, 100% { box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 4px 25px rgba(239, 68, 68, 0.7); }
+}
+
+.sorteo-detail-participants {
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+}
+
+/* Content grid */
+.sorteo-detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 2rem;
+}
+
+/* Main content */
+.sorteo-detail-main {
+    background: linear-gradient(145deg, rgba(30, 25, 40, 0.95), rgba(20, 15, 30, 0.98));
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    border-radius: 20px;
+    padding: 2rem;
+}
+
+.sorteo-detail-prize-tag {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.15));
+    color: #fbbf24;
+    padding: 0.5rem 1.25rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.sorteo-detail-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 1.25rem;
+    line-height: 1.3;
+}
+
+.sorteo-detail-description {
+    color: #cbd5e1;
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    white-space: pre-line;
+}
+
+.sorteo-detail-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(251, 191, 36, 0.1);
+}
+
+.sorteo-detail-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 1rem;
+}
+
+.sorteo-detail-requirements {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.sorteo-requirement-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(251, 191, 36, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(251, 191, 36, 0.1);
+}
+
+.sorteo-requirement-item span {
+    color: #fbbf24;
+}
+
+.sorteo-requirement-item p {
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Winner section */
+.sorteo-detail-winner-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(22, 163, 74, 0.05));
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    border-radius: 16px;
+}
+
+.sorteo-detail-winner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 12px;
+}
+
+.sorteo-winner-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.sorteo-winner-info h4 {
+    font-size: 1.1rem;
+    color: #fff;
+    margin-bottom: 0.25rem;
+}
+
+.sorteo-winner-info p {
+    color: #4ade80;
+    font-size: 0.9rem;
+}
+
+/* Sidebar */
+.sorteo-detail-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* Countdown card */
+.sorteo-countdown-card {
+    background: linear-gradient(145deg, rgba(30, 25, 40, 0.98), rgba(20, 15, 30, 0.99));
+    border: 1px solid rgba(251, 191, 36, 0.25);
+    border-radius: 18px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.sorteo-countdown-title {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sorteo-countdown {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.sorteo-countdown-item {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.2);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    min-width: 65px;
+}
+
+.sorteo-countdown-number {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fbbf24;
+    line-height: 1;
+    text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+}
+
+.sorteo-countdown-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-top: 0.35rem;
+}
+
+.sorteo-countdown-date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+}
+
+.sorteo-countdown-date svg {
+    color: #fbbf24;
+}
+
+/* Participation card */
+.sorteo-participation-card {
+    background: linear-gradient(145deg, rgba(30, 25, 40, 0.98), rgba(20, 15, 30, 0.99));
+    border: 1px solid rgba(251, 191, 36, 0.15);
+    border-radius: 18px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.sorteo-participation-message {
+    color: #cbd5e1;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+
+.btn-participate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: none;
+    border-radius: 12px;
+    color: #1f2937;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(251, 191, 36, 0.35);
+}
+
+.btn-participate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(251, 191, 36, 0.5);
+}
+
+.btn-participate:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sorteo-participation-note {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-top: 0.75rem;
+}
+
+.sorteo-participation-register {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 1rem;
+}
+
+.sorteo-participation-register a {
+    color: #fbbf24;
+    text-decoration: none;
+}
+
+.sorteo-participation-register a:hover {
+    text-decoration: underline;
+}
+
+.sorteo-participating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(22, 163, 74, 0.15));
+    color: #4ade80;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.btn-cancel-participation {
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #f87171;
+    padding: 0.6rem 1.25rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.btn-cancel-participation:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.6);
+}
+
+.sorteo-ended-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.2), rgba(75, 85, 99, 0.15));
+    color: #9ca3af;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+/* Share card */
+.sorteo-share-card {
+    background: linear-gradient(145deg, rgba(30, 25, 40, 0.95), rgba(20, 15, 30, 0.98));
+    border: 1px solid rgba(251, 191, 36, 0.1);
+    border-radius: 18px;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.sorteo-share-title {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+}
+
+.sorteo-share-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.sorteo-share-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sorteo-share-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.sorteo-share-btn.whatsapp {
+    background: #25D366;
+    color: #fff;
+}
+
+.sorteo-share-btn.facebook {
+    background: #1877F2;
+    color: #fff;
+}
+
+.sorteo-share-btn.twitter {
+    background: #000;
+    color: #fff;
+}
+
+.sorteo-share-btn.copy {
+    background: rgba(251, 191, 36, 0.15);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    color: #fbbf24;
+}
+
+.sorteo-share-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(30, 25, 40, 0.95);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    color: #fff;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.toast.success {
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.toast.error {
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .sorteo-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .sorteo-detail-sidebar {
+        order: -1;
+    }
+}
+
+@media (max-width: 640px) {
+    .sorteo-detail-container {
+        padding: 0.75rem;
+    }
+
+    .sorteo-detail-image {
+        height: 250px;
+    }
+
+    .sorteo-detail-main {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .sorteo-detail-title {
+        font-size: 1.5rem;
+    }
+
+    .sorteo-countdown {
+        gap: 0.5rem;
+    }
+
+    .sorteo-countdown-item {
+        padding: 0.6rem 0.75rem;
+        min-width: 55px;
+    }
+
+    .sorteo-countdown-number {
+        font-size: 1.4rem;
+    }
+
+    .btn-participate {
+        font-size: 1rem;
+        padding: 0.9rem 1.25rem;
+    }
+}

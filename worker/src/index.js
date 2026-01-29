@@ -28,7 +28,7 @@ import { handleGetCategories, handleGetCategoryById, handleAdminGetCategories, h
 import { handleGetZones, handleGetZoneById, handleAdminGetZones, handleAdminCreateZone, handleAdminUpdateZone, handleAdminDeleteZone, handleAdminMergeZone } from './routes/zones.js';
 
 // Events routes
-import { handleGetEvents, handleGetEventById, handleAdminGetEvents, handleAdminCreateEvent, handleAdminUpdateEvent, handleAdminDeleteEvent } from './routes/events.js';
+import { handleGetEvents, handleGetEventById, handleAdminGetEvents, handleAdminCreateEvent, handleAdminUpdateEvent, handleAdminDeleteEvent, handleAdminCreateEventsBulk, handleAdminDeleteEventsBulk } from './routes/events.js';
 
 // Event Registrations routes
 import {
@@ -36,6 +36,14 @@ import {
     handleAdminGetEventRegistrations, handleAdminUpdateRegistrationStatus, handleAdminDeleteEventRegistration,
     handleAdminGetEventRegistrationStats, handleVerifyRegistrationCode
 } from './routes/event-registrations.js';
+
+// Special Events routes (Sorteos y Recurrentes)
+import {
+    handleGetSorteos, handleGetSorteoById,
+    handleParticipateSorteo, handleCheckSorteoParticipation, handleCancelSorteoParticipation,
+    handleAdminGetSpecialEvents, handleAdminCreateSpecialEvent, handleAdminUpdateSpecialEvent, handleAdminDeleteSpecialEvent,
+    handleAdminGetSorteoParticipants, handleAdminSelectWinners, handleAdminMarkPrizeClaimed, handleAdminDisqualifyParticipant
+} from './routes/special-events.js';
 
 // Videos routes
 import {
@@ -63,6 +71,9 @@ import {
 
 // Admin routes
 import { handleGetStats, handleGetStorageStats } from './routes/admin.js';
+
+// Logs routes (auditoria)
+import { handleGetLogs, handleGetLogsSummary, handleGetLogsUsers } from './routes/logs.js';
 
 // Cinema routes
 import {
@@ -196,6 +207,15 @@ const routes = [
     { method: 'GET', path: '/api/events', handler: handleGetEvents },
     { method: 'GET', path: '/api/events/:id', handler: (req, env, params) => handleGetEventById(req, env, params.id) },
 
+    // Sorteos (public)
+    { method: 'GET', path: '/api/sorteos', handler: handleGetSorteos },
+    { method: 'GET', path: '/api/sorteos/:id', handler: (req, env, params) => handleGetSorteoById(req, env, params.id) },
+
+    // Sorteo Participation (auth required)
+    { method: 'POST', path: '/api/sorteos/:id/participate', handler: (req, env, params) => handleParticipateSorteo(req, env, params.id) },
+    { method: 'GET', path: '/api/sorteos/:id/participation', handler: (req, env, params) => handleCheckSorteoParticipation(req, env, params.id) },
+    { method: 'DELETE', path: '/api/sorteos/:id/participate', handler: (req, env, params) => handleCancelSorteoParticipation(req, env, params.id) },
+
     // Event Registrations (auth required)
     { method: 'POST', path: '/api/events/:id/register', handler: (req, env, params) => handleEventRegister(req, env, params.id) },
     { method: 'DELETE', path: '/api/events/:id/register', handler: (req, env, params) => handleEventUnregister(req, env, params.id) },
@@ -227,6 +247,11 @@ const routes = [
     // Admin - Stats
     { method: 'GET', path: '/api/admin/stats', handler: handleGetStats },
     { method: 'GET', path: '/api/admin/storage', handler: handleGetStorageStats },
+
+    // Admin - Activity Logs (auditoria)
+    { method: 'GET', path: '/api/admin/logs', handler: handleGetLogs },
+    { method: 'GET', path: '/api/admin/logs/summary', handler: handleGetLogsSummary },
+    { method: 'GET', path: '/api/admin/logs/users', handler: handleGetLogsUsers },
 
     // Admin - Users
     { method: 'GET', path: '/api/admin/users', handler: handleGetUsers },
@@ -265,6 +290,8 @@ const routes = [
     // Admin - Events
     { method: 'GET', path: '/api/admin/events', handler: handleAdminGetEvents },
     { method: 'POST', path: '/api/admin/events', handler: handleAdminCreateEvent },
+    { method: 'POST', path: '/api/admin/events/bulk', handler: handleAdminCreateEventsBulk },
+    { method: 'POST', path: '/api/admin/events/bulk-delete', handler: handleAdminDeleteEventsBulk },
     { method: 'PUT', path: '/api/admin/events/:id', handler: (req, env, params) => handleAdminUpdateEvent(req, env, params.id) },
     { method: 'DELETE', path: '/api/admin/events/:id', handler: (req, env, params) => handleAdminDeleteEvent(req, env, params.id) },
 
@@ -274,6 +301,16 @@ const routes = [
     { method: 'DELETE', path: '/api/admin/event-registrations/:id', handler: (req, env, params) => handleAdminDeleteEventRegistration(req, env, params.id) },
     { method: 'GET', path: '/api/admin/events/:id/registrations/stats', handler: (req, env, params) => handleAdminGetEventRegistrationStats(req, env, params.id) },
     { method: 'GET', path: '/api/admin/event-registrations/verify/:code', handler: (req, env, params) => handleVerifyRegistrationCode(req, env, params.code) },
+
+    // Admin - Special Events (Sorteos y Recurrentes)
+    { method: 'GET', path: '/api/admin/special-events', handler: handleAdminGetSpecialEvents },
+    { method: 'POST', path: '/api/admin/special-events', handler: handleAdminCreateSpecialEvent },
+    { method: 'PUT', path: '/api/admin/special-events/:id', handler: (req, env, params) => handleAdminUpdateSpecialEvent(req, env, params.id) },
+    { method: 'DELETE', path: '/api/admin/special-events/:id', handler: (req, env, params) => handleAdminDeleteSpecialEvent(req, env, params.id) },
+    { method: 'GET', path: '/api/admin/sorteos/:id/participants', handler: (req, env, params) => handleAdminGetSorteoParticipants(req, env, params.id) },
+    { method: 'POST', path: '/api/admin/sorteos/:id/select-winners', handler: (req, env, params) => handleAdminSelectWinners(req, env, params.id) },
+    { method: 'PUT', path: '/api/admin/sorteos/participants/:id/claim', handler: (req, env, params) => handleAdminMarkPrizeClaimed(req, env, params.id) },
+    { method: 'PUT', path: '/api/admin/sorteos/participants/:id/disqualify', handler: (req, env, params) => handleAdminDisqualifyParticipant(req, env, params.id) },
 
     // Admin - Videos
     { method: 'GET', path: '/api/admin/videos', handler: handleAdminGetVideos },

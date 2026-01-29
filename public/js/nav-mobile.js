@@ -39,7 +39,7 @@ const MobileNav = {
         if (!nav) return;
 
         const user = Auth.getUser();
-        const isPeriodista = user && user.role === 'periodista';
+        const canPublish = user && ['periodista', 'editor', 'admin', 'reporter'].includes(user.role);
 
         // Items de navegacion con iconos SVG
         const items = [
@@ -47,8 +47,8 @@ const MobileNav = {
             { id: 'categorias', icon: this.icons.categorias, label: 'Categorias', href: '/mobile/categorias-mobile.html' }
         ];
 
-        // Agregar Publicar solo para periodistas
-        if (isPeriodista) {
+        // Agregar Publicar para periodistas, editores y admins
+        if (canPublish) {
             items.push({ id: 'publicar', icon: this.icons.publicar, label: 'Publicar', href: '/mobile/publicar-mobile.html' });
         }
 

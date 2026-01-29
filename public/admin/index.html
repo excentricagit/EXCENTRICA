@@ -28,6 +28,9 @@
                 <a href="/admin/almacenamiento.html" class="admin-nav-item">
                     <span class="icon">💾</span> Almacenamiento
                 </a>
+                <a href="/admin/logs.html" class="admin-nav-item">
+                    <span class="icon">📜</span> Logs
+                </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
                     <span class="icon">🏠</span> Volver al sitio
@@ -58,40 +61,42 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">📰</div>
+                        <div class="stat-icon">📺</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="stat-news">-</span>
-                            <span class="stat-label">Noticias</span>
+                            <span class="stat-value" id="stat-ads">-</span>
+                            <span class="stat-label">Anuncios</span>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🛒</div>
+                        <div class="stat-icon">💾</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="stat-products">-</span>
-                            <span class="stat-label">Productos</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">📅</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="stat-events">-</span>
-                            <span class="stat-label">Eventos</span>
+                            <span class="stat-value" id="stat-storage">-</span>
+                            <span class="stat-label">Archivos</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pending items -->
-                <div class="grid grid-2 mt-4">
+                <!-- Quick actions -->
+                <div class="grid grid-3 mt-4">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="mb-3">⏳ Productos pendientes: <span id="pending-products">0</span></h3>
-                            <a href="/admin/productos.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                            <h3 class="mb-3">👥 Gestionar Usuarios</h3>
+                            <p class="text-muted mb-3">Administra usuarios, roles y permisos</p>
+                            <a href="/admin/usuarios.html" class="btn btn-primary btn-sm">Ver usuarios</a>
                         </div>
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="mb-3">⏳ Noticias pendientes: <span id="pending-news">0</span></h3>
-                            <a href="/admin/noticias.html?status=pending" class="btn btn-primary btn-sm">Ver pendientes</a>
+                            <h3 class="mb-3">📺 Gestionar Anuncios</h3>
+                            <p class="text-muted mb-3">Administra la publicidad del sitio</p>
+                            <a href="/admin/anuncios.html" class="btn btn-primary btn-sm">Ver anuncios</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <h3 class="mb-3">💾 Almacenamiento</h3>
+                            <p class="text-muted mb-3">Gestiona archivos e imágenes subidas</p>
+                            <a href="/admin/almacenamiento.html" class="btn btn-primary btn-sm">Ver archivos</a>
                         </div>
                     </div>
                 </div>
@@ -124,26 +129,28 @@
 
         async function loadDashboard() {
             try {
-                const response = await api.getAdminStats();
-                if (response.success) {
-                    const data = response.data;
+                // Cargar estadisticas en paralelo
+                const [statsResponse, adsResponse, mediaResponse] = await Promise.all([
+                    api.getAdminStats(),
+                    api.get('/api/admin/ads'),
+                    api.get('/api/media')
+                ]);
 
-                    document.getElementById('stat-users').textContent = data.counts.users;
-                    document.getElementById('stat-news').textContent = data.counts.news;
-                    document.getElementById('stat-products').textContent = data.counts.products;
-                    document.getElementById('stat-events').textContent = data.counts.events;
-                    document.getElementById('pending-products').textContent = data.counts.pending_products;
-                    document.getElementById('pending-news').textContent = data.counts.pending_news;
+                // Usuarios
+                if (statsResponse.success) {
+                    const data = statsResponse.data;
+                    document.getElementById('stat-users').textContent = data.counts?.users || 0;
 
                     // Usuarios recientes
                     const usersContainer = document.getElementById('recent-users');
-                    if (data.recent.users.length > 0) {
+                    if (data.recent?.users?.length > 0) {
                         usersContainer.innerHTML = `
                             <table class="admin-table">
                                 <thead>
                                     <tr>
                                         <th>Nombre</th>
                                         <th>Email</th>
+                                        <th>Rol</th>
                                         <th>Fecha</th>
                                     </tr>
                                 </thead>
@@ -152,6 +159,7 @@
                                         <tr>
                                             <td>${Utils.escapeHtml(u.name)}</td>
                                             <td>${Utils.escapeHtml(u.email)}</td>
+                                            <td><span class="badge badge-${u.role === 'admin' ? 'danger' : 'secondary'}">${u.role}</span></td>
                                             <td>${Utils.formatDate(u.created_at)}</td>
                                         </tr>
                                     `).join('')}
@@ -162,6 +170,19 @@
                         usersContainer.innerHTML = '<p class="text-muted">No hay usuarios recientes</p>';
                     }
                 }
+
+                // Anuncios
+                if (adsResponse.success) {
+                    const totalAds = adsResponse.data?.pagination?.total || adsResponse.data?.length || 0;
+                    document.getElementById('stat-ads').textContent = totalAds;
+                }
+
+                // Archivos/Storage
+                if (mediaResponse.success) {
+                    const totalMedia = mediaResponse.data?.pagination?.total || mediaResponse.data?.media?.length || 0;
+                    document.getElementById('stat-storage').textContent = totalMedia;
+                }
+
             } catch (e) {
                 console.error('Error loading dashboard:', e);
             }

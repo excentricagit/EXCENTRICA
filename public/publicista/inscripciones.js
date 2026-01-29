@@ -22,28 +22,39 @@
     // Cargar datos iniciales
     async function loadData() {
         try {
-            // Cargar eventos del publicista y registros
+            console.log('[Inscripciones] Cargando datos...');
+
+            // Cargar TODOS los eventos y TODAS las inscripciones (publicista ve todo)
             const [eventsResponse, registrationsResponse] = await Promise.all([
-                api.getAdminEvents({ author_id: user.id }),
+                api.getAdminEvents(), // Sin filtro - todos los eventos
                 api.getAdminEventRegistrations()
             ]);
 
+            console.log('[Inscripciones] Eventos response:', eventsResponse);
+            console.log('[Inscripciones] Registrations response:', registrationsResponse);
+
             if (eventsResponse.success) {
-                myEvents = eventsResponse.data.events || eventsResponse.data || [];
+                myEvents = eventsResponse.data?.events || eventsResponse.data || [];
+                console.log('[Inscripciones] Eventos cargados:', myEvents.length);
                 renderEventFilter();
+            } else {
+                console.error('[Inscripciones] Error en eventos:', eventsResponse.message || eventsResponse.error);
+                Components.toast('Error cargando eventos: ' + (eventsResponse.message || 'Error desconocido'), 'error');
             }
 
             if (registrationsResponse.success) {
-                allRegistrations = registrationsResponse.data.registrations || registrationsResponse.data || [];
-                // Filtrar solo registros de mis eventos
-                const myEventIds = myEvents.map(e => e.id);
-                allRegistrations = allRegistrations.filter(r => myEventIds.includes(r.event_id));
+                allRegistrations = registrationsResponse.data?.registrations || registrationsResponse.data || [];
+                console.log('[Inscripciones] Inscripciones cargadas:', allRegistrations.length);
+                // El publicista ve TODAS las inscripciones (ya filtradas por el backend)
                 applyFilters();
                 updateStats();
+            } else {
+                console.error('[Inscripciones] Error en inscripciones:', registrationsResponse.message || registrationsResponse.error);
+                Components.toast('Error cargando inscripciones: ' + (registrationsResponse.message || 'Error desconocido'), 'error');
             }
         } catch (e) {
-            console.error('Error loading data:', e);
-            Components.toast('Error cargando datos', 'error');
+            console.error('[Inscripciones] Error loading data:', e);
+            Components.toast('Error cargando datos: ' + (e.message || 'Error desconocido'), 'error');
         }
     }
 
@@ -140,6 +151,22 @@
                                             ❌
                                         </button>
                                     ` : ''}
+                                    ${reg.status === 'confirmado' ? `
+                                        <button class="btn-pending" onclick="setPendingRegistration(${reg.id})" title="Volver a pendiente">
+                                            ⏳ Pendiente
+                                        </button>
+                                        <button class="btn-reject" onclick="showRejectModal(${reg.id})" title="Rechazar">
+                                            ❌
+                                        </button>
+                                    ` : ''}
+                                    ${reg.status === 'rechazado' ? `
+                                        <button class="btn-pending" onclick="setPendingRegistration(${reg.id})" title="Volver a pendiente">
+                                            ⏳ Pendiente
+                                        </button>
+                                        <button class="btn-approve" onclick="approveRegistration(${reg.id})" title="Aprobar">
+                                            ✅
+                                        </button>
+                                    ` : ''}
                                     ${reg.user_phone ? `
                                         <a href="https://wa.me/${formatWhatsApp(reg.user_phone)}?text=${encodeURIComponent(getWhatsAppMessage(reg))}"
                                            target="_blank" class="btn-whatsapp" title="Contactar por WhatsApp">
@@ -215,6 +242,21 @@
         } catch (e) {
             console.error('Error approving registration:', e);
             Components.toast(e.message || 'Error al confirmar', 'error');
+        }
+    };
+
+    window.setPendingRegistration = async function(registrationId) {
+        if (!confirm('¿Volver esta inscripcion a estado pendiente?')) return;
+
+        try {
+            const response = await api.updateEventRegistrationStatus(registrationId, 'pendiente');
+            if (response.success) {
+                Components.toast('Inscripcion marcada como pendiente', 'success');
+                loadData();
+            }
+        } catch (e) {
+            console.error('Error setting pending registration:', e);
+            Components.toast(e.message || 'Error al cambiar estado', 'error');
         }
     };
 

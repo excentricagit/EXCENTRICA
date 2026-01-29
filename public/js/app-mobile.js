@@ -38,6 +38,24 @@ const MobileApp = {
         return user && user.role === 'periodista';
     },
 
+    // Verificar si puede publicar noticias (periodista, editor, admin)
+    canPublishNews() {
+        const user = this.getUser();
+        return user && ['periodista', 'editor', 'admin', 'reporter'].includes(user.role);
+    },
+
+    // Redirigir a home si no puede publicar
+    requireCanPublish() {
+        if (!this.requireAuth()) return false;
+
+        if (!this.canPublishNews()) {
+            MobileUI.toast('No tienes permisos para publicar', 'error');
+            window.location.href = '/mobile/index-mobile.html';
+            return false;
+        }
+        return true;
+    },
+
     // Redirigir a login si no esta autenticado
     requireAuth(redirectUrl = null) {
         if (!this.isLoggedIn()) {

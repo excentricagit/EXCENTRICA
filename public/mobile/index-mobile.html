@@ -243,8 +243,22 @@
             `;
         }
 
+        function getYouTubeId(url) {
+            if (!url) return null;
+            const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+            return match ? match[1] : null;
+        }
+
         function cardVideoCompact(v) {
-            const thumb = v.thumbnail_url || `https://img.youtube.com/vi/${v.youtube_id}/mqdefault.jpg`;
+            let thumb = v.thumbnail_url;
+            if (!thumb && v.video_url) {
+                const ytId = getYouTubeId(v.video_url);
+                if (ytId) {
+                    thumb = `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;
+                }
+            }
+            thumb = thumb || '/images/placeholder.jpg';
+
             return `
                 <a href="/mobile/video-mobile.html?id=${v.id}" class="mobile-home-card-video">
                     <div class="mobile-home-card-video-thumb" style="background-image: url('${thumb}')">

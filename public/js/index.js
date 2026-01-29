@@ -296,6 +296,94 @@ function getYouTubeVideoId(url) {
     return match ? match[1] : null;
 }
 
+// Render sorteo card - Premium design
+function renderSorteoCard(sorteo) {
+    const imageUrl = sorteo.image_url || '/images/placeholder.svg';
+    const participantCount = sorteo.participant_count || 0;
+
+    // Calculate if ending soon (within 3 days)
+    const drawDate = new Date(sorteo.draw_date);
+    const now = new Date();
+    const daysUntilDraw = Math.ceil((drawDate - now) / (1000 * 60 * 60 * 24));
+    const isEndingSoon = daysUntilDraw <= 3 && daysUntilDraw > 0;
+    const hasEnded = daysUntilDraw <= 0;
+
+    // Format draw date
+    const drawDateFormatted = drawDate.toLocaleDateString('es-AR', {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // Badge text
+    let badgeText = '🎲 Sorteo Activo';
+    let badgeClass = '';
+    if (hasEnded) {
+        badgeText = '✓ Finalizado';
+    } else if (isEndingSoon) {
+        badgeText = `⏰ ${daysUntilDraw === 1 ? 'Ultimo dia!' : `Quedan ${daysUntilDraw} dias`}`;
+        badgeClass = 'sorteo-card-badge-ending';
+    }
+
+    return `
+        <article class="sorteo-card">
+            <div class="sorteo-card-image-container">
+                <img src="${imageUrl}" alt="${escapeHtml(sorteo.title)}" class="sorteo-card-image" onerror="this.src='/images/placeholder.svg'">
+                <div class="sorteo-card-overlay"></div>
+                <span class="sorteo-card-badge ${badgeClass}">${badgeText}</span>
+                <span class="sorteo-card-participants">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                    ${participantCount} participantes
+                </span>
+            </div>
+            <div class="sorteo-card-body">
+                <div class="sorteo-card-prize">
+                    🎁 ${escapeHtml(sorteo.prize || sorteo.prize_description || 'Premio sorpresa')}
+                </div>
+                <h3 class="sorteo-card-title">
+                    <a href="/sorteo.html?id=${sorteo.id}">${escapeHtml(sorteo.title)}</a>
+                </h3>
+                ${sorteo.description ? `
+                    <p class="sorteo-card-description">${escapeHtml(truncate(sorteo.description, 100))}</p>
+                ` : ''}
+                <div class="sorteo-card-meta">
+                    <div class="sorteo-card-date">
+                        <span class="sorteo-card-date-label">Sorteo</span>
+                        <span class="sorteo-card-date-value">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            ${drawDateFormatted}
+                        </span>
+                    </div>
+                    ${!hasEnded ? `
+                        <a href="/sorteo.html?id=${sorteo.id}" class="sorteo-card-btn">
+                            Participar
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                    ` : `
+                        <a href="/sorteo.html?id=${sorteo.id}" class="sorteo-card-btn" style="background: linear-gradient(135deg, #6b7280, #4b5563);">
+                            Ver resultado
+                        </a>
+                    `}
+                </div>
+            </div>
+        </article>
+    `;
+}
+
 // Render gastronomy card - Interactive with website button
 function renderGastronomyCard(restaurant) {
     const imageUrl = restaurant.image_url || '/images/placeholder.svg';
@@ -415,7 +503,8 @@ async function loadHomePage() {
         loadEvents(),
         loadMovies(),
         loadGastronomy(),
-        loadPoi()
+        loadPoi(),
+        loadSorteos()
     ]);
 }
 
@@ -620,6 +709,31 @@ async function loadPoi() {
     } catch (e) {
         console.error('Error loading POI:', e);
         showEmpty(document.getElementById('poi-grid'), 'No hay lugares disponibles', '🗺️');
+    }
+}
+
+// Load sorteos
+async function loadSorteos() {
+    try {
+        const sorteosResponse = await api.getSorteos({ status: 'active', limit: 6 });
+        const sorteosGrid = document.getElementById('sorteos-grid');
+        const sorteosSection = document.getElementById('sorteos-section');
+
+        if (!sorteosGrid) return;
+
+        const sorteosData = extractArray(sorteosResponse, 'sorteos', 'items');
+
+        if (sorteosData.length > 0) {
+            sorteosGrid.innerHTML = sorteosData.map(s => renderSorteoCard(s)).join('');
+            if (sorteosSection) sorteosSection.style.display = 'block';
+        } else {
+            // Hide section if no sorteos
+            if (sorteosSection) sorteosSection.style.display = 'none';
+        }
+    } catch (e) {
+        console.error('Error loading sorteos:', e);
+        const sorteosSection = document.getElementById('sorteos-section');
+        if (sorteosSection) sorteosSection.style.display = 'none';
     }
 }
 

@@ -16,6 +16,11 @@
     let filteredEvents = [];
     let categories = [];
     let zones = [];
+    let allSorteos = [];
+    let currentTab = 'eventos';
+    let currentSorteoId = null;
+    let duplicarEventData = null;
+    let lastCreatedEventIds = []; // Para poder deshacer
 
     // Cargar datos iniciales
     async function loadData() {
@@ -150,6 +155,9 @@
                                     ` : ''}
                                     <button class="btn btn-sm btn-outline" onclick="editEvent(${event.id})" title="Editar">
                                         ✏️
+                                    </button>
+                                    <button class="btn btn-sm btn-outline" onclick="showDuplicarModal(${event.id})" title="Duplicar semanalmente" style="color: #3b82f6; border-color: #3b82f6;">
+                                        🔄
                                     </button>
                                     <button class="btn btn-sm btn-danger" onclick="deleteEvent(${event.id})" title="Eliminar">
                                         🗑️
@@ -504,6 +512,525 @@
         document.getElementById('event-modal').classList.remove('active');
         document.getElementById('event-modal-backdrop').classList.remove('active');
         document.body.style.overflow = '';
+    };
+
+    // =============================================
+    // TAB SWITCHING
+    // =============================================
+    window.switchTab = function(tab) {
+        currentTab = tab;
+
+        // Update tab buttons
+        document.querySelectorAll('.event-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tab);
+        });
+
+        // Update tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+            content.classList.toggle('active', content.id === `tab-${tab}`);
+            content.style.display = content.id === `tab-${tab}` ? 'block' : 'none';
+        });
+
+        // Load data if needed
+        if (tab === 'sorteos' && allSorteos.length === 0) {
+            loadSorteos();
+        }
+    };
+
+    // =============================================
+    // SORTEOS FUNCTIONS
+    // =============================================
+    async function loadSorteos() {
+        const container = document.getElementById('sorteos-container');
+        if (!container) return;
+
+        try {
+            const status = document.getElementById('filter-sorteo-status')?.value || '';
+            const response = await api.getAdminSpecialEvents({ type: 'sorteo', status });
+
+            if (response.success) {
+                allSorteos = response.data.events || [];
+                renderSorteos();
+                updateSorteosStats();
+            }
+        } catch (e) {
+            console.error('Error loading sorteos:', e);
+            container.innerHTML = '<p class="text-center text-muted p-4">Error cargando sorteos</p>';
+        }
+    }
+
+    function renderSorteos() {
+        const container = document.getElementById('sorteos-container');
+        if (!container) return;
+
+        if (allSorteos.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted p-4">No hay sorteos creados</p>';
+            return;
+        }
+
+        container.innerHTML = allSorteos.map(sorteo => `
+            <div class="sorteo-card">
+                <div class="sorteo-card-header">
+                    <div>
+                        <h4 class="sorteo-card-title">${sorteo.title}</h4>
+                        <p class="sorteo-card-prize">🎁 ${sorteo.prize_description || 'Sin descripcion'}</p>
+                    </div>
+                    <span class="badge badge-${getSorteoStatusBadge(sorteo.status)}">${getSorteoStatusLabel(sorteo.status)}</span>
+                </div>
+                <div class="sorteo-card-info">
+                    <span>📅 ${sorteo.draw_date ? formatDate(sorteo.draw_date) : 'Sin fecha'}</span>
+                    <span>⏰ ${sorteo.draw_time || '--:--'}</span>
+                    <span>👥 ${sorteo.participants_count || 0} participantes</span>
+                    <span>🏆 ${sorteo.winners_count || 1} ganador(es)</span>
+                    ${sorteo.prize_value ? `<span>💰 $${sorteo.prize_value}</span>` : ''}
+                </div>
+                <div class="sorteo-card-actions">
+                    <button class="btn btn-sm btn-outline" onclick="showParticipantsModal(${sorteo.id})">
+                        👥 Ver Participantes
+                    </button>
+                    ${sorteo.status === 'activo' ? `
+                        <button class="btn btn-sm btn-primary" onclick="selectWinners(${sorteo.id})">
+                            🏆 Sortear
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-sm btn-outline" onclick="editSorteo(${sorteo.id})">
+                        ✏️ Editar
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteSorteo(${sorteo.id})">
+                        🗑️
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function updateSorteosStats() {
+        const totalEl = document.getElementById('total-sorteos');
+        const participantsEl = document.getElementById('total-participants');
+        const finalizadosEl = document.getElementById('total-finalizados');
+
+        if (totalEl) totalEl.textContent = allSorteos.filter(s => s.status === 'activo').length;
+        if (participantsEl) {
+            const total = allSorteos.reduce((sum, s) => sum + (s.participants_count || 0), 0);
+            participantsEl.textContent = total;
+        }
+        if (finalizadosEl) finalizadosEl.textContent = allSorteos.filter(s => s.status === 'finalizado').length;
+    }
+
+    function getSorteoStatusBadge(status) {
+        const badges = {
+            activo: 'success',
+            pausado: 'warning',
+            finalizado: 'info',
+            cancelado: 'danger'
+        };
+        return badges[status] || 'secondary';
+    }
+
+    function getSorteoStatusLabel(status) {
+        const labels = {
+            activo: 'Activo',
+            pausado: 'Pausado',
+            finalizado: 'Finalizado',
+            cancelado: 'Cancelado'
+        };
+        return labels[status] || status;
+    }
+
+    window.showSorteoModal = function(sorteoId = null) {
+        currentSorteoId = sorteoId;
+        const form = document.getElementById('sorteo-form');
+        form.reset();
+        document.getElementById('sorteo-id').value = sorteoId || '';
+
+        // Set default date to tomorrow
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 7);
+        document.getElementById('sorteo-fecha').value = tomorrow.toISOString().split('T')[0];
+
+        if (sorteoId) {
+            const sorteo = allSorteos.find(s => s.id === sorteoId);
+            if (sorteo) {
+                document.getElementById('sorteo-titulo').value = sorteo.title || '';
+                document.getElementById('sorteo-premio').value = sorteo.prize_description || '';
+                document.getElementById('sorteo-valor').value = sorteo.prize_value || '';
+                document.getElementById('sorteo-lugar').value = sorteo.location || '';
+                document.getElementById('sorteo-whatsapp').value = sorteo.whatsapp || '';
+                document.getElementById('sorteo-fecha').value = sorteo.draw_date || '';
+                document.getElementById('sorteo-hora').value = sorteo.draw_time || '20:00';
+                document.getElementById('sorteo-ganadores').value = sorteo.winners_count || 1;
+                document.getElementById('sorteo-max').value = sorteo.max_participants || '';
+                document.getElementById('sorteo-deadline').value = sorteo.registration_deadline || '';
+            }
+        }
+
+        document.getElementById('sorteo-modal').classList.add('active');
+        document.getElementById('sorteo-modal-backdrop').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeSorteoModal = function() {
+        document.getElementById('sorteo-modal').classList.remove('active');
+        document.getElementById('sorteo-modal-backdrop').classList.remove('active');
+        document.body.style.overflow = '';
+        currentSorteoId = null;
+    };
+
+    window.editSorteo = function(sorteoId) {
+        showSorteoModal(sorteoId);
+    };
+
+    window.saveSorteo = async function(event) {
+        event.preventDefault();
+
+        const sorteoId = document.getElementById('sorteo-id').value;
+        const data = {
+            event_type: 'sorteo',
+            title: document.getElementById('sorteo-titulo').value,
+            prize_description: document.getElementById('sorteo-premio').value,
+            prize_value: parseFloat(document.getElementById('sorteo-valor').value) || null,
+            location: document.getElementById('sorteo-lugar').value || null,
+            whatsapp: document.getElementById('sorteo-whatsapp').value || null,
+            draw_date: document.getElementById('sorteo-fecha').value,
+            draw_time: document.getElementById('sorteo-hora').value || null,
+            winners_count: parseInt(document.getElementById('sorteo-ganadores').value) || 1,
+            max_participants: parseInt(document.getElementById('sorteo-max').value) || null,
+            registration_deadline: document.getElementById('sorteo-deadline').value || null
+        };
+
+        try {
+            let response;
+            if (sorteoId) {
+                response = await api.updateSpecialEvent(sorteoId, data);
+            } else {
+                response = await api.createSpecialEvent(data);
+            }
+
+            if (response.success) {
+                Components.toast(sorteoId ? 'Sorteo actualizado' : 'Sorteo creado', 'success');
+                closeSorteoModal();
+                loadSorteos();
+            }
+        } catch (e) {
+            console.error('Error saving sorteo:', e);
+            Components.toast(e.message || 'Error guardando sorteo', 'error');
+        }
+    };
+
+    window.deleteSorteo = async function(sorteoId) {
+        if (!confirm('¿Eliminar este sorteo? Se eliminaran tambien todos los participantes.')) return;
+
+        try {
+            const response = await api.deleteSpecialEvent(sorteoId);
+            if (response.success) {
+                Components.toast('Sorteo eliminado', 'success');
+                loadSorteos();
+            }
+        } catch (e) {
+            console.error('Error deleting sorteo:', e);
+            Components.toast('Error eliminando sorteo', 'error');
+        }
+    };
+
+    // =============================================
+    // PARTICIPANTS MODAL
+    // =============================================
+    window.showParticipantsModal = async function(sorteoId) {
+        currentSorteoId = sorteoId;
+        const modal = document.getElementById('participants-modal');
+        const backdrop = document.getElementById('participants-modal-backdrop');
+        const list = document.getElementById('participants-list');
+
+        modal.classList.add('active');
+        backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        list.innerHTML = '<div class="text-center p-4"><div class="spinner"></div></div>';
+
+        try {
+            const response = await api.getSorteoParticipants(sorteoId);
+            if (response.success) {
+                const { participants, winners } = response.data;
+
+                if (participants.length === 0) {
+                    list.innerHTML = '<p class="text-center text-muted p-4">No hay participantes aun</p>';
+                    return;
+                }
+
+                list.innerHTML = participants.map(p => `
+                    <div class="participant-item ${p.is_winner ? 'winner' : ''}">
+                        <div class="participant-info">
+                            <span class="participant-name">
+                                ${p.is_winner ? '🏆 ' : ''}${p.user_name || 'Usuario'}
+                            </span>
+                            <span class="participant-email">${p.user_email || ''}</span>
+                            ${p.user_phone ? `<span class="participant-email">📱 ${p.user_phone}</span>` : ''}
+                        </div>
+                        <div class="btn-group">
+                            ${p.is_winner && !p.prize_claimed ? `
+                                <button class="btn btn-sm btn-success" onclick="markPrizeClaimed(${p.id})">
+                                    ✓ Entregado
+                                </button>
+                            ` : ''}
+                            ${p.is_winner && p.prize_claimed ? `
+                                <span class="badge badge-success">Premio entregado</span>
+                            ` : ''}
+                            ${!p.is_winner && p.status !== 'descalificado' ? `
+                                <button class="btn btn-sm btn-danger" onclick="disqualifyParticipant(${p.id})">
+                                    Descalificar
+                                </button>
+                            ` : ''}
+                            ${p.status === 'descalificado' ? `
+                                <span class="badge badge-danger">Descalificado</span>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                // Update sortear button visibility
+                const sorteo = allSorteos.find(s => s.id === sorteoId);
+                const btnSortear = document.getElementById('btn-sortear');
+                if (btnSortear) {
+                    btnSortear.style.display = sorteo?.status === 'activo' ? 'block' : 'none';
+                }
+            }
+        } catch (e) {
+            console.error('Error loading participants:', e);
+            list.innerHTML = '<p class="text-center text-danger p-4">Error cargando participantes</p>';
+        }
+    };
+
+    window.closeParticipantsModal = function() {
+        document.getElementById('participants-modal').classList.remove('active');
+        document.getElementById('participants-modal-backdrop').classList.remove('active');
+        document.body.style.overflow = '';
+    };
+
+    window.selectWinners = async function(sorteoId = null) {
+        const id = sorteoId || currentSorteoId;
+        if (!id) return;
+
+        if (!confirm('¿Realizar el sorteo y seleccionar ganadores aleatoriamente?')) return;
+
+        try {
+            const response = await api.selectSorteoWinners(id);
+            if (response.success) {
+                Components.toast(response.message || 'Ganadores seleccionados', 'success');
+                loadSorteos();
+                if (currentSorteoId === id) {
+                    showParticipantsModal(id);
+                }
+            }
+        } catch (e) {
+            console.error('Error selecting winners:', e);
+            Components.toast(e.message || 'Error al sortear', 'error');
+        }
+    };
+
+    window.markPrizeClaimed = async function(participantId) {
+        if (!confirm('¿Marcar premio como entregado?')) return;
+
+        try {
+            const response = await api.markSorteoPrizeClaimed(participantId);
+            if (response.success) {
+                Components.toast('Premio marcado como entregado', 'success');
+                if (currentSorteoId) {
+                    showParticipantsModal(currentSorteoId);
+                }
+            }
+        } catch (e) {
+            console.error('Error marking prize claimed:', e);
+            Components.toast('Error al marcar premio', 'error');
+        }
+    };
+
+    window.disqualifyParticipant = async function(participantId) {
+        const notes = prompt('Motivo de descalificacion (opcional):');
+        if (notes === null) return; // Cancelled
+
+        try {
+            const response = await api.disqualifySorteoParticipant(participantId, notes);
+            if (response.success) {
+                Components.toast('Participante descalificado', 'success');
+                if (currentSorteoId) {
+                    showParticipantsModal(currentSorteoId);
+                }
+            }
+        } catch (e) {
+            console.error('Error disqualifying:', e);
+            Components.toast('Error al descalificar', 'error');
+        }
+    };
+
+    // =============================================
+    // DUPLICAR EVENTO SEMANAL
+    // =============================================
+    window.showRecurrenteModal = function() {
+        // Redirect to duplicar modal but first need to select an event
+        Components.toast('Selecciona un evento de la tabla y usa el boton "🔄" para duplicarlo semanalmente', 'info');
+    };
+
+    window.showDuplicarModal = function(eventId) {
+        const event = allEvents.find(e => e.id === eventId);
+        if (!event) {
+            Components.toast('Evento no encontrado', 'error');
+            return;
+        }
+
+        duplicarEventData = event;
+        document.getElementById('duplicar-evento-id').value = eventId;
+        document.getElementById('duplicar-evento-info').innerHTML = `
+            <strong>${event.title}</strong><br>
+            📅 ${formatEventDate(event.event_date)}
+        `;
+        document.getElementById('duplicar-semanas').value = 4;
+
+        previewDuplicar();
+
+        document.getElementById('duplicar-modal').classList.add('active');
+        document.getElementById('duplicar-modal-backdrop').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeDuplicarModal = function() {
+        document.getElementById('duplicar-modal').classList.remove('active');
+        document.getElementById('duplicar-modal-backdrop').classList.remove('active');
+        document.body.style.overflow = '';
+        duplicarEventData = null;
+    };
+
+    window.previewDuplicar = function() {
+        if (!duplicarEventData) return;
+
+        const semanas = parseInt(document.getElementById('duplicar-semanas').value) || 4;
+        const preview = document.getElementById('duplicar-preview');
+        const originalDate = new Date(duplicarEventData.event_date);
+
+        let html = '';
+        for (let i = 1; i <= semanas; i++) {
+            const newDate = new Date(originalDate);
+            newDate.setDate(newDate.getDate() + (i * 7));
+            html += `<div class="preview-date">Semana ${i}: ${formatEventDate(newDate.toISOString())}</div>`;
+        }
+
+        preview.innerHTML = html;
+    };
+
+    window.duplicarEvento = async function(event) {
+        event.preventDefault();
+
+        if (!duplicarEventData) {
+            Components.toast('No hay evento seleccionado', 'error');
+            return;
+        }
+
+        const semanas = parseInt(document.getElementById('duplicar-semanas').value) || 4;
+        const originalDate = new Date(duplicarEventData.event_date);
+
+        // Create array of events to create
+        const eventsToCreate = [];
+        for (let i = 1; i <= semanas; i++) {
+            const newDate = new Date(originalDate);
+            newDate.setDate(newDate.getDate() + (i * 7));
+
+            eventsToCreate.push({
+                title: duplicarEventData.title,
+                description: duplicarEventData.description,
+                image_url: duplicarEventData.image_url,
+                category_id: duplicarEventData.category_id,
+                zone_id: duplicarEventData.zone_id,
+                location: duplicarEventData.location,
+                address: duplicarEventData.address,
+                event_date: newDate.toISOString().split('T')[0],
+                event_time: duplicarEventData.event_time,
+                price: duplicarEventData.price,
+                phone: duplicarEventData.phone,
+                whatsapp: duplicarEventData.whatsapp,
+                website: duplicarEventData.website,
+                status: 'approved',
+                is_featured: duplicarEventData.is_featured,
+                is_special: duplicarEventData.is_special
+            });
+        }
+
+        try {
+            const response = await api.createEventsBulk(eventsToCreate);
+            if (response.success) {
+                lastCreatedEventIds = response.data.ids || [];
+                closeDuplicarModal();
+                loadData();
+
+                // Mostrar toast con opcion de deshacer
+                if (lastCreatedEventIds.length > 0) {
+                    showUndoToast(response.data.created);
+                } else {
+                    Components.toast(`Se crearon ${response.data.created} eventos`, 'success');
+                }
+            }
+        } catch (e) {
+            console.error('Error duplicating events:', e);
+            Components.toast(e.message || 'Error al duplicar eventos', 'error');
+        }
+    };
+
+    function showUndoToast(count) {
+        // Crear toast personalizado con boton deshacer
+        const toastContainer = document.getElementById('toast-container') || createToastContainer();
+
+        const toast = document.createElement('div');
+        toast.className = 'toast toast-success';
+        toast.innerHTML = `
+            <span>Se crearon ${count} eventos</span>
+            <button onclick="undoLastBulkCreate()" style="margin-left: 1rem; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); padding: 0.25rem 0.75rem; border-radius: 4px; color: white; cursor: pointer;">
+                ↩️ Deshacer
+            </button>
+        `;
+        toastContainer.appendChild(toast);
+
+        // Auto-remover despues de 10 segundos
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.remove();
+                lastCreatedEventIds = []; // Limpiar IDs
+            }
+        }, 10000);
+    }
+
+    function createToastContainer() {
+        let container = document.getElementById('toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'toast-container';
+            container.style.cssText = 'position: fixed; top: 1rem; right: 1rem; z-index: 9999;';
+            document.body.appendChild(container);
+        }
+        return container;
+    }
+
+    window.undoLastBulkCreate = async function() {
+        if (lastCreatedEventIds.length === 0) {
+            Components.toast('No hay eventos para deshacer', 'warning');
+            return;
+        }
+
+        if (!confirm(`¿Eliminar los ${lastCreatedEventIds.length} eventos recien creados?`)) return;
+
+        try {
+            const response = await api.deleteEventsBulk(lastCreatedEventIds);
+
+            if (response.success) {
+                Components.toast(`Se eliminaron ${response.data.deleted} eventos`, 'success');
+                lastCreatedEventIds = [];
+                loadData();
+
+                // Remover el toast de deshacer si existe
+                const toasts = document.querySelectorAll('.toast');
+                toasts.forEach(t => t.remove());
+            }
+        } catch (e) {
+            console.error('Error undoing:', e);
+            Components.toast('Error al deshacer', 'error');
+        }
     };
 
     // Event listeners

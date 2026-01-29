@@ -851,6 +851,74 @@ class ApiService {
     async deletePoi(id) {
         return this.delete(`/api/admin/poi/${id}`);
     }
+
+    // ========== SPECIAL EVENTS (Sorteos) ==========
+
+    // Public
+    async getSorteos(params = {}) {
+        return this.get('/api/sorteos', params);
+    }
+
+    async getSorteoById(id) {
+        return this.get(`/api/sorteos/${id}`);
+    }
+
+    // Participar en sorteo
+    async participateSorteo(sorteoId) {
+        return this.post(`/api/sorteos/${sorteoId}/participate`);
+    }
+
+    async checkSorteoParticipation(sorteoId) {
+        return this.get(`/api/sorteos/${sorteoId}/participation`);
+    }
+
+    async cancelSorteoParticipation(sorteoId) {
+        return this.delete(`/api/sorteos/${sorteoId}/participate`);
+    }
+
+    // Admin - Special Events
+    async getAdminSpecialEvents(params = {}) {
+        return this.get('/api/admin/special-events', params);
+    }
+
+    async createSpecialEvent(data) {
+        return this.post('/api/admin/special-events', data);
+    }
+
+    async updateSpecialEvent(id, data) {
+        return this.put(`/api/admin/special-events/${id}`, data);
+    }
+
+    async deleteSpecialEvent(id) {
+        return this.delete(`/api/admin/special-events/${id}`);
+    }
+
+    // Sorteo Participants
+    async getSorteoParticipants(sorteoId) {
+        return this.get(`/api/admin/sorteos/${sorteoId}/participants`);
+    }
+
+    async selectSorteoWinners(sorteoId) {
+        return this.post(`/api/admin/sorteos/${sorteoId}/select-winners`);
+    }
+
+    async markSorteoPrizeClaimed(participantId) {
+        return this.put(`/api/admin/sorteos/participants/${participantId}/claim`);
+    }
+
+    async disqualifySorteoParticipant(participantId, notes = '') {
+        return this.put(`/api/admin/sorteos/participants/${participantId}/disqualify`, { notes });
+    }
+
+    // Bulk create events (for weekly duplicates)
+    async createEventsBulk(events) {
+        return this.post('/api/admin/events/bulk', { events });
+    }
+
+    // Bulk delete events (for undo)
+    async deleteEventsBulk(ids) {
+        return this.post('/api/admin/events/bulk-delete', { ids });
+    }
 }
 
 // Crear instancia global

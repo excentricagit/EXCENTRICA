@@ -3,113 +3,550 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#A020F0">
+    <meta name="theme-color" content="#ef4444">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/images/favicon.png">
+    <link rel="apple-touch-icon" href="/assets/icon-192.png">
     <title>Cine - Excentrica</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/base-mobile.css">
     <link rel="stylesheet" href="/css/layout-mobile.css">
     <link rel="stylesheet" href="/css/components-mobile.css">
+    <link rel="stylesheet" href="/css/pages-mobile.css">
 </head>
 <body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
     <div id="install-banner"></div>
+
+    <!-- Header mobile -->
     <header id="mobile-header"></header>
 
+    <!-- Contenido principal -->
     <main id="mobile-main">
-        <div class="mobile-page">
-            <div class="mobile-page-header">
-                <h1 class="mobile-page-title">🎬 Cartelera de Cine</h1>
+        <div class="mobile-page mobile-cine">
+
+            <!-- Header Cine -->
+            <div class="cine-header">
+                <div class="cine-header-top">
+                    <h1>Cartelera</h1>
+                    <span id="movies-count" class="cine-count"></span>
+                </div>
+                <p class="cine-subtitle">Cines en Santiago del Estero</p>
             </div>
-            <div id="cine-container">
-                <div class="mobile-loading"><div class="mobile-spinner"></div></div>
+
+            <!-- Selector de fechas -->
+            <div id="date-selector" class="cine-date-selector"></div>
+
+            <!-- Filtros -->
+            <div class="cine-filters">
+                <select id="cinema-filter" class="cine-cinema-select">
+                    <option value="">🎬 Todos los cines</option>
+                </select>
             </div>
+
+            <!-- Tabs de vista -->
+            <div class="cine-tabs">
+                <button class="cine-tab active" data-view="movies">
+                    🎬 Peliculas
+                </button>
+                <button class="cine-tab" data-view="cinemas">
+                    🏢 Cines
+                </button>
+            </div>
+
+            <!-- Contenido -->
+            <div id="cine-content" class="cine-content">
+                <div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>
+            </div>
+
+            <!-- Proximos Estrenos -->
+            <div id="upcoming-container" class="cine-upcoming-section" style="display: none;"></div>
+
         </div>
     </main>
 
+    <!-- Bottom navigation -->
     <nav id="mobile-bottom-nav"></nav>
 
+    <!-- Bottom Sheet para detalle de pelicula -->
+    <div id="movie-sheet" class="cine-sheet">
+        <div class="cine-sheet-overlay" onclick="CinePage.closeSheet()"></div>
+        <div class="cine-sheet-content">
+            <div class="cine-sheet-handle"></div>
+            <div id="movie-detail" class="movie-detail">
+                <!-- Contenido dinamico -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts reutilizados -->
     <script src="/js/config.js"></script>
     <script src="/js/api.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile -->
     <script src="/js/pwa-mobile.js"></script>
     <script src="/js/nav-mobile.js"></script>
     <script src="/js/ui-mobile.js"></script>
     <script src="/js/app-mobile.js"></script>
 
     <script>
-        async function loadCartelera() {
-            const container = document.getElementById('cine-container');
+        const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab'];
+        const MONTH_NAMES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
+        function getRatingClass(rating) {
+            if (!rating) return 'atp';
+            const r = rating.toLowerCase();
+            if (r.includes('18') || r === 'r') return 'plus18';
+            if (r.includes('16')) return 'plus16';
+            if (r.includes('13') || r === 'pg-13') return 'plus13';
+            return 'atp';
+        }
+
+        function formatDuration(minutes) {
+            if (!minutes) return '';
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            return h > 0 ? `${h}h ${m}min` : `${m}min`;
+        }
+
+        function parseGenres(genre) {
+            if (!genre) return [];
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const response = await Api.getShowtimes({ date: today });
-                // La API devuelve un array directo en data
-                const showtimes = Array.isArray(response.data) ? response.data : [];
-
-                // Agrupar por pelicula
-                const movieMap = {};
-                showtimes.forEach(st => {
-                    if (!movieMap[st.movie_id]) {
-                        movieMap[st.movie_id] = {
-                            id: st.movie_id,
-                            title: st.movie_title || 'Sin titulo',
-                            poster_url: st.poster_url,
-                            duration: st.duration,
-                            rating: st.rating,
-                            showtimes: []
-                        };
-                    }
-                    movieMap[st.movie_id].showtimes.push({
-                        time: st.show_time,
-                        cinema: st.cinema_name,
-                        format: st.format,
-                        language: st.language
-                    });
-                });
-                const movies = Object.values(movieMap);
-
-                if (!movies.length) {
-                    MobileUI.showEmpty(container, '🎬', 'Sin funciones', 'No hay peliculas hoy');
-                    return;
-                }
-
-                let html = '';
-                movies.forEach(movie => {
-                    const poster = movie.poster_url || CONFIG.PLACEHOLDER_IMAGE;
-                    const showtimes = movie.showtimes || [];
-
-                    html += `
-                        <div class="cine-movie-card">
-                            <img src="${poster}" alt="" class="cine-movie-poster" onerror="this.src='${CONFIG.PLACEHOLDER_IMAGE}'">
-                            <div class="cine-movie-info">
-                                <div class="cine-movie-title">${Utils.escapeHtml(movie.title)}</div>
-                                <div class="cine-movie-meta">
-                                    ${movie.duration ? movie.duration + ' min' : ''}
-                                    ${movie.rating ? ' • ' + movie.rating : ''}
-                                </div>
-                                <div class="cine-showtimes">
-                                    ${showtimes.map(st => `<span class="cine-showtime">${st.time}</span>`).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                container.innerHTML = html;
-
-            } catch (error) {
-                console.error('Error loading cartelera:', error);
-                MobileUI.showError(container, 'Error al cargar cartelera');
+                return typeof genre === 'string' ? JSON.parse(genre) : genre;
+            } catch {
+                return genre.split(',').map(g => g.trim());
             }
         }
 
+        const CinePage = {
+            currentDate: new Date().toISOString().split('T')[0],
+            currentCinema: '',
+            currentView: 'movies',
+            cinemas: [],
+            showtimes: [],
+            upcomingMovies: [],
+
+            async init() {
+                this.renderDateSelector();
+                await this.loadCinemas();
+                this.setupFilters();
+                this.setupTabs();
+                this.loadShowtimes();
+                this.loadUpcoming();
+            },
+
+            generateDates() {
+                const dates = [];
+                const today = new Date();
+                for (let i = 0; i < 7; i++) {
+                    const date = new Date(today);
+                    date.setDate(today.getDate() + i);
+                    dates.push({
+                        date: date.toISOString().split('T')[0],
+                        dayName: i === 0 ? 'Hoy' : DAY_NAMES[date.getDay()],
+                        dayNum: date.getDate(),
+                        month: MONTH_NAMES[date.getMonth()],
+                        isToday: i === 0
+                    });
+                }
+                return dates;
+            },
+
+            renderDateSelector() {
+                const container = document.getElementById('date-selector');
+                const dates = this.generateDates();
+
+                container.innerHTML = dates.map(d => `
+                    <button class="cine-date-btn ${d.date === this.currentDate ? 'active' : ''}" data-date="${d.date}">
+                        <span class="cine-date-day">${d.dayName}</span>
+                        <span class="cine-date-num">${d.dayNum}</span>
+                    </button>
+                `).join('');
+
+                container.querySelectorAll('.cine-date-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.currentDate = btn.dataset.date;
+                        this.renderDateSelector();
+                        this.loadShowtimes();
+                    });
+                });
+            },
+
+            async loadCinemas() {
+                try {
+                    const response = await Api.getCinemas({});
+                    this.cinemas = response.data || [];
+                    const select = document.getElementById('cinema-filter');
+                    this.cinemas.forEach(cinema => {
+                        const option = document.createElement('option');
+                        option.value = cinema.id;
+                        option.textContent = cinema.name;
+                        select.appendChild(option);
+                    });
+                } catch (e) {
+                    console.error('Error loading cinemas:', e);
+                }
+            },
+
+            setupFilters() {
+                document.getElementById('cinema-filter').addEventListener('change', (e) => {
+                    this.currentCinema = e.target.value;
+                    this.loadShowtimes();
+                });
+            },
+
+            setupTabs() {
+                document.querySelectorAll('.cine-tab').forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        document.querySelectorAll('.cine-tab').forEach(t => t.classList.remove('active'));
+                        tab.classList.add('active');
+                        this.currentView = tab.dataset.view;
+                        this.render();
+                    });
+                });
+            },
+
+            async loadShowtimes() {
+                const content = document.getElementById('cine-content');
+                content.innerHTML = '<div class="mobile-loading-inline"><div class="mobile-spinner-sm"></div></div>';
+
+                try {
+                    const params = { date: this.currentDate };
+                    if (this.currentCinema) params.cinema_id = this.currentCinema;
+
+                    const response = await Api.getShowtimes(params);
+                    this.showtimes = Array.isArray(response.data) ? response.data : [];
+
+                    if (this.showtimes.length === 0) {
+                        content.innerHTML = `
+                            <div class="cine-empty">
+                                <span class="cine-empty-icon">🎬</span>
+                                <p>No hay funciones para esta fecha</p>
+                                <span class="cine-empty-hint">Proba con otra fecha</span>
+                            </div>
+                        `;
+                        document.getElementById('movies-count').textContent = '';
+                        return;
+                    }
+
+                    this.render();
+                } catch (error) {
+                    console.error('Error loading showtimes:', error);
+                    content.innerHTML = '<p class="cine-empty">Error al cargar cartelera</p>';
+                }
+            },
+
+            render() {
+                if (this.currentView === 'movies') {
+                    this.renderMoviesView();
+                } else {
+                    this.renderCinemasView();
+                }
+            },
+
+            renderMoviesView() {
+                const content = document.getElementById('cine-content');
+
+                // Agrupar por pelicula
+                const movieMap = {};
+                this.showtimes.forEach(st => {
+                    if (!movieMap[st.movie_id]) {
+                        movieMap[st.movie_id] = {
+                            id: st.movie_id,
+                            title: st.movie_title,
+                            poster_url: st.poster_url,
+                            duration: st.duration,
+                            rating: st.rating,
+                            genre: st.genre,
+                            synopsis: st.synopsis,
+                            showtimes: []
+                        };
+                    }
+                    movieMap[st.movie_id].showtimes.push(st);
+                });
+
+                const movies = Object.values(movieMap);
+                document.getElementById('movies-count').textContent = `${movies.length} peliculas`;
+
+                content.innerHTML = `
+                    <div class="cine-movies-list">
+                        ${movies.map(movie => this.renderMovieCard(movie)).join('')}
+                    </div>
+                `;
+            },
+
+            renderMovieCard(movie) {
+                const poster = movie.poster_url || '/images/placeholder.jpg';
+                const ratingClass = getRatingClass(movie.rating);
+                const genres = parseGenres(movie.genre);
+
+                // Agrupar horarios por cine
+                const cinemaGroups = {};
+                movie.showtimes.forEach(st => {
+                    if (!cinemaGroups[st.cinema_id]) {
+                        cinemaGroups[st.cinema_id] = {
+                            name: st.cinema_name,
+                            times: []
+                        };
+                    }
+                    cinemaGroups[st.cinema_id].times.push(st);
+                });
+
+                let showtimesHtml = '';
+                for (const cinemaId in cinemaGroups) {
+                    const group = cinemaGroups[cinemaId];
+                    showtimesHtml += `
+                        <div class="movie-cinema-row">
+                            <span class="movie-cinema-name">${Utils.escapeHtml(group.name)}</span>
+                            <div class="movie-times">
+                                ${group.times.slice(0, 4).map(st => `
+                                    <span class="movie-time-chip">
+                                        ${st.show_time.substring(0, 5)}
+                                        <small>${st.format || '2D'}</small>
+                                    </span>
+                                `).join('')}
+                                ${group.times.length > 4 ? `<span class="movie-time-more">+${group.times.length - 4}</span>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="cine-movie-card" onclick="CinePage.showMovieDetail(${movie.id})">
+                        <div class="cine-movie-poster" style="background-image: url('${poster}')">
+                            ${movie.rating ? `<span class="cine-movie-rating ${ratingClass}">${movie.rating}</span>` : ''}
+                        </div>
+                        <div class="cine-movie-info">
+                            <h3 class="cine-movie-title">${Utils.escapeHtml(movie.title)}</h3>
+                            <div class="cine-movie-meta">
+                                ${movie.duration ? `<span>🕐 ${formatDuration(movie.duration)}</span>` : ''}
+                                ${genres.length > 0 ? `<span>🎭 ${genres[0]}</span>` : ''}
+                            </div>
+                            <div class="cine-movie-showtimes">
+                                ${showtimesHtml}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderCinemasView() {
+                const content = document.getElementById('cine-content');
+
+                // Agrupar por cine
+                const cinemaMap = {};
+                this.showtimes.forEach(st => {
+                    if (!cinemaMap[st.cinema_id]) {
+                        const cinema = this.cinemas.find(c => c.id == st.cinema_id) || {
+                            id: st.cinema_id,
+                            name: st.cinema_name,
+                            address: st.cinema_address
+                        };
+                        cinemaMap[st.cinema_id] = {
+                            cinema: cinema,
+                            showtimes: []
+                        };
+                    }
+                    cinemaMap[st.cinema_id].showtimes.push(st);
+                });
+
+                const cinemasList = Object.values(cinemaMap);
+                document.getElementById('movies-count').textContent = `${cinemasList.length} cines`;
+
+                content.innerHTML = cinemasList.map(c => this.renderCinemaCard(c.cinema, c.showtimes)).join('');
+            },
+
+            renderCinemaCard(cinema, cinemaShowtimes) {
+                // Agrupar por pelicula
+                const movieMap = {};
+                cinemaShowtimes.forEach(st => {
+                    if (!movieMap[st.movie_id]) {
+                        movieMap[st.movie_id] = {
+                            id: st.movie_id,
+                            title: st.movie_title,
+                            poster_url: st.poster_url,
+                            times: []
+                        };
+                    }
+                    movieMap[st.movie_id].times.push(st);
+                });
+
+                const movies = Object.values(movieMap);
+
+                return `
+                    <div class="cine-cinema-card">
+                        <div class="cine-cinema-header">
+                            <div class="cine-cinema-icon">🎬</div>
+                            <div class="cine-cinema-info">
+                                <h3>${Utils.escapeHtml(cinema.name)}</h3>
+                                ${cinema.address ? `<p>📍 ${Utils.escapeHtml(cinema.address)}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="cine-cinema-movies">
+                            ${movies.map(movie => `
+                                <div class="cine-mini-movie" onclick="CinePage.showMovieDetail(${movie.id})">
+                                    <div class="cine-mini-poster" style="background-image: url('${movie.poster_url || '/images/placeholder.jpg'}')"></div>
+                                    <div class="cine-mini-info">
+                                        <span class="cine-mini-title">${Utils.escapeHtml(movie.title)}</span>
+                                        <div class="cine-mini-times">
+                                            ${movie.times.slice(0, 3).map(t => `<span>${t.show_time.substring(0, 5)}</span>`).join('')}
+                                            ${movie.times.length > 3 ? `<span>+${movie.times.length - 3}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            },
+
+            async loadUpcoming() {
+                try {
+                    const response = await Api.getMovies({ status: 'coming_soon', limit: 5 });
+                    this.upcomingMovies = response.data || [];
+                    if (this.upcomingMovies.length > 0) {
+                        this.renderUpcoming();
+                    }
+                } catch (e) {
+                    console.error('Error loading upcoming:', e);
+                }
+            },
+
+            renderUpcoming() {
+                const container = document.getElementById('upcoming-container');
+                container.style.display = 'block';
+                container.innerHTML = `
+                    <div class="cine-upcoming-header">
+                        <h2>🎥 Proximos Estrenos</h2>
+                    </div>
+                    <div class="cine-upcoming-scroll">
+                        ${this.upcomingMovies.map(movie => {
+                            const releaseDate = movie.release_date ? new Date(movie.release_date) : null;
+                            const dateStr = releaseDate ? `${releaseDate.getDate()} ${MONTH_NAMES[releaseDate.getMonth()]}` : 'Proximamente';
+                            return `
+                                <div class="cine-upcoming-card">
+                                    <div class="cine-upcoming-poster" style="background-image: url('${movie.poster_url || '/images/placeholder.jpg'}')">
+                                        <span class="cine-upcoming-date">${dateStr}</span>
+                                    </div>
+                                    <span class="cine-upcoming-title">${Utils.escapeHtml(movie.title)}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            },
+
+            showMovieDetail(movieId) {
+                const movieShowtimes = this.showtimes.filter(st => st.movie_id == movieId);
+                if (movieShowtimes.length === 0) return;
+
+                const st = movieShowtimes[0];
+                const movie = {
+                    id: st.movie_id,
+                    title: st.movie_title,
+                    poster_url: st.poster_url,
+                    duration: st.duration,
+                    rating: st.rating,
+                    synopsis: st.synopsis,
+                    genre: st.genre,
+                    director: st.director,
+                    trailer_url: st.trailer_url
+                };
+
+                // Agrupar horarios por cine
+                const cinemaGroups = {};
+                movieShowtimes.forEach(s => {
+                    if (!cinemaGroups[s.cinema_id]) {
+                        cinemaGroups[s.cinema_id] = {
+                            name: s.cinema_name,
+                            address: s.cinema_address,
+                            times: []
+                        };
+                    }
+                    cinemaGroups[s.cinema_id].times.push(s);
+                });
+
+                const genres = parseGenres(movie.genre);
+                const ratingClass = getRatingClass(movie.rating);
+
+                // Generar HTML de horarios
+                let showtimesHtml = '';
+                for (const cinemaId in cinemaGroups) {
+                    const group = cinemaGroups[cinemaId];
+                    showtimesHtml += `
+                        <div class="detail-cinema-group">
+                            <div class="detail-cinema-name">🎬 ${Utils.escapeHtml(group.name)}</div>
+                            <div class="detail-showtime-grid">
+                                ${group.times.map(t => `
+                                    <div class="detail-showtime-chip">
+                                        <span class="detail-time">${t.show_time.substring(0, 5)}</span>
+                                        <span class="detail-format">${t.format || '2D'} ${t.language === 'doblada' ? 'DOB' : 'SUB'}</span>
+                                        ${t.price ? `<span class="detail-price">$${t.price}</span>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const sheet = document.getElementById('movie-sheet');
+                const detail = document.getElementById('movie-detail');
+
+                detail.innerHTML = `
+                    <div class="movie-detail-header">
+                        <div class="movie-detail-poster" style="background-image: url('${movie.poster_url || '/images/placeholder.jpg'}')">
+                            ${movie.rating ? `<span class="movie-detail-rating ${ratingClass}">${movie.rating}</span>` : ''}
+                        </div>
+                        <div class="movie-detail-info">
+                            <h2>${Utils.escapeHtml(movie.title)}</h2>
+                            <div class="movie-detail-meta">
+                                ${movie.duration ? `<span>🕐 ${formatDuration(movie.duration)}</span>` : ''}
+                                ${genres.length > 0 ? `<span>🎭 ${genres.join(', ')}</span>` : ''}
+                            </div>
+                            ${movie.director ? `<p class="movie-detail-director">Director: ${Utils.escapeHtml(movie.director)}</p>` : ''}
+                        </div>
+                    </div>
+
+                    ${movie.synopsis ? `
+                        <div class="movie-detail-synopsis">
+                            <h3>Sinopsis</h3>
+                            <p>${Utils.escapeHtml(movie.synopsis)}</p>
+                        </div>
+                    ` : ''}
+
+                    ${movie.trailer_url ? `
+                        <a href="${movie.trailer_url}" target="_blank" rel="noopener" class="movie-detail-trailer-btn">
+                            ▶️ Ver Trailer
+                        </a>
+                    ` : ''}
+
+                    <div class="movie-detail-showtimes">
+                        <h3>🎟️ Funciones Disponibles</h3>
+                        ${showtimesHtml}
+                    </div>
+                `;
+
+                sheet.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            },
+
+            closeSheet() {
+                const sheet = document.getElementById('movie-sheet');
+                sheet.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        };
+
         MobileApp.init({
             page: 'categorias',
-            onReady: loadCartelera
+            onReady: () => CinePage.init()
         });
     </script>
 </body>

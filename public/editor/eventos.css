@@ -2,6 +2,159 @@
    EDITOR EVENTOS - Estilos especificos
    ============================================= */
 
+/* Event Tabs */
+.event-tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    background: var(--bg-dark, #1a1a2e);
+    border-radius: 12px;
+    width: fit-content;
+}
+
+.event-tab {
+    padding: 0.625rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: var(--text-muted, #94a3b8);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.event-tab:hover {
+    color: var(--text-primary, #fff);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.event-tab.active {
+    background: var(--primary, #a855f7);
+    color: white;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Sorteo Card */
+.sorteo-card {
+    background: var(--bg-secondary, #1e1e32);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sorteo-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.sorteo-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    margin: 0;
+}
+
+.sorteo-card-prize {
+    color: #a855f7;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.sorteo-card-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+.sorteo-card-info span {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.sorteo-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Participants List */
+.participant-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.participant-item:last-child {
+    border-bottom: none;
+}
+
+.participant-item.winner {
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.participant-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.participant-name {
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.participant-email {
+    font-size: 0.85rem;
+    color: var(--text-muted, #94a3b8);
+}
+
+/* Modal 2 columns */
+.modal-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .modal-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Duplicar Preview */
+#duplicar-preview {
+    font-family: monospace;
+}
+
+#duplicar-preview .preview-date {
+    padding: 0.25rem 0;
+    color: var(--text-muted, #94a3b8);
+}
+
+#duplicar-preview .preview-date:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.03);
+}
+
 /* Compact Modal Styling for Events */
 #event-modal {
     max-width: 1400px !important;

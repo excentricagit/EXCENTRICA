@@ -1,5 +1,6 @@
 // EXCENTRICA - Service Worker
-// Solo maneja estado offline, NO cachea archivos
+// Version para control de actualizaciones
+const SW_VERSION = '1.0.1';
 
 const OFFLINE_PAGE = `
 <!DOCTYPE html>
@@ -64,14 +65,48 @@ const OFFLINE_PAGE = `
 </html>
 `;
 
-// Instalacion
+// Instalacion - activar inmediatamente
 self.addEventListener('install', (event) => {
+    console.log('[SW] Installing version:', SW_VERSION);
+    // skipWaiting hace que el nuevo SW tome control inmediatamente
     self.skipWaiting();
 });
 
-// Activacion
+// Activacion - tomar control de todos los clientes
 self.addEventListener('activate', (event) => {
-    event.waitUntil(clients.claim());
+    console.log('[SW] Activated version:', SW_VERSION);
+    event.waitUntil(
+        Promise.all([
+            // Tomar control de todas las pestanas abiertas
+            clients.claim(),
+            // Notificar a todos los clientes que hay una actualizacion
+            notifyClientsOfUpdate()
+        ])
+    );
+});
+
+// Notificar a los clientes sobre la actualizacion
+async function notifyClientsOfUpdate() {
+    const allClients = await clients.matchAll({ type: 'window' });
+    allClients.forEach(client => {
+        client.postMessage({
+            type: 'SW_UPDATED',
+            version: SW_VERSION
+        });
+    });
+}
+
+// Escuchar mensajes de los clientes
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+    if (event.data && event.data.type === 'GET_VERSION') {
+        event.source.postMessage({
+            type: 'SW_VERSION',
+            version: SW_VERSION
+        });
+    }
 });
 
 // Interceptar requests

@@ -93,12 +93,7 @@
                     <label class="mobile-form-label">Categoria</label>
                     <select id="category" class="mobile-form-select">
                         <option value="">Sin categoria</option>
-                        <option value="politica">Politica</option>
-                        <option value="economia">Economia</option>
-                        <option value="deportes">Deportes</option>
-                        <option value="cultura">Cultura</option>
-                        <option value="sociedad">Sociedad</option>
-                        <option value="tecnologia">Tecnologia</option>
+                        <!-- Se cargan desde API -->
                     </select>
                 </div>
 
@@ -127,10 +122,30 @@
     <script src="/js/app-mobile.js"></script>
 
     <script>
-        // Verificar que es periodista
-        if (!MobileApp.requirePeriodista()) {
+        // Verificar que puede publicar (periodista, editor, admin)
+        if (!MobileApp.requireCanPublish()) {
             // Se redirige automaticamente
         }
+
+        // Cargar categorias desde API
+        async function loadCategories() {
+            try {
+                const response = await Api.getCategories('noticias');
+                if (response.success && response.data) {
+                    const select = document.getElementById('category');
+                    select.innerHTML = '<option value="">Sin categoria</option>';
+                    response.data.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (e) {
+                console.error('Error cargando categorias:', e);
+            }
+        }
+        loadCategories();
 
         // Subir imagen
         document.getElementById('image-input').addEventListener('change', async (e) => {
@@ -155,11 +170,15 @@
                 formData.append('file', file);
 
                 const response = await Api.post('/api/upload', formData);
-                if (response.url) {
-                    document.getElementById('image-url').value = response.url;
+                if (response.success && response.data && response.data.url) {
+                    document.getElementById('image-url').value = response.data.url;
+                    MobileUI.toast('Imagen subida', 'success');
+                } else {
+                    throw new Error('No se obtuvo URL de imagen');
                 }
             } catch (error) {
-                MobileUI.toast('Error al subir imagen', 'error');
+                console.error('Upload error:', error);
+                MobileUI.toast('Error al subir imagen: ' + (error.message || 'Error desconocido'), 'error');
             }
         });
 
@@ -179,10 +198,11 @@
             submitBtn.textContent = 'Publicando...';
 
             try {
-                const response = await Api.post('/api/news', {
+                const response = await Api.post('/api/admin/news', {
                     title,
                     content,
-                    category,
+                    summary: content.substring(0, 150) + '...',
+                    category_id: category || null,
                     image_url: imageUrl || null,
                     status: 'pending' // Pendiente de aprobacion
                 });

@@ -3,8 +3,8 @@
 > **Base de datos:** Cloudflare D1 (SQLite)
 > **Nombre:** excentrica-db
 > **ID:** 7616d9fe-1043-4b69-9751-7026d89b8c81
-> **Versión:** 1.6.0
-> **Última actualización:** 2026-01-28
+> **Versión:** 1.8.0
+> **Última actualización:** 2026-01-29
 
 ---
 
@@ -40,7 +40,9 @@
 | `subscriptions` | Suscripciones de usuarios |
 | `settings` | Configuraciones del sistema |
 | `statistics` | Estadísticas diarias |
-| `audit_logs` | Logs de auditoría |
+| `activity_logs` | Logs de actividad (auditoría) |
+| `special_events` | Sorteos y eventos recurrentes |
+| `sorteo_participants` | Participantes en sorteos |
 
 ---
 
@@ -697,20 +699,104 @@ Estadísticas diarias.
 | data | TEXT | - | - | Datos adicionales JSON |
 | created_at | TEXT | - | datetime('now') | Fecha creación |
 
-### `audit_logs`
-Logs de auditoría.
+### `activity_logs`
+Logs de actividad para auditoría y control. Registra todas las acciones importantes de los usuarios (especialmente publicistas y editores).
 
 | Campo | Tipo | NOT NULL | Default | Descripción |
 |-------|------|----------|---------|-------------|
 | id | INTEGER | PK | - | ID único |
-| user_id | INTEGER | - | - | FK → users |
-| action | TEXT | ✓ | - | Acción realizada |
-| entity_type | TEXT | - | - | Tipo de entidad afectada |
-| entity_id | INTEGER | - | - | ID de la entidad |
-| details | TEXT | - | - | Detalles JSON |
+| user_id | INTEGER | ✓ | - | FK → users (quién hizo la acción) |
+| user_name | TEXT | ✓ | - | Nombre del usuario (cache) |
+| user_role | TEXT | ✓ | - | Rol del usuario al momento de la acción |
+| action | TEXT | ✓ | - | Acción: `create`, `update`, `delete`, `approve`, `reject`, `activate`, `deactivate` |
+| entity_type | TEXT | ✓ | - | Tipo: `ad`, `event`, `registration`, `user`, `news`, `product` |
+| entity_id | INTEGER | - | - | ID de la entidad afectada |
+| entity_name | TEXT | - | - | Nombre/título de la entidad (referencia rápida) |
+| details | TEXT | - | - | Detalles JSON (old_status, new_status, etc) |
 | ip_address | TEXT | - | - | IP del usuario |
 | user_agent | TEXT | - | - | User agent del navegador |
 | created_at | TEXT | - | datetime('now') | Fecha creación |
+
+**Índices:**
+- `idx_activity_logs_user_id` - Búsqueda por usuario
+- `idx_activity_logs_action` - Búsqueda por acción
+- `idx_activity_logs_entity_type` - Búsqueda por tipo de entidad
+- `idx_activity_logs_created_at` - Ordenamiento cronológico
+- `idx_activity_logs_user_role` - Filtrado por rol
+
+**Uso principal:** Panel Admin → Logs - Para ver qué acciones realizan los publicistas y otros usuarios con permisos especiales.
+
+### `special_events`
+Eventos especiales: sorteos (rifas/giveaways) y eventos recurrentes (semanales). Separados de la tabla `events` principal para mantener la lógica diferenciada.
+
+| Campo | Tipo | NOT NULL | Default | Descripción |
+|-------|------|----------|---------|-------------|
+| id | INTEGER | PK | - | ID único |
+| event_type | TEXT | ✓ | 'sorteo' | Tipo: `sorteo`, `recurrente` |
+| title | TEXT | ✓ | - | Título del evento |
+| description | TEXT | - | - | Descripción |
+| image_url | TEXT | - | - | Imagen del evento |
+| location | TEXT | - | - | Lugar |
+| address | TEXT | - | - | Dirección |
+| zone_id | INTEGER | - | - | FK → zones |
+| category_id | INTEGER | - | - | FK → categories |
+| phone | TEXT | - | - | Teléfono de contacto |
+| whatsapp | TEXT | - | - | WhatsApp |
+| website | TEXT | - | - | Sitio web |
+| price | REAL | - | 0 | Precio (0 = gratis) |
+| **Campos Sorteo** |
+| prize_description | TEXT | - | - | Descripción del premio |
+| prize_value | REAL | - | - | Valor estimado del premio |
+| max_participants | INTEGER | - | - | Máximo participantes (NULL = ilimitado) |
+| draw_date | TEXT | - | - | Fecha del sorteo |
+| draw_time | TEXT | - | - | Hora del sorteo |
+| winners_count | INTEGER | - | 1 | Cantidad de ganadores |
+| registration_deadline | TEXT | - | - | Fecha límite inscripción |
+| **Campos Recurrente** |
+| recurrence_day | INTEGER | - | - | Día semana (0=Dom, 1=Lun, ..., 6=Sab) |
+| recurrence_time | TEXT | - | - | Hora del evento (HH:MM) |
+| recurrence_start_date | TEXT | - | - | Fecha inicio recurrencia |
+| recurrence_end_date | TEXT | - | - | Fecha fin recurrencia |
+| recurrence_weeks | INTEGER | - | - | Semanas a generar |
+| generated_event_ids | TEXT | - | - | JSON array de IDs generados |
+| **Metadata** |
+| author_id | INTEGER | ✓ | - | FK → users |
+| status | TEXT | - | 'activo' | Estado: `activo`, `pausado`, `finalizado`, `cancelado` |
+| is_featured | INTEGER | - | 0 | Destacado |
+| created_at | TEXT | - | datetime('now') | Fecha creación |
+| updated_at | TEXT | - | datetime('now') | Fecha actualización |
+
+**Índices:**
+- `idx_special_events_type` - Por tipo de evento
+- `idx_special_events_author` - Por autor
+- `idx_special_events_status` - Por estado
+- `idx_special_events_draw_date` - Por fecha de sorteo
+- `idx_special_events_category` - Por categoría
+- `idx_special_events_zone` - Por zona
+
+**Uso principal:** Panel Editor → Crear sorteos y eventos semanales recurrentes.
+
+### `sorteo_participants`
+Participantes registrados en sorteos.
+
+| Campo | Tipo | NOT NULL | Default | Descripción |
+|-------|------|----------|---------|-------------|
+| id | INTEGER | PK | - | ID único |
+| sorteo_id | INTEGER | ✓ | - | FK → special_events |
+| user_id | INTEGER | ✓ | - | FK → users |
+| status | TEXT | - | 'participando' | Estado: `participando`, `ganador`, `descalificado` |
+| is_winner | INTEGER | - | 0 | Si es ganador |
+| prize_claimed | INTEGER | - | 0 | Si reclamó el premio |
+| claimed_at | TEXT | - | - | Fecha que reclamó |
+| notes | TEXT | - | - | Notas/motivo descalificación |
+| registered_at | TEXT | - | datetime('now') | Fecha registro |
+
+**Índices:**
+- `idx_sorteo_participants_sorteo` - Por sorteo
+- `idx_sorteo_participants_user` - Por usuario
+- `idx_sorteo_participants_winner` - Por ganadores
+
+**Constraint:** `UNIQUE(sorteo_id, user_id)` - Un usuario solo puede participar una vez por sorteo.
 
 ---
 
@@ -720,6 +806,7 @@ Logs de auditoría.
 users ─────┬───> news
            ├───> products
            ├───> events
+           ├───> special_events ───> sorteo_participants
            ├───> videos
            ├───> video_playlists
            ├───> services

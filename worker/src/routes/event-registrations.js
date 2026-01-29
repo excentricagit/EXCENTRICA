@@ -2,6 +2,7 @@
 
 import { success, error, notFound, forbidden } from '../utils/response.js';
 import { requireAuth, requireEditor } from '../middleware/auth.js';
+import { logActivity, ACTIONS, ENTITY_TYPES } from '../utils/logger.js';
 
 // Generar codigo de registro unico
 function generateRegistrationCode(eventId, userId) {
@@ -262,8 +263,8 @@ export async function handleAdminGetEventRegistrations(request, env) {
         let countQuery = 'SELECT COUNT(*) as total FROM event_registrations er JOIN events e ON er.event_id = e.id JOIN users u ON er.user_id = u.id WHERE 1=1';
         const params = [];
 
-        // Si no es admin, solo mostrar registros de sus propios eventos
-        if (user.role !== 'admin') {
+        // Admin y publicista ven todas las inscripciones, otros roles solo sus eventos
+        if (user.role !== 'admin' && user.role !== 'publicista') {
             query += ' AND e.author_id = ?';
             countQuery += ' AND e.author_id = ?';
             params.push(user.id);
@@ -323,9 +324,10 @@ export async function handleAdminUpdateRegistrationStatus(request, env, registra
 
         // Verificar que el registro existe
         const registration = await env.DB.prepare(`
-            SELECT er.*, e.author_id as event_author_id
+            SELECT er.*, e.author_id as event_author_id, e.title as event_title, u.name as registered_user_name
             FROM event_registrations er
             JOIN events e ON er.event_id = e.id
+            JOIN users u ON er.user_id = u.id
             WHERE er.id = ?
         `).bind(registrationId).first();
 
@@ -333,10 +335,12 @@ export async function handleAdminUpdateRegistrationStatus(request, env, registra
             return notFound('Registro no encontrado');
         }
 
-        // Solo el autor del evento o admin puede aprobar
-        if (user.role !== 'admin' && registration.event_author_id !== user.id) {
+        // Solo el autor del evento o admin o publicista puede aprobar
+        if (user.role !== 'admin' && user.role !== 'publicista' && registration.event_author_id !== user.id) {
             return forbidden('No tienes permiso para modificar este registro');
         }
+
+        const oldStatus = registration.status;
 
         // Actualizar estado
         const approvedAt = status === 'confirmado' ? "datetime('now')" : 'NULL';
@@ -355,6 +359,14 @@ export async function handleAdminUpdateRegistrationStatus(request, env, registra
             ...(status === 'confirmado' ? [user.id] : []),
             registrationId
         ).run();
+
+        // Log de actividad
+        const action = status === 'confirmado' ? ACTIONS.APPROVE : (status === 'rechazado' ? ACTIONS.REJECT : ACTIONS.UPDATE);
+        await logActivity(env, user, action, ENTITY_TYPES.REGISTRATION, registrationId,
+            `${registration.registered_user_name} - ${registration.event_title}`,
+            { old_status: oldStatus, new_status: status, event_id: registration.event_id, notes },
+            request
+        );
 
         return success({ status }, `Inscripcion ${status === 'confirmado' ? 'aprobada' : 'actualizada'}`);
 

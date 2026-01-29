@@ -2,6 +2,7 @@
 
 import { success, error, notFound } from '../utils/response.js';
 import { requireAdmin, requirePublicista } from '../middleware/auth.js';
+import { logActivity, ACTIONS, ENTITY_TYPES } from '../utils/logger.js';
 
 export async function handleGetAds(request, env) {
     try {
@@ -270,6 +271,9 @@ export async function handlePublicistaCreateAd(request, env) {
             end_date || null
         ).run();
 
+        // Log de actividad
+        await logActivity(env, user, ACTIONS.CREATE, ENTITY_TYPES.AD, result.meta.last_row_id, title, { position: finalPosition }, request);
+
         return success({ id: result.meta.last_row_id }, 'Anuncio creado');
 
     } catch (e) {
@@ -288,7 +292,7 @@ export async function handlePublicistaUpdateAd(request, env, id) {
         console.log('[handlePublicistaUpdateAd] Updating ad', id, 'with position:', position);
 
         // Verificar que el anuncio pertenece al publicista
-        const existing = await env.DB.prepare('SELECT id, author_id FROM ads WHERE id = ?').bind(id).first();
+        const existing = await env.DB.prepare('SELECT id, author_id, title, is_active FROM ads WHERE id = ?').bind(id).first();
         if (!existing) {
             return notFound('Anuncio no encontrado');
         }
@@ -323,6 +327,10 @@ export async function handlePublicistaUpdateAd(request, env, id) {
             id
         ).run();
 
+        // Log de actividad - determinar accion especifica
+        const action = is_active !== undefined ? (is_active ? ACTIONS.ACTIVATE : ACTIONS.DEACTIVATE) : ACTIONS.UPDATE;
+        await logActivity(env, user, action, ENTITY_TYPES.AD, id, existing.title || title, { changes: data }, request);
+
         return success(null, 'Anuncio actualizado');
 
     } catch (e) {
@@ -336,7 +344,7 @@ export async function handlePublicistaDeleteAd(request, env, id) {
 
     try {
         // Verificar que el anuncio pertenece al publicista
-        const existing = await env.DB.prepare('SELECT id, author_id FROM ads WHERE id = ?').bind(id).first();
+        const existing = await env.DB.prepare('SELECT id, author_id, title FROM ads WHERE id = ?').bind(id).first();
         if (!existing) {
             return notFound('Anuncio no encontrado');
         }
@@ -346,6 +354,9 @@ export async function handlePublicistaDeleteAd(request, env, id) {
         }
 
         await env.DB.prepare('DELETE FROM ads WHERE id = ?').bind(id).run();
+
+        // Log de actividad
+        await logActivity(env, user, ACTIONS.DELETE, ENTITY_TYPES.AD, id, existing.title, {}, request);
 
         return success(null, 'Anuncio eliminado');
 

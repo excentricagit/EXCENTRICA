@@ -69,13 +69,33 @@
                 <h1>📅 Gestion de Eventos</h1>
                 <div class="admin-user">
                     <span id="user-name">Editor</span>
-                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
-                        <span>➕</span> Nuevo Evento
-                    </button>
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                            ➕ Evento
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="showSorteoModal()" style="border-color: #a855f7; color: #a855f7;">
+                            🎲 Sorteo
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="showRecurrenteModal()" style="border-color: #3b82f6; color: #3b82f6;" title="Selecciona un evento de la tabla y usa el boton 🔄 para duplicarlo">
+                            🔄 Duplicar Semanal
+                        </button>
+                    </div>
                 </div>
             </header>
 
             <div class="admin-content">
+                <!-- Tabs -->
+                <div class="event-tabs mb-4">
+                    <button class="event-tab active" data-tab="eventos" onclick="switchTab('eventos')">
+                        📅 Eventos
+                    </button>
+                    <button class="event-tab" data-tab="sorteos" onclick="switchTab('sorteos')">
+                        🎲 Sorteos
+                    </button>
+                </div>
+
+                <!-- Tab: Eventos -->
+                <div class="tab-content active" id="tab-eventos">
                 <!-- Stats -->
                 <div class="stats-grid mb-4">
                     <div class="stat-card">
@@ -137,6 +157,50 @@
                         </div>
                     </div>
                 </div>
+                </div><!-- End tab-eventos -->
+
+                <!-- Tab: Sorteos -->
+                <div class="tab-content" id="tab-sorteos" style="display: none;">
+                    <!-- Sorteos Stats -->
+                    <div class="stats-grid mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon">🎲</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="total-sorteos">0</span>
+                                <span class="stat-label">Sorteos activos</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="total-participants">0</span>
+                                <span class="stat-label">Participantes</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-info">
+                                <span class="stat-value" id="total-finalizados">0</span>
+                                <span class="stat-label">Finalizados</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sorteos filters -->
+                    <div class="d-flex gap-3 mb-4 flex-wrap">
+                        <select id="filter-sorteo-status" class="form-control" style="max-width: 150px;" onchange="loadSorteos()">
+                            <option value="">Todos</option>
+                            <option value="activo">Activos</option>
+                            <option value="finalizado">Finalizados</option>
+                            <option value="cancelado">Cancelados</option>
+                        </select>
+                    </div>
+
+                    <!-- Sorteos List -->
+                    <div id="sorteos-container">
+                        <div class="text-center p-4"><div class="spinner"></div></div>
+                    </div>
+                </div><!-- End tab-sorteos -->
             </div>
         </main>
     </div>
@@ -258,6 +322,114 @@
                     </div>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal Sorteo -->
+    <div class="modal-backdrop" id="sorteo-modal-backdrop" onclick="closeSorteoModal()"></div>
+    <div class="modal" id="sorteo-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">🎲 Nuevo Sorteo</h3>
+            <div class="modal-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeSorteoModal()">Cancelar</button>
+                <button type="submit" form="sorteo-form" class="btn btn-primary btn-sm">Crear Sorteo</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <form id="sorteo-form" onsubmit="saveSorteo(event)">
+                <input type="hidden" id="sorteo-id">
+                <div class="modal-grid-2">
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label>Titulo del Sorteo *</label>
+                            <input type="text" id="sorteo-titulo" class="form-control" placeholder="Ej: Sorteo iPhone 15" required>
+                        </div>
+                        <div class="form-group">
+                            <label>🎁 Descripcion del Premio *</label>
+                            <textarea id="sorteo-premio" class="form-control" rows="2" placeholder="Describe el premio..." required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>💰 Valor del Premio ($)</label>
+                            <input type="number" id="sorteo-valor" class="form-control" min="0" step="0.01" placeholder="Opcional">
+                        </div>
+                        <div class="form-group">
+                            <label>📍 Lugar (donde se entrega)</label>
+                            <input type="text" id="sorteo-lugar" class="form-control" placeholder="Lugar de entrega">
+                        </div>
+                        <div class="form-group">
+                            <label>📞 WhatsApp de contacto</label>
+                            <input type="tel" id="sorteo-whatsapp" class="form-control" placeholder="+54 9 385...">
+                        </div>
+                    </div>
+                    <div class="form-column">
+                        <div class="form-group">
+                            <label>📅 Fecha del Sorteo *</label>
+                            <input type="date" id="sorteo-fecha" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>⏰ Hora</label>
+                            <input type="time" id="sorteo-hora" class="form-control" value="20:00">
+                        </div>
+                        <div class="form-group">
+                            <label>🏆 Cantidad de Ganadores</label>
+                            <input type="number" id="sorteo-ganadores" class="form-control" min="1" value="1">
+                        </div>
+                        <div class="form-group">
+                            <label>👥 Max. Participantes</label>
+                            <input type="number" id="sorteo-max" class="form-control" min="0" placeholder="Ilimitado">
+                        </div>
+                        <div class="form-group">
+                            <label>📆 Fecha limite inscripcion</label>
+                            <input type="date" id="sorteo-deadline" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Duplicar Evento Semanalmente -->
+    <div class="modal-backdrop" id="duplicar-modal-backdrop" onclick="closeDuplicarModal()"></div>
+    <div class="modal" id="duplicar-modal" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3 class="modal-title">🔄 Duplicar Semanalmente</h3>
+            <div class="modal-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeDuplicarModal()">Cancelar</button>
+                <button type="submit" form="duplicar-form" class="btn btn-primary btn-sm">Crear Copias</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <form id="duplicar-form" onsubmit="duplicarEvento(event)">
+                <input type="hidden" id="duplicar-evento-id">
+                <p class="mb-3" id="duplicar-evento-info" style="color: var(--text-muted);"></p>
+                <div class="form-group">
+                    <label>🔢 Cantidad de semanas a duplicar</label>
+                    <input type="number" id="duplicar-semanas" class="form-control" min="1" max="52" value="4" onchange="previewDuplicar()">
+                    <small class="text-muted">Se crearan copias del evento en las proximas semanas</small>
+                </div>
+                <div class="form-group">
+                    <label>Vista previa de fechas:</label>
+                    <div id="duplicar-preview" style="max-height: 150px; overflow-y: auto; background: var(--bg-dark); padding: 0.75rem; border-radius: 8px; font-size: 0.85rem;">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Participantes Sorteo -->
+    <div class="modal-backdrop" id="participants-modal-backdrop" onclick="closeParticipantsModal()"></div>
+    <div class="modal" id="participants-modal">
+        <div class="modal-header">
+            <h3 class="modal-title">👥 Participantes del Sorteo</h3>
+            <div class="modal-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeParticipantsModal()">Cerrar</button>
+                <button type="button" class="btn btn-primary btn-sm" id="btn-sortear" onclick="selectWinners()">🏆 Sortear</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <div id="participants-list">
+                <div class="text-center p-4"><div class="spinner"></div></div>
+            </div>
         </div>
     </div>
 
