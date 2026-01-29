@@ -20,17 +20,14 @@
                     <span class="icon">📊</span> Dashboard
                 </a>
                 <a href="/comerciante/mis-productos.html" class="admin-nav-item">
-                    <span class="icon">🛒</span> Mis Productos
-                </a>
-                <a href="/comerciante/mis-servicios.html" class="admin-nav-item">
-                    <span class="icon">🔧</span> Mis Servicios
+                    <span class="icon">🛒</span> Productos
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
                     <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">🚪</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
@@ -50,15 +47,8 @@
                     <div class="stat-card">
                         <div class="stat-icon">🛒</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="stat-products">-</span>
-                            <span class="stat-label">Mis Productos</span>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">🔧</div>
-                        <div class="stat-info">
-                            <span class="stat-value" id="stat-services">-</span>
-                            <span class="stat-label">Mis Servicios</span>
+                            <span class="stat-value" id="stat-total">-</span>
+                            <span class="stat-label">Total Productos</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -75,31 +65,38 @@
                             <span class="stat-label">Aprobados</span>
                         </div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-sold">-</span>
+                            <span class="stat-label">Vendidos</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Quick actions -->
                 <div class="grid grid-2 mt-4">
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="mb-3">🛒 Productos pendientes de aprobación</h3>
-                            <p class="text-muted mb-3">Tienes <strong id="pending-products">0</strong> productos esperando aprobación</p>
-                            <a href="/comerciante/mis-productos.html?status=pending" class="btn btn-primary btn-sm">Ver productos pendientes</a>
+                            <h3 class="mb-3">🛒 Gestion de Productos</h3>
+                            <p class="text-muted mb-3">Administra todos los productos de la plataforma. Puedes crear, editar, eliminar y cambiar el estado de cualquier producto.</p>
+                            <a href="/comerciante/mis-productos.html" class="btn btn-primary">Ir a Productos</a>
                         </div>
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <h3 class="mb-3">🔧 Servicios pendientes de aprobación</h3>
-                            <p class="text-muted mb-3">Tienes <strong id="pending-services">0</strong> servicios esperando aprobación</p>
-                            <a href="/comerciante/mis-servicios.html?status=pending" class="btn btn-primary btn-sm">Ver servicios pendientes</a>
+                            <h3 class="mb-3">➕ Agregar Nuevo Producto</h3>
+                            <p class="text-muted mb-3">Crea un nuevo producto en la plataforma. Los productos se publican automaticamente como aprobados.</p>
+                            <a href="/comerciante/mis-productos.html" class="btn btn-primary" onclick="sessionStorage.setItem('openProductModal', 'true')">Nuevo Producto</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent activity -->
+                <!-- Recent products -->
                 <div class="card mt-4">
                     <div class="card-body">
-                        <h3 class="mb-3">🕐 Actividad reciente</h3>
-                        <div id="recent-content">
+                        <h3 class="mb-3">🕐 Ultimos Productos</h3>
+                        <div id="recent-products">
                             <div class="text-center p-3"><div class="spinner"></div></div>
                         </div>
                     </div>
@@ -124,90 +121,74 @@
 
         async function loadDashboard() {
             try {
-                // Get user's products and services
-                const [productsResponse, servicesResponse] = await Promise.all([
-                    api.getProductos({ comerciante_id: user.id }),
-                    api.getServicios({ comerciante_id: user.id })
-                ]);
-
-                let totalProducts = 0;
-                let totalServices = 0;
-                let pendingProducts = 0;
-                let pendingServices = 0;
-                let approvedTotal = 0;
-
-                if (productsResponse.success) {
-                    const products = productsResponse.data;
-                    totalProducts = products.length;
-                    pendingProducts = products.filter(p => p.estado === 'pendiente').length;
-                    approvedTotal += products.filter(p => p.estado === 'aprobado').length;
+                // Cargar estadisticas
+                const statsResponse = await api.getComercianteProductStats();
+                if (statsResponse.success) {
+                    document.getElementById('stat-total').textContent = statsResponse.data.total || 0;
+                    document.getElementById('stat-pending').textContent = statsResponse.data.pending || 0;
+                    document.getElementById('stat-approved').textContent = statsResponse.data.approved || 0;
+                    document.getElementById('stat-sold').textContent = statsResponse.data.sold || 0;
                 }
 
-                if (servicesResponse.success) {
-                    const services = servicesResponse.data;
-                    totalServices = services.length;
-                    pendingServices = services.filter(s => s.estado === 'pendiente').length;
-                    approvedTotal += services.filter(s => s.estado === 'aprobado').length;
-                }
+                // Cargar ultimos productos
+                const productsResponse = await api.getComercianteProducts({ limit: 5 });
+                const container = document.getElementById('recent-products');
 
-                document.getElementById('stat-products').textContent = totalProducts;
-                document.getElementById('stat-services').textContent = totalServices;
-                document.getElementById('stat-pending').textContent = pendingProducts + pendingServices;
-                document.getElementById('stat-approved').textContent = approvedTotal;
-                document.getElementById('pending-products').textContent = pendingProducts;
-                document.getElementById('pending-services').textContent = pendingServices;
-
-                // Show recent activity
-                const contentContainer = document.getElementById('recent-content');
-                const recentItems = [];
-
-                if (productsResponse.success && productsResponse.data.length > 0) {
-                    recentItems.push(...productsResponse.data.slice(0, 5).map(p => ({
-                        ...p,
-                        type: 'Producto',
-                        nombre: p.titulo
-                    })));
-                }
-
-                if (servicesResponse.success && servicesResponse.data.length > 0) {
-                    recentItems.push(...servicesResponse.data.slice(0, 5).map(s => ({
-                        ...s,
-                        type: 'Servicio'
-                    })));
-                }
-
-                if (recentItems.length > 0) {
-                    // Sort by date
-                    recentItems.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-                    contentContainer.innerHTML = `
+                if (productsResponse.success && productsResponse.data.products.length > 0) {
+                    const products = productsResponse.data.products;
+                    container.innerHTML = `
                         <table class="admin-table">
                             <thead>
                                 <tr>
-                                    <th>Tipo</th>
-                                    <th>Nombre</th>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
                                     <th>Estado</th>
                                     <th>Fecha</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${recentItems.slice(0, 10).map(item => `
+                                ${products.map(p => `
                                     <tr>
-                                        <td><span class="badge badge-secondary">${item.type}</span></td>
-                                        <td>${Utils.escapeHtml(item.nombre || item.titulo)}</td>
-                                        <td><span class="badge badge-${item.estado === 'aprobado' ? 'success' : 'warning'}">${item.estado}</span></td>
-                                        <td>${Utils.formatDate(item.created_at)}</td>
+                                        <td><strong>${Utils.escapeHtml(p.title)}</strong></td>
+                                        <td>$${parseFloat(p.price).toLocaleString()}</td>
+                                        <td>
+                                            <span class="badge badge-${getStatusClass(p.status)}">
+                                                ${getStatusLabel(p.status)}
+                                            </span>
+                                        </td>
+                                        <td>${Utils.formatDate(p.created_at)}</td>
                                     </tr>
                                 `).join('')}
                             </tbody>
                         </table>
                     `;
                 } else {
-                    contentContainer.innerHTML = '<p class="text-muted">No tienes productos o servicios aún. ¡Comienza agregando tu primer producto o servicio!</p>';
+                    container.innerHTML = '<p class="text-muted">No hay productos aun. ¡Comienza agregando tu primer producto!</p>';
                 }
+
             } catch (e) {
                 console.error('Error loading dashboard:', e);
             }
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                pending: 'warning',
+                approved: 'success',
+                rejected: 'danger',
+                sold: 'primary'
+            };
+            return classes[status] || 'secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                pending: 'Pendiente',
+                approved: 'Aprobado',
+                rejected: 'Rechazado',
+                sold: 'Vendido'
+            };
+            return labels[status] || status;
         }
 
         loadDashboard();

@@ -52,9 +52,13 @@ const App = {
                 panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
                 panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
             }
-            // Editor/Reporter/Periodista
-            else if (user.role === 'editor' || user.role === 'reporter' || user.role === 'periodista') {
+            // Editor/Reporter
+            else if (user.role === 'editor' || user.role === 'reporter') {
                 panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+            }
+            // Periodista
+            else if (user.role === 'periodista') {
+                panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: #fff;" onclick="window.location.href='/periodista/'">Panel Periodista</button>`;
             }
             // Comerciante
             else if (user.role === 'merchant' || user.role === 'comerciante') {

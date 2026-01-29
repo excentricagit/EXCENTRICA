@@ -7,6 +7,7 @@
     <meta name="description" content="Contacta con Excentrica. Publica tu negocio y conecta con miles de usuarios en Santiago del Estero.">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/contacto.css">
+    <link rel="stylesheet" href="/css/ads-player.css">
 </head>
 <body>
     <!-- Sidebar de Navegacion Lateral Fijo -->
@@ -196,6 +197,7 @@
     <script src="/js/utils.js"></script>
     <script src="/js/components.js"></script>
     <script src="/js/app.js"></script>
+    <script src="/js/ads-player.js"></script>
     <script>
         // Inicializar componentes de layout
         Components.initLayout({
@@ -218,6 +220,9 @@
                 }
             });
         });
+
+        // Inicializar ads player
+        initAdsPlayer('ad-widget-content', 'sidebar');
     </script>
 </body>
 </html>

@@ -276,6 +276,31 @@ class ApiService {
         return this.delete(`/api/publicista/ads/${id}`);
     }
 
+    // ========== COMERCIANTE ==========
+    async getComercianteProducts(params = {}) {
+        return this.get('/api/comerciante/products', params);
+    }
+
+    async getComercianteProductStats() {
+        return this.get('/api/comerciante/products/stats');
+    }
+
+    async createComercianteProduct(data) {
+        return this.post('/api/comerciante/products', data);
+    }
+
+    async updateComercianteProduct(id, data) {
+        return this.put(`/api/comerciante/products/${id}`, data);
+    }
+
+    async updateComercianteProductStatus(id, status) {
+        return this.patch(`/api/comerciante/products/${id}/status`, { status });
+    }
+
+    async deleteComercianteProduct(id) {
+        return this.delete(`/api/comerciante/products/${id}`);
+    }
+
     // ========== VIDEOEDITOR ==========
     async getVideoEditorVideos(params = {}) {
         return this.get('/api/videoeditor/videos', params);

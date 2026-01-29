@@ -192,8 +192,10 @@
                     panelButtons += `<a href="/admin/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;">Panel Admin</a>`;
                     panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
                     panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
-                } else if (user.role === 'editor' || user.role === 'periodista') {
+                } else if (user.role === 'editor' || user.role === 'reporter') {
                     panelButtons += `<a href="/editor/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;">Panel Editor</a>`;
+                } else if (user.role === 'periodista') {
+                    panelButtons += `<a href="/periodista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: #fff;">Panel Periodista</a>`;
                 } else if (user.role === 'publicista') {
                     panelButtons += `<a href="/publicista/" class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;">Panel Publicista</a>`;
                 } else if (user.role === 'videoeditor') {

@@ -1,0 +1,327 @@
+================================================================================
+                    PLAN PWA MOBILE - EXCENTRICA
+================================================================================
+
+OBJETIVO
+--------
+Convertir Excentrica en una PWA (Progressive Web App) instalable con diseño
+mobile-first, sin funcionalidad offline (solo mensaje de "sin conexion").
+
+REGLA: Ningun archivo debe superar las 500 lineas.
+
+
+================================================================================
+ARCHIVOS A CREAR (MODULAR - Max 500 lineas c/u)
+================================================================================
+
+/public/
+├── manifest.json                   <- Config PWA (~30 lineas)
+├── sw.js                           <- Service Worker basico (~50 lineas)
+│
+├── mobile/                         <- Carpeta con HTMLs mobile
+│   ├── index.html                  <- Home feed (~100 lineas)
+│   ├── categorias.html             <- Menu secciones (~80 lineas)
+│   ├── perfil.html                 <- Perfil usuario (~80 lineas)
+│   ├── publicar.html               <- Form periodista (~120 lineas)
+│   ├── noticias.html               <- Lista noticias (~80 lineas)
+│   ├── mercaderia.html             <- Lista productos (~80 lineas)
+│   ├── eventos.html                <- Lista eventos (~80 lineas)
+│   ├── videos.html                 <- Lista videos (~80 lineas)
+│   ├── gastronomia.html            <- Restaurantes (~80 lineas)
+│   ├── alojamiento.html            <- Alojamientos (~80 lineas)
+│   ├── transporte.html             <- Transportes (~80 lineas)
+│   ├── servicios.html              <- Servicios (~80 lineas)
+│   ├── turismo.html                <- Puntos interes (~80 lineas)
+│   ├── cine.html                   <- Cartelera (~80 lineas)
+│   └── contacto.html               <- Contacto (~60 lineas)
+│
+├── css/
+│   ├── mobile-base.css             <- Variables, reset, tipografia (~150 lineas)
+│   ├── mobile-layout.css           <- Header, bottom nav, estructura (~200 lineas)
+│   ├── mobile-components.css       <- Cards, botones, forms (~250 lineas)
+│   └── mobile-pages.css            <- Estilos especificos paginas (~200 lineas)
+│
+└── js/
+    ├── pwa.js                      <- Install prompt, offline (~100 lineas)
+    ├── mobile-app.js               <- Init, router, estado (~150 lineas)
+    ├── mobile-nav.js               <- Header y bottom nav (~150 lineas)
+    ├── mobile-feed.js              <- Logica del feed home (~200 lineas)
+    └── mobile-ui.js                <- Componentes UI (cards, loaders) (~200 lineas)
+
+
+================================================================================
+SCRIPTS REUTILIZADOS (ya existen)
+================================================================================
+
+/js/config.js      <- API URL, constantes
+/js/api.js         <- Todas las llamadas a la API
+/js/auth.js        <- Login, logout, getUser, tokens
+/js/utils.js       <- Helpers (formatDate, escapeHtml, etc)
+
+
+================================================================================
+NAVEGACION - BOTTOM NAV BAR
+================================================================================
+
+USUARIOS NORMALES (3 botones):
+┌─────────────────────────────────────────────────────────┐
+│    [  🏠 Home  ]    [ 📂 Categorias ]    [ 👤 Perfil ] │
+└─────────────────────────────────────────────────────────┘
+
+PERIODISTAS (4 botones):
+┌─────────────────────────────────────────────────────────────────────┐
+│  [ 🏠 Home ]  [ 📂 Categorias ]  [ ✏️ Publicar ]  [ 👤 Perfil ]    │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+================================================================================
+PAGINA: HOME (index.html)
+================================================================================
+
+- Feed mixto con contenido de todas las secciones
+- Cards de noticias, productos, eventos mezclados
+- Ordenado por fecha (mas reciente primero)
+- Scroll infinito o "cargar mas"
+- Header minimalista con logo y busqueda
+
+
+================================================================================
+PAGINA: CATEGORIAS (categorias.html)
+================================================================================
+
+Menu visual tipo grid con iconos grandes:
+
+┌────────────────────────────────────┐
+│                                    │
+│   📰 Noticias     🛒 Mercaderia   │
+│                                    │
+│   📅 Eventos      🎥 Videos       │
+│                                    │
+│   🍽️ Gastronomia  🏨 Alojamiento  │
+│                                    │
+│   🚌 Transporte   🔧 Servicios    │
+│                                    │
+│   📍 Turismo      🎬 Cine         │
+│                                    │
+│   📞 Contacto                      │
+│                                    │
+└────────────────────────────────────┘
+
+Cada card lleva a su seccion mobile correspondiente.
+
+
+================================================================================
+PAGINA: PERFIL (perfil.html)
+================================================================================
+
+- Foto y nombre del usuario
+- Email
+- Boton "Cerrar sesion"
+- Si NO logueado: botones "Iniciar sesion" y "Crear cuenta"
+- NO mostrar acceso a paneles de admin/editor (no editan desde mobile)
+
+
+================================================================================
+PAGINA: PUBLICAR (publicar.html) - SOLO PERIODISTAS
+================================================================================
+
+Formulario simplificado para subir noticia:
+- Titulo
+- Contenido (textarea)
+- Imagen principal (upload desde camara o galeria)
+- Categoria
+- Boton "Publicar"
+
+Diseño optimizado para celular, campos grandes, facil de usar.
+
+
+================================================================================
+RESTRICCIONES
+================================================================================
+
+- Admin, Editor, Publicista, VideoEditor, Comerciante:
+  → NO pueden acceder a sus paneles desde mobile
+  → Solo ven la app como usuario normal
+
+- Periodista:
+  → SI puede publicar noticias desde mobile
+  → Tiene el boton extra "Publicar" en el bottom nav
+
+
+================================================================================
+BANNER DE INSTALACION
+================================================================================
+
+Ubicacion: Arriba de todo, no intrusivo
+
+┌────────────────────────────────────────────────────────────┐
+│ ⚡ Instala Excentrica para acceso rapido  [Instalar] [✕]  │
+└────────────────────────────────────────────────────────────┘
+
+Comportamiento:
+- Detecta si ya esta instalada → no mostrar
+- Android: boton "Instalar" dispara prompt del navegador
+- iOS: muestra instrucciones "Toca Compartir > Agregar a inicio"
+- Boton cerrar (✕) guarda en localStorage para no mostrar de nuevo
+
+
+================================================================================
+SERVICE WORKER (sw.js)
+================================================================================
+
+Funcion: SOLO mostrar mensaje cuando no hay internet
+
+NO hace:
+- Cache de archivos
+- Funcionamiento offline
+
+SI hace:
+- Intercepta requests cuando no hay conexion
+- Muestra pagina/mensaje: "Conectate a internet para usar Excentrica"
+
+
+================================================================================
+MANIFEST.JSON
+================================================================================
+
+{
+  "name": "Excentrica",
+  "short_name": "Excentrica",
+  "description": "Red social y marketplace de Santiago del Estero",
+  "start_url": "/mobile/index.html",
+  "display": "standalone",
+  "background_color": "#0f0f15",
+  "theme_color": "#ef4444",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
+
+
+================================================================================
+DETECCION MOBILE Y REDIRECCION
+================================================================================
+
+En index.html (desktop), agregar script que:
+1. Detecta si es mobile (user agent o screen width < 768px)
+2. Si es mobile → redirige a /mobile/index.html
+3. Si es desktop → queda en index.html normal
+
+
+================================================================================
+ESTRUCTURA HTML MOBILE (TEMPLATE BASE)
+================================================================================
+
+Cada HTML mobile sigue esta estructura:
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ef4444">
+    <link rel="manifest" href="/manifest.json">
+    <title>Excentrica</title>
+
+    <!-- CSS Base (reutilizado) -->
+    <link rel="stylesheet" href="/css/main.css">
+
+    <!-- CSS Mobile (nuevos) -->
+    <link rel="stylesheet" href="/css/mobile-base.css">
+    <link rel="stylesheet" href="/css/mobile-layout.css">
+    <link rel="stylesheet" href="/css/mobile-components.css">
+</head>
+<body class="mobile-app">
+
+    <!-- Banner instalacion PWA -->
+    <div id="install-banner"></div>
+
+    <!-- Header mobile -->
+    <header id="mobile-header"></header>
+
+    <!-- Contenido de la pagina -->
+    <main id="mobile-main">
+        <!-- Contenido especifico aqui -->
+    </main>
+
+    <!-- Bottom navigation -->
+    <nav id="mobile-bottom-nav"></nav>
+
+    <!-- Scripts reutilizados -->
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+
+    <!-- Scripts mobile nuevos -->
+    <script src="/js/pwa.js"></script>
+    <script src="/js/mobile-nav.js"></script>
+    <script src="/js/mobile-ui.js"></script>
+    <script src="/js/mobile-app.js"></script>
+
+    <script>
+        MobileApp.init({ page: 'home' });
+    </script>
+</body>
+</html>
+```
+
+
+================================================================================
+ORDEN DE TRABAJO (FASES)
+================================================================================
+
+FASE 1 - Base PWA (~30 min)
+---------------------------
+1. manifest.json
+2. sw.js
+3. Iconos placeholder (podemos mejorar despues)
+
+FASE 2 - Estructura Mobile (~1 hora)
+------------------------------------
+4. css/mobile-base.css (variables, reset)
+5. css/mobile-layout.css (header, bottom nav, main)
+6. js/pwa.js (install banner, offline)
+7. js/mobile-nav.js (renderiza header y bottom nav)
+8. js/mobile-app.js (init, estado global)
+
+FASE 3 - Paginas Core (~1 hora)
+-------------------------------
+9.  mobile/index.html (home feed)
+10. mobile/categorias.html (menu secciones)
+11. mobile/perfil.html (usuario)
+12. js/mobile-feed.js (logica del feed)
+13. js/mobile-ui.js (cards, componentes)
+14. css/mobile-components.css (cards, botones)
+
+FASE 4 - Periodista (~30 min)
+-----------------------------
+15. mobile/publicar.html (form noticia)
+16. Logica especifica en mobile-app.js
+
+FASE 5 - Secciones (~2 horas)
+-----------------------------
+17-27. Resto de secciones mobile (noticias, mercaderia, etc)
+28. css/mobile-pages.css (estilos especificos)
+
+FASE 6 - Integracion (~30 min)
+------------------------------
+29. Redireccion mobile en index.html desktop
+30. Testing y ajustes
+
+
+================================================================================
+ICONOS NECESARIOS
+================================================================================
+
+Crear o conseguir:
+- /assets/icon-192.png      (192x192 px)
+- /assets/icon-512.png      (512x512 px)
+- /assets/icon-maskable.png (512x512 px, para Android adaptive icons)
+
+Nota: Podemos usar el logo actual redimensionado como placeholder.
+
+
+================================================================================

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Periodista - Excentrica</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/editor/editor.css">
+    <style>
+        .periodista-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(30, 30, 40, 0.95));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .periodista-header h2 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.25rem;
+        }
+        .periodista-header p {
+            margin: 0.25rem 0 0 0;
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+        .news-card {
+            background: linear-gradient(135deg, rgba(30, 30, 40, 0.9), rgba(20, 20, 30, 0.95));
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            transition: all 0.2s;
+        }
+        .news-card:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        .news-card-image {
+            width: 120px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .news-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+        .news-card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 0.5rem 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .news-card-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        .news-card-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Modal grande para 3 columnas */
+        .modal-large {
+            max-width: 1400px;
+            width: 95%;
+        }
+
+        /* Grid de 3 columnas compacto */
+        .form-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+            margin-bottom: 0;
+        }
+
+        .form-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.4rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Form groups compactos */
+        #news-modal .form-group {
+            margin-bottom: 0.5rem;
+        }
+
+        #news-modal .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.75rem;
+        }
+
+        #news-modal .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            transition: border-color 0.3s ease;
+        }
+
+        #news-modal .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.1);
+        }
+
+        #news-modal textarea.form-control {
+            resize: vertical;
+        }
+
+        #news-modal .text-muted {
+            font-size: 0.7rem;
+            margin-top: 0.2rem;
+        }
+
+        /* Header con botones */
+        #news-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #news-modal .modal-header-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        /* Modal body compacto */
+        #news-modal .modal-body {
+            padding: 1rem !important;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        /* Ajustes para inputs de archivo */
+        #news-modal input[type="file"].form-control {
+            padding: 0.5rem;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        #news-modal input[type="file"].form-control:hover {
+            border-color: var(--primary);
+            background: #f0f0f0;
+        }
+
+        /* Preview de imagen compacto */
+        #news-modal .image-preview {
+            margin-top: 0.4rem;
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            background: #ffffff;
+            min-height: 120px;
+            max-height: 160px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        #news-modal .image-preview img {
+            display: block;
+            max-width: 100%;
+            max-height: 140px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+        }
+
+        /* Info box para periodistas */
+        .info-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.5rem;
+        }
+        .info-box p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        .info-box strong {
+            color: #3b82f6;
+        }
+
+        /* Responsive: a 2 columnas en tablets */
+        @media (max-width: 1200px) {
+            .modal-large {
+                max-width: 1000px;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form-column:last-child {
+                grid-column: span 2;
+            }
+        }
+
+        /* Responsive: a 1 columna en moviles */
+        @media (max-width: 768px) {
+            .modal-large {
+                max-width: 95%;
+                width: 95%;
+            }
+
+            .form-grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-column:last-child {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <!-- Sidebar simple -->
+        <aside class="admin-sidebar">
+            <div class="admin-logo">
+                <a href="/"><span>⚡</span> Excentrica</a>
+                <span class="admin-badge" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">PERIODISTA</span>
+            </div>
+            <nav class="admin-nav">
+                <a href="/periodista/" class="admin-nav-item active">
+                    <span class="icon">📰</span> Mis Noticias
+                </a>
+                <div class="admin-nav-divider"></div>
+                <a href="/" class="admin-nav-item">
+                    <span class="icon">🏠</span> Volver al sitio
+                </a>
+                <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
+                    <span class="icon">🚪</span> Cerrar sesion
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main content -->
+        <main class="admin-main">
+            <header class="admin-header">
+                <h1>Panel Periodista</h1>
+                <div class="admin-user">
+                    <span id="user-name">Periodista</span>
+                    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+                        <span>➕</span> Nueva Noticia
+                    </button>
+                </div>
+            </header>
+
+            <div class="admin-content">
+                <!-- Header con boton crear -->
+                <div class="periodista-header">
+                    <div>
+                        <h2>Mis Noticias</h2>
+                        <p>Crea y gestiona tus noticias. Seran revisadas por un editor antes de publicarse.</p>
+                    </div>
+                </div>
+
+                <!-- Stats simples -->
+                <div class="stats-grid mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon">📰</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="total-news">0</span>
+                            <span class="stat-label">Total</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="pending-news">0</span>
+                            <span class="stat-label">Pendientes</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="published-news">0</span>
+                            <span class="stat-label">Publicadas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de noticias -->
+                <div class="card">
+                    <div class="card-body" id="news-container">
+                        <div class="text-center p-4">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para crear/editar noticia -->
+    <div class="modal-backdrop" id="news-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal modal-large" id="news-modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-title">Nueva Noticia</h3>
+            <div class="modal-header-actions">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeModal()">Cancelar</button>
+                <button type="submit" form="news-form" class="btn btn-primary btn-sm" id="save-btn">Enviar para revision</button>
+            </div>
+        </div>
+        <div class="modal-body">
+            <form id="news-form" onsubmit="saveNews(event)">
+                <input type="hidden" id="news-id">
+
+                <div class="form-grid-3">
+                    <!-- COLUMNA 1: Informacion Principal -->
+                    <div class="form-column">
+                        <h4 class="form-section-title">Informacion Principal</h4>
+
+                        <div class="form-group">
+                            <label for="news-titulo">Titulo *</label>
+                            <input type="text" id="news-titulo" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-resumen">Subtitulo/Resumen *</label>
+                            <textarea id="news-resumen" class="form-control" rows="2" placeholder="Breve resumen que aparecera en la vista previa" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-contenido">Contenido Completo *</label>
+                            <textarea id="news-contenido" class="form-control" rows="8" required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-fuente">Fuente / URL de Origen</label>
+                            <input type="url" id="news-fuente" class="form-control" placeholder="https://fuente.com/articulo">
+                            <small class="text-muted">Enlace a la fuente original de la noticia</small>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA 2: Imagenes -->
+                    <div class="form-column">
+                        <h4 class="form-section-title">Imagenes</h4>
+
+                        <div class="form-group">
+                            <label for="news-imagen-principal-file">Imagen de Portada *</label>
+                            <input type="hidden" id="news-imagen-principal">
+                            <input type="file" id="news-imagen-principal-file" class="form-control" accept="image/*" onchange="uploadMainImage(event)" required>
+                            <div id="main-image-preview" class="image-preview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-imagen-alt">Texto Alternativo (Alt) *</label>
+                            <input type="text" id="news-imagen-alt" class="form-control" placeholder="Descripcion de la imagen para accesibilidad" required>
+                            <small class="text-muted">Describe la imagen para lectores de pantalla</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-imagen-extra-1-file">Imagen Extra 1</label>
+                            <input type="hidden" id="news-imagen-extra-1">
+                            <input type="file" id="news-imagen-extra-1-file" class="form-control" accept="image/*" onchange="uploadExtraImage(event, 1)">
+                            <div id="extra-image-1-preview" class="image-preview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="news-imagen-extra-2-file">Imagen Extra 2</label>
+                            <input type="hidden" id="news-imagen-extra-2">
+                            <input type="file" id="news-imagen-extra-2-file" class="form-control" accept="image/*" onchange="uploadExtraImage(event, 2)">
+                            <div id="extra-image-2-preview" class="image-preview"></div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA 3: Configuracion -->
+                    <div class="form-column">
+                        <h4 class="form-section-title">Configuracion</h4>
+
+                        <div class="form-group">
+                            <label for="news-categoria">Categoria</label>
+                            <select id="news-categoria" class="form-control">
+                                <option value="">Sin categoria</option>
+                            </select>
+                        </div>
+
+                        <div class="info-box">
+                            <p><strong>Nota:</strong> Tu noticia sera enviada para revision. Un editor la revisara y, si cumple con los criterios, sera publicada en el sitio.</p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/config.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/components.js"></script>
+    <script>
+        // Verificar rol periodista
+        const user = auth.getUser();
+        if (!user || (user.role !== 'admin' && user.role !== 'editor' && user.role !== 'periodista')) {
+            window.location.href = '/login.html';
+        }
+
+        document.getElementById('user-name').textContent = user?.name || 'Periodista';
+
+        let myNews = [];
+        let categories = [];
+
+        async function loadData() {
+            try {
+                const [newsResponse, categoriesResponse] = await Promise.all([
+                    api.getAdminNews(),
+                    api.getCategories('noticias')
+                ]);
+
+                if (newsResponse.success) {
+                    // Filtrar solo mis noticias (por author_id)
+                    const allNews = newsResponse.data.news || newsResponse.data || [];
+                    myNews = allNews.filter(n => n.author_id === user.id);
+                    renderNews();
+                    updateStats();
+                }
+
+                if (categoriesResponse.success) {
+                    categories = Array.isArray(categoriesResponse.data) ? categoriesResponse.data : [];
+                    renderCategoryOptions();
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                Components.toast('Error cargando datos', 'error');
+            }
+        }
+
+        function renderCategoryOptions() {
+            const select = document.getElementById('news-categoria');
+            select.innerHTML = '<option value="">Sin categoria</option>' +
+                categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+        }
+
+        function renderNews() {
+            const container = document.getElementById('news-container');
+
+            if (myNews.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📰</div>
+                        <h3>No tienes noticias</h3>
+                        <p>Crea tu primera noticia haciendo click en "Nueva Noticia"</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myNews.map(news => `
+                <div class="news-card">
+                    <img src="${news.image_url || '/images/placeholder.svg'}" alt="" class="news-card-image" onerror="this.src='/images/placeholder.svg'">
+                    <div class="news-card-body">
+                        <h4 class="news-card-title">${Utils.escapeHtml(news.title)}</h4>
+                        <div class="news-card-meta">
+                            <span class="badge badge-${getStatusClass(news.status)}">${getStatusLabel(news.status)}</span>
+                            <span>${formatDate(news.created_at)}</span>
+                        </div>
+                    </div>
+                    <div class="news-card-actions">
+                        <button class="btn btn-sm btn-outline" onclick="editNews(${news.id})" title="Editar">✏️</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteNews(${news.id})" title="Eliminar">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            document.getElementById('total-news').textContent = myNews.length;
+            document.getElementById('pending-news').textContent = myNews.filter(n => n.status === 'pending').length;
+            document.getElementById('published-news').textContent = myNews.filter(n => n.status === 'published').length;
+        }
+
+        function getStatusClass(status) {
+            const classes = { pending: 'warning', published: 'success', rejected: 'danger', draft: 'secondary' };
+            return classes[status] || 'secondary';
+        }
+
+        function getStatusLabel(status) {
+            const labels = { pending: 'Pendiente', published: 'Publicada', rejected: 'Rechazada', draft: 'Borrador' };
+            return labels[status] || status;
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('es-AR', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function showCreateModal() {
+            document.getElementById('modal-title').textContent = 'Nueva Noticia';
+            document.getElementById('news-form').reset();
+            document.getElementById('news-id').value = '';
+
+            // Limpiar previsualizaciones de imagenes
+            clearImagePreviews();
+
+            // En crear, la imagen es requerida
+            document.getElementById('news-imagen-principal-file').required = true;
+
+            openModal();
+        }
+
+        function editNews(newsId) {
+            const news = myNews.find(n => n.id === newsId);
+            if (!news) return;
+
+            document.getElementById('modal-title').textContent = 'Editar Noticia';
+            document.getElementById('news-id').value = news.id;
+            document.getElementById('news-titulo').value = news.title || '';
+            document.getElementById('news-contenido').value = news.content || '';
+            document.getElementById('news-resumen').value = news.summary || '';
+            document.getElementById('news-imagen-principal').value = news.image_url || '';
+            document.getElementById('news-imagen-alt').value = news.image_alt || '';
+            document.getElementById('news-fuente').value = news.source_url || '';
+            document.getElementById('news-categoria').value = news.category_id || '';
+
+            // Si ya tiene imagen, no es requerido subir otra
+            const fileInput = document.getElementById('news-imagen-principal-file');
+            fileInput.required = !news.image_url;
+
+            // Limpiar previews primero
+            clearImagePreviews();
+
+            // Cargar imagenes extras si existen
+            if (news.images) {
+                try {
+                    const images = JSON.parse(news.images);
+                    if (images[0]) {
+                        document.getElementById('news-imagen-extra-1').value = images[0];
+                        showImagePreview('extra-image-1-preview', images[0]);
+                    }
+                    if (images[1]) {
+                        document.getElementById('news-imagen-extra-2').value = images[1];
+                        showImagePreview('extra-image-2-preview', images[1]);
+                    }
+                } catch (e) {
+                    console.error('Error parsing images:', e);
+                }
+            }
+
+            // Mostrar preview de imagen principal si existe
+            if (news.image_url) {
+                showImagePreview('main-image-preview', news.image_url);
+            }
+
+            openModal();
+        }
+
+        function clearImagePreviews() {
+            const previews = ['main-image-preview', 'extra-image-1-preview', 'extra-image-2-preview'];
+            previews.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = '';
+                    el.style.display = 'none';
+                }
+            });
+        }
+
+        async function deleteNews(newsId) {
+            if (!confirm('Eliminar esta noticia?')) return;
+
+            try {
+                const response = await api.deleteNews(newsId);
+                if (response.success) {
+                    Components.toast('Noticia eliminada', 'success');
+                    loadData();
+                }
+            } catch (e) {
+                Components.toast('Error eliminando noticia', 'error');
+            }
+        }
+
+        async function saveNews(event) {
+            event.preventDefault();
+
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Guardando...';
+
+            const newsId = document.getElementById('news-id').value;
+
+            // Recopilar imagenes extras
+            const extraImages = [];
+            const img1 = document.getElementById('news-imagen-extra-1').value;
+            const img2 = document.getElementById('news-imagen-extra-2').value;
+            if (img1) extraImages.push(img1);
+            if (img2) extraImages.push(img2);
+
+            const data = {
+                title: document.getElementById('news-titulo').value,
+                summary: document.getElementById('news-resumen').value || null,
+                content: document.getElementById('news-contenido').value,
+                image_url: document.getElementById('news-imagen-principal').value || null,
+                image_alt: document.getElementById('news-imagen-alt').value || null,
+                images: extraImages.length > 0 ? extraImages : null,
+                source_url: document.getElementById('news-fuente').value || null,
+                category_id: document.getElementById('news-categoria').value || null,
+                status: 'pending' // Siempre pendiente para revision
+            };
+
+            try {
+                let response;
+                if (newsId) {
+                    response = await api.updateNews(newsId, data);
+                } else {
+                    response = await api.createNews(data);
+                }
+
+                if (response.success) {
+                    Components.toast(newsId ? 'Noticia actualizada' : 'Noticia enviada para revision', 'success');
+                    closeModal();
+                    loadData();
+                } else {
+                    Components.toast(response.message || 'Error guardando noticia', 'error');
+                }
+            } catch (e) {
+                Components.toast(e.message || 'Error guardando noticia', 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Enviar para revision';
+            }
+        }
+
+        // Upload de imagen principal
+        async function uploadMainImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                Components.toast('Por favor selecciona un archivo de imagen', 'error');
+                return;
+            }
+
+            try {
+                Components.toast('Subiendo imagen...', 'info');
+                const response = await api.uploadFile(file);
+
+                if (response.success) {
+                    const imageUrl = response.data.url;
+                    document.getElementById('news-imagen-principal').value = imageUrl;
+                    showImagePreview('main-image-preview', imageUrl);
+                    Components.toast('Imagen subida exitosamente', 'success');
+                } else {
+                    Components.toast('Error subiendo imagen', 'error');
+                }
+            } catch (e) {
+                console.error('Error uploading image:', e);
+                Components.toast('Error subiendo imagen', 'error');
+            }
+        }
+
+        // Upload de imagenes extras
+        async function uploadExtraImage(event, index) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                Components.toast('Por favor selecciona un archivo de imagen', 'error');
+                return;
+            }
+
+            try {
+                Components.toast('Subiendo imagen...', 'info');
+                const response = await api.uploadFile(file);
+
+                if (response.success) {
+                    const imageUrl = response.data.url;
+                    document.getElementById(`news-imagen-extra-${index}`).value = imageUrl;
+                    showImagePreview(`extra-image-${index}-preview`, imageUrl);
+                    Components.toast('Imagen subida exitosamente', 'success');
+                } else {
+                    Components.toast('Error subiendo imagen', 'error');
+                }
+            } catch (e) {
+                console.error('Error uploading image:', e);
+                Components.toast('Error subiendo imagen', 'error');
+            }
+        }
+
+        // Mostrar preview de imagen
+        function showImagePreview(containerId, url) {
+            const container = document.getElementById(containerId);
+            if (!container) {
+                console.error('Container not found:', containerId);
+                return;
+            }
+
+            // Validar URL
+            if (!url || url === 'undefined' || url === 'null') {
+                console.error('Invalid URL');
+                container.innerHTML = '<p style="color: #f44336; text-align: center;">URL invalida</p>';
+                container.style.display = 'flex';
+                return;
+            }
+
+            // Limpiar contenedor
+            container.innerHTML = '';
+            container.style.display = 'flex';
+
+            // Crear imagen
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Preview';
+            img.style.maxWidth = '100%';
+            img.style.maxHeight = '140px';
+            img.style.objectFit = 'contain';
+
+            img.onerror = function() {
+                console.error('Error loading image');
+                container.innerHTML = '<p style="color: #f44336; text-align: center;">Error cargando imagen</p>';
+            };
+
+            container.appendChild(img);
+        }
+
+        function openModal() {
+            document.getElementById('news-modal').classList.add('active');
+            document.getElementById('news-modal-backdrop').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('news-modal').classList.remove('active');
+            document.getElementById('news-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Load data
+        loadData();
+    </script>
+</body>
+</html>

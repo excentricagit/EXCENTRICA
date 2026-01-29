@@ -73,8 +73,9 @@ class AuthService {
                 return '/admin/';
             case 'editor':
             case 'reporter':
-            case 'periodista':
                 return '/editor/';
+            case 'periodista':
+                return '/periodista/';
             case 'merchant':
             case 'comerciante':
                 return '/comerciante/';

@@ -209,73 +209,88 @@ function selectImage(index) {
 // =============================================
 
 async function openModal(productId) {
+    if (!productId) {
+        console.error('openModal: productId is required');
+        return;
+    }
+
     try {
         const response = await api.getProductById(productId);
-        if (response.success && response.data) {
-            const product = response.data;
-            currentProduct = product;
-            currentImageIndex = 0;
-
-            productImages = buildProductImages(product);
-
-            document.getElementById('modal-main-image').src = productImages[0].url;
-
-            const thumbsContainer = document.getElementById('modal-thumbs');
-            if (productImages.length > 1) {
-                thumbsContainer.innerHTML = productImages.map((img, i) =>
-                    `<img src="${img.url}" alt="${img.label}" class="modal-gallery-thumb ${i === 0 ? 'active' : ''}" onclick="selectImage(${i})" onerror="this.style.display='none'">`
-                ).join('');
-                thumbsContainer.style.display = 'flex';
-            } else {
-                thumbsContainer.innerHTML = '';
-                thumbsContainer.style.display = 'none';
+        if (!response.success || !response.data) {
+            console.error('Error loading product:', response);
+            if (typeof Components !== 'undefined') {
+                Components.toast('Error cargando producto', 'danger');
             }
-
-            document.querySelectorAll('.modal-gallery-nav').forEach(btn => {
-                btn.style.display = productImages.length > 1 ? 'flex' : 'none';
-            });
-
-            document.getElementById('modal-category').textContent = product.category_name || 'Producto';
-            document.getElementById('modal-title').textContent = product.title;
-            document.getElementById('modal-price').textContent = formatPrice(product.price);
-            document.getElementById('modal-description').textContent = product.description || 'Sin descripcion disponible.';
-            document.getElementById('modal-condition').textContent = formatCondition(product.condition);
-            document.getElementById('modal-location').textContent = product.zone_name || product.address || 'Santiago del Estero';
-            document.getElementById('modal-date').textContent = formatDate(product.created_at);
-            document.getElementById('modal-seller').textContent = product.author_name || 'Excentrica';
-
-            const originalPriceEl = document.getElementById('modal-price-original');
-            const discountEl = document.getElementById('modal-discount');
-            if (product.original_price && product.original_price > product.price) {
-                originalPriceEl.textContent = formatPrice(product.original_price);
-                originalPriceEl.style.display = 'inline';
-                const discount = Math.round((1 - product.price / product.original_price) * 100);
-                discountEl.textContent = `-${discount}%`;
-                discountEl.style.display = 'inline';
-            } else {
-                originalPriceEl.style.display = 'none';
-                discountEl.style.display = 'none';
-            }
-
-            const whatsappNumber = product.whatsapp || PAYMENT_CONFIG.WHATSAPP;
-            const cleanNumber = whatsappNumber.replace(/\D/g, '');
-            const fullNumber = cleanNumber.startsWith('549') ? cleanNumber : `549${cleanNumber}`;
-            const message = generateWhatsAppMessage(product);
-            document.getElementById('modal-whatsapp').href = `https://wa.me/${fullNumber}?text=${message}`;
-
-            const phoneEl = document.getElementById('modal-phone');
-            if (product.phone || product.whatsapp) {
-                phoneEl.textContent = product.phone || product.whatsapp;
-                phoneEl.parentElement.style.display = 'block';
-            } else {
-                phoneEl.parentElement.style.display = 'none';
-            }
-
-            document.getElementById('product-modal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            return;
         }
+
+        const product = response.data;
+        currentProduct = product;
+        currentImageIndex = 0;
+
+        productImages = buildProductImages(product);
+
+        document.getElementById('modal-main-image').src = productImages[0].url;
+
+        const thumbsContainer = document.getElementById('modal-thumbs');
+        if (productImages.length > 1) {
+            thumbsContainer.innerHTML = productImages.map((img, i) =>
+                `<img src="${img.url}" alt="${img.label}" class="modal-gallery-thumb ${i === 0 ? 'active' : ''}" onclick="selectImage(${i})" onerror="this.style.display='none'">`
+            ).join('');
+            thumbsContainer.style.display = 'flex';
+        } else {
+            thumbsContainer.innerHTML = '';
+            thumbsContainer.style.display = 'none';
+        }
+
+        document.querySelectorAll('.modal-gallery-nav').forEach(btn => {
+            btn.style.display = productImages.length > 1 ? 'flex' : 'none';
+        });
+
+        document.getElementById('modal-category').textContent = product.category_name || 'Producto';
+        document.getElementById('modal-title').textContent = product.title;
+        document.getElementById('modal-price').textContent = formatPrice(product.price);
+        document.getElementById('modal-description').textContent = product.description || 'Sin descripcion disponible.';
+        document.getElementById('modal-condition').textContent = formatCondition(product.condition);
+        document.getElementById('modal-location').textContent = product.zone_name || product.address || 'Santiago del Estero';
+        document.getElementById('modal-date').textContent = formatDate(product.created_at);
+        document.getElementById('modal-seller').textContent = product.author_name || 'Excentrica';
+
+        const originalPriceEl = document.getElementById('modal-price-original');
+        const discountEl = document.getElementById('modal-discount');
+        if (product.original_price && product.original_price > product.price) {
+            originalPriceEl.textContent = formatPrice(product.original_price);
+            originalPriceEl.style.display = 'inline';
+            const discount = Math.round((1 - product.price / product.original_price) * 100);
+            discountEl.textContent = `-${discount}%`;
+            discountEl.style.display = 'inline';
+        } else {
+            originalPriceEl.style.display = 'none';
+            discountEl.style.display = 'none';
+        }
+
+        const whatsappNumber = product.whatsapp || PAYMENT_CONFIG.WHATSAPP;
+        const cleanNumber = whatsappNumber.replace(/\D/g, '');
+        const fullNumber = cleanNumber.startsWith('549') ? cleanNumber : `549${cleanNumber}`;
+        const message = generateWhatsAppMessage(product);
+        document.getElementById('modal-whatsapp').href = `https://wa.me/${fullNumber}?text=${message}`;
+
+        const phoneEl = document.getElementById('modal-phone');
+        if (product.phone || product.whatsapp) {
+            phoneEl.textContent = product.phone || product.whatsapp;
+            phoneEl.parentElement.style.display = 'block';
+        } else {
+            phoneEl.parentElement.style.display = 'none';
+        }
+
+        document.getElementById('product-modal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+
     } catch (e) {
         console.error('Error loading product:', e);
+        if (typeof Components !== 'undefined') {
+            Components.toast('Error cargando producto', 'danger');
+        }
     }
 }
 

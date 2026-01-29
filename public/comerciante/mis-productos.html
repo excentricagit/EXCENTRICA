@@ -3,9 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis Productos - Comerciante Excentrica</title>
+    <title>Productos - Comerciante Excentrica</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/comerciante/comerciante.css">
+    <style>
+        .modal-4col {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        @media (max-width: 1100px) {
+            .modal-4col {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .modal-4col {
+                grid-template-columns: 1fr;
+            }
+        }
+        .modal-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .modal-col .form-group {
+            margin-bottom: 0;
+        }
+        .modal-col label {
+            font-size: 0.8rem;
+            margin-bottom: 0.25rem;
+        }
+        .modal-col .form-control {
+            padding: 0.4rem 0.6rem;
+            font-size: 0.85rem;
+        }
+        .modal-col textarea.form-control {
+            min-height: 80px;
+        }
+        .image-preview {
+            width: 100%;
+            height: 100px;
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .image-preview:hover {
+            border-color: var(--primary);
+        }
+        .image-preview-placeholder {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        .product-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            background: var(--bg-secondary);
+        }
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+        .status-approved { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status-rejected { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status-sold { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .action-btn {
+            padding: 0.35rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .action-btn-edit { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .action-btn-edit:hover { background: rgba(59, 130, 246, 0.3); }
+        .action-btn-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .action-btn-delete:hover { background: rgba(239, 68, 68, 0.3); }
+        .action-btn-status { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .action-btn-status:hover { background: rgba(34, 197, 94, 0.3); }
+    </style>
 </head>
 <body>
     <div class="admin-layout">
@@ -20,17 +118,14 @@
                     <span class="icon">📊</span> Dashboard
                 </a>
                 <a href="/comerciante/mis-productos.html" class="admin-nav-item active">
-                    <span class="icon">🛒</span> Mis Productos
-                </a>
-                <a href="/comerciante/mis-servicios.html" class="admin-nav-item">
-                    <span class="icon">🔧</span> Mis Servicios
+                    <span class="icon">🛒</span> Productos
                 </a>
                 <div class="admin-nav-divider"></div>
                 <a href="/" class="admin-nav-item">
                     <span class="icon">🏠</span> Volver al sitio
                 </a>
                 <a href="#" onclick="auth.logout(); return false;" class="admin-nav-item">
-                    <span class="icon">🚪</span> Cerrar sesión
+                    <span class="icon">🚪</span> Cerrar sesion
                 </a>
             </nav>
         </aside>
@@ -38,7 +133,7 @@
         <!-- Main content -->
         <main class="admin-main">
             <header class="admin-header">
-                <h1>🛒 Mis Productos</h1>
+                <h1>🛒 Productos</h1>
                 <div class="admin-user">
                     <span id="user-name">Comerciante</span>
                 </div>
@@ -51,7 +146,7 @@
                         <div class="stat-icon">🛒</div>
                         <div class="stat-info">
                             <span class="stat-value" id="total-products">0</span>
-                            <span class="stat-label">Total productos</span>
+                            <span class="stat-label">Total</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -69,10 +164,10 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">❌</div>
+                        <div class="stat-icon">💰</div>
                         <div class="stat-info">
-                            <span class="stat-value" id="rejected-products">0</span>
-                            <span class="stat-label">Rechazados</span>
+                            <span class="stat-value" id="sold-products">0</span>
+                            <span class="stat-label">Vendidos</span>
                         </div>
                     </div>
                 </div>
@@ -83,12 +178,13 @@
                         <input type="text" id="search" class="form-control" placeholder="Buscar..." style="max-width: 200px;">
                         <select id="filter-status" class="form-control" style="max-width: 150px;">
                             <option value="">Todos los estados</option>
-                            <option value="pendiente">Pendiente</option>
-                            <option value="aprobado">Aprobado</option>
-                            <option value="rechazado">Rechazado</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="approved">Aprobado</option>
+                            <option value="rejected">Rechazado</option>
+                            <option value="sold">Vendido</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" onclick="addProduct()">
+                    <button class="btn btn-primary" onclick="openModal()">
                         <span>➕</span> Agregar Producto
                     </button>
                 </div>
@@ -103,8 +199,123 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                <div id="pagination" class="mt-4"></div>
             </div>
         </main>
+    </div>
+
+    <!-- Modal de Producto -->
+    <div class="modal-backdrop" id="product-modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal" id="product-modal" style="max-width: 1200px; width: 95%;">
+        <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1.5rem; border-bottom: 1px solid var(--border-color);">
+            <h3 class="modal-title" id="modal-title">Nuevo Producto</h3>
+            <div style="display: flex; gap: 0.75rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="closeModal()">Cancelar</button>
+                <button type="submit" form="product-form" class="btn btn-primary btn-sm" id="submit-btn">Guardar</button>
+            </div>
+        </div>
+        <div class="modal-body" style="padding: 1rem 1.5rem;">
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+
+                <div class="modal-4col">
+                    <!-- Columna 1: Titulo y Descripcion -->
+                    <div class="modal-col">
+                        <div class="form-group">
+                            <label>Titulo *</label>
+                            <input type="text" id="title" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Descripcion *</label>
+                            <textarea id="description" class="form-control" required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Columna 2: Precios y Clasificacion -->
+                    <div class="modal-col">
+                        <div class="form-group">
+                            <label>Precio *</label>
+                            <input type="number" id="price" class="form-control" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Precio Original</label>
+                            <input type="number" id="original_price" class="form-control" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select id="category_id" class="form-control">
+                                <option value="">Sin categoria</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Zona</label>
+                            <select id="zone_id" class="form-control">
+                                <option value="">Sin zona</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Columna 3: Imagenes -->
+                    <div class="modal-col">
+                        <div class="form-group">
+                            <label>Imagen Frontal</label>
+                            <div class="image-preview" onclick="document.getElementById('front_image_url_input').click()">
+                                <img id="front_image_url_preview" style="display: none;">
+                                <span class="image-preview-placeholder" id="front_image_url_placeholder">Click para subir</span>
+                            </div>
+                            <input type="file" id="front_image_url_input" style="display: none;" accept="image/*" onchange="uploadImage(this, 'front_image_url')">
+                            <input type="hidden" id="front_image_url">
+                        </div>
+                        <div class="form-group">
+                            <label>Imagen Trasera</label>
+                            <div class="image-preview" onclick="document.getElementById('back_image_url_input').click()">
+                                <img id="back_image_url_preview" style="display: none;">
+                                <span class="image-preview-placeholder" id="back_image_url_placeholder">Click para subir</span>
+                            </div>
+                            <input type="file" id="back_image_url_input" style="display: none;" accept="image/*" onchange="uploadImage(this, 'back_image_url')">
+                            <input type="hidden" id="back_image_url">
+                        </div>
+                    </div>
+
+                    <!-- Columna 4: Estado y Contacto -->
+                    <div class="modal-col">
+                        <div class="form-group">
+                            <label>Condicion</label>
+                            <select id="condition" class="form-control">
+                                <option value="new">Nuevo</option>
+                                <option value="used">Usado</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Estado</label>
+                            <select id="status" class="form-control">
+                                <option value="approved">Aprobado</option>
+                                <option value="pending">Pendiente</option>
+                                <option value="rejected">Rechazado</option>
+                                <option value="sold">Vendido</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Telefono</label>
+                            <input type="text" id="phone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>WhatsApp</label>
+                            <input type="text" id="whatsapp" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="d-flex align-items-center gap-2">
+                                <input type="checkbox" id="featured">
+                                Destacado
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
     </div>
 
     <script src="/js/config.js"></script>
@@ -122,44 +333,72 @@
         document.getElementById('user-name').textContent = user?.name || 'Comerciante';
 
         let allProducts = [];
-        let filteredProducts = [];
+        let categories = [];
+        let zones = [];
+        let currentPage = 1;
 
         async function loadData() {
             try {
-                const response = await api.getProductos({ comerciante_id: user.id });
+                // Cargar productos
+                const params = {
+                    page: currentPage,
+                    limit: 20,
+                    search: document.getElementById('search').value,
+                    status: document.getElementById('filter-status').value
+                };
+
+                const response = await api.getComercianteProducts(params);
 
                 if (response.success) {
-                    allProducts = response.data;
-                    applyFilters();
-                    updateStats();
+                    allProducts = response.data.products;
+                    renderTable();
+                    renderPagination(response.data.pagination);
                 }
+
+                // Cargar estadisticas
+                const statsResponse = await api.getComercianteProductStats();
+                if (statsResponse.success) {
+                    document.getElementById('total-products').textContent = statsResponse.data.total || 0;
+                    document.getElementById('pending-products').textContent = statsResponse.data.pending || 0;
+                    document.getElementById('approved-products').textContent = statsResponse.data.approved || 0;
+                    document.getElementById('sold-products').textContent = statsResponse.data.sold || 0;
+                }
+
             } catch (e) {
                 console.error('Error loading data:', e);
-                Components.showToast('Error cargando datos', 'error');
+                Components.toast('Error cargando datos', 'error');
             }
         }
 
-        function applyFilters() {
-            const search = document.getElementById('search').value.toLowerCase();
-            const status = document.getElementById('filter-status').value;
+        async function loadCategoriesAndZones() {
+            try {
+                const [catResponse, zoneResponse] = await Promise.all([
+                    api.getCategories('products'),
+                    api.getZones()
+                ]);
 
-            filteredProducts = allProducts.filter(product => {
-                const matchSearch = !search ||
-                    product.titulo.toLowerCase().includes(search) ||
-                    (product.descripcion && product.descripcion.toLowerCase().includes(search));
+                if (catResponse.success) {
+                    categories = catResponse.data;
+                    const catSelect = document.getElementById('category_id');
+                    catSelect.innerHTML = '<option value="">Sin categoria</option>' +
+                        categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
 
-                const matchStatus = !status || product.estado === status;
-
-                return matchSearch && matchStatus;
-            });
-
-            renderTable();
+                if (zoneResponse.success) {
+                    zones = zoneResponse.data;
+                    const zoneSelect = document.getElementById('zone_id');
+                    zoneSelect.innerHTML = '<option value="">Sin zona</option>' +
+                        zones.map(z => `<option value="${z.id}">${z.name}</option>`).join('');
+                }
+            } catch (e) {
+                console.error('Error loading categories/zones:', e);
+            }
         }
 
         function renderTable() {
             const container = document.getElementById('products-table-container');
 
-            if (filteredProducts.length === 0) {
+            if (allProducts.length === 0) {
                 container.innerHTML = '<p class="text-center text-muted p-4">No se encontraron productos</p>';
                 return;
             }
@@ -168,43 +407,48 @@
                 <table class="admin-table">
                     <thead>
                         <tr>
+                            <th style="width: 60px;">Imagen</th>
                             <th>Producto</th>
-                            <th>Categoría</th>
+                            <th>Categoria</th>
                             <th>Precio</th>
                             <th>Estado</th>
                             <th>Fecha</th>
-                            <th>Acciones</th>
+                            <th style="width: 150px;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${filteredProducts.map(product => `
+                        ${allProducts.map(product => `
                             <tr>
                                 <td>
-                                    <div class="product-info">
-                                        <strong>${product.titulo}</strong>
-                                        ${product.descripcion ? `<br><small class="text-muted">${truncate(product.descripcion, 60)}</small>` : ''}
-                                    </div>
+                                    ${product.front_image_url
+                                        ? `<img src="${product.front_image_url}" class="product-thumb" alt="">`
+                                        : '<div class="product-thumb" style="display:flex;align-items:center;justify-content:center;">📦</div>'}
                                 </td>
                                 <td>
-                                    <span class="badge badge-secondary">
-                                        ${product.categoria_nombre || '-'}
+                                    <strong>${Utils.escapeHtml(product.title)}</strong>
+                                    ${product.featured ? '<span style="color: #eab308; margin-left: 0.5rem;">⭐</span>' : ''}
+                                    ${product.description ? `<br><small class="text-muted">${Utils.escapeHtml(product.description.substring(0, 50))}${product.description.length > 50 ? '...' : ''}</small>` : ''}
+                                </td>
+                                <td>${product.category_name || '-'}</td>
+                                <td>
+                                    <strong>$${parseFloat(product.price).toLocaleString()}</strong>
+                                    ${product.original_price ? `<br><small class="text-muted" style="text-decoration: line-through;">$${parseFloat(product.original_price).toLocaleString()}</small>` : ''}
+                                </td>
+                                <td>
+                                    <span class="status-badge status-${product.status}">
+                                        ${getStatusLabel(product.status)}
                                     </span>
                                 </td>
+                                <td>${Utils.formatDate(product.created_at)}</td>
                                 <td>
-                                    ${product.precio ? `<strong>$${parseFloat(product.precio).toLocaleString()}</strong>` : '-'}
-                                </td>
-                                <td>
-                                    <span class="badge badge-${getStatusBadgeClass(product.estado)}">
-                                        ${getStatusLabel(product.estado)}
-                                    </span>
-                                </td>
-                                <td>${formatDate(product.created_at)}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button class="btn btn-sm btn-outline" onclick="editProduct(${product.id})" title="Editar">
+                                    <div class="action-btns">
+                                        <button class="action-btn action-btn-status" onclick="cycleStatus(${product.id}, '${product.status}')" title="Cambiar estado">
+                                            🔄
+                                        </button>
+                                        <button class="action-btn action-btn-edit" onclick="editProduct(${product.id})" title="Editar">
                                             ✏️
                                         </button>
-                                        <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})" title="Eliminar">
+                                        <button class="action-btn action-btn-delete" onclick="deleteProduct(${product.id})" title="Eliminar">
                                             🗑️
                                         </button>
                                     </div>
@@ -216,75 +460,243 @@
             `;
         }
 
-        function updateStats() {
-            document.getElementById('total-products').textContent = allProducts.length;
-            document.getElementById('pending-products').textContent = allProducts.filter(p => p.estado === 'pendiente').length;
-            document.getElementById('approved-products').textContent = allProducts.filter(p => p.estado === 'aprobado').length;
-            document.getElementById('rejected-products').textContent = allProducts.filter(p => p.estado === 'rechazado').length;
+        function renderPagination(pagination) {
+            const container = document.getElementById('pagination');
+            if (!pagination || pagination.pages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '<div class="d-flex gap-2 justify-content-center">';
+
+            if (pagination.page > 1) {
+                html += `<button class="btn btn-sm btn-secondary" onclick="goToPage(${pagination.page - 1})">Anterior</button>`;
+            }
+
+            html += `<span class="btn btn-sm" style="background: var(--bg-secondary);">Pagina ${pagination.page} de ${pagination.pages}</span>`;
+
+            if (pagination.page < pagination.pages) {
+                html += `<button class="btn btn-sm btn-secondary" onclick="goToPage(${pagination.page + 1})">Siguiente</button>`;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
         }
 
-        function getStatusBadgeClass(status) {
-            const classes = {
-                pendiente: 'warning',
-                aprobado: 'success',
-                rechazado: 'danger'
-            };
-            return classes[status] || 'secondary';
+        function goToPage(page) {
+            currentPage = page;
+            loadData();
         }
 
         function getStatusLabel(status) {
             const labels = {
-                pendiente: 'Pendiente',
-                aprobado: 'Aprobado',
-                rechazado: 'Rechazado'
+                pending: 'Pendiente',
+                approved: 'Aprobado',
+                rejected: 'Rechazado',
+                sold: 'Vendido'
             };
             return labels[status] || status;
         }
 
-        function truncate(text, maxLength) {
-            if (!text) return '';
-            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
-        }
+        async function cycleStatus(productId, currentStatus) {
+            const statusOrder = ['pending', 'approved', 'sold', 'rejected'];
+            const currentIndex = statusOrder.indexOf(currentStatus);
+            const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length];
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('es-AR', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
+            try {
+                const response = await api.updateComercianteProductStatus(productId, nextStatus);
+                if (response.success) {
+                    Components.toast(`Estado cambiado a: ${getStatusLabel(nextStatus)}`, 'success');
+                    loadData();
+                }
+            } catch (e) {
+                Components.toast('Error cambiando estado', 'error');
+            }
         }
 
         async function deleteProduct(productId) {
-            if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
+            if (!confirm('¿Eliminar este producto? Esta accion no se puede deshacer.')) return;
 
             try {
-                const response = await api.deleteProducto(productId);
+                const response = await api.deleteComercianteProduct(productId);
                 if (response.success) {
-                    Components.showToast('Producto eliminado exitosamente', 'success');
+                    Components.toast('Producto eliminado', 'success');
                     loadData();
                 }
             } catch (e) {
                 console.error('Error deleting product:', e);
-                Components.showToast('Error eliminando producto', 'error');
+                Components.toast('Error eliminando producto', 'error');
+            }
+        }
+
+        function openModal(product = null) {
+            try {
+                const modal = document.getElementById('product-modal');
+                const form = document.getElementById('product-form');
+                const title = document.getElementById('modal-title');
+
+                form.reset();
+                clearImagePreviews();
+
+                if (product) {
+                    title.textContent = 'Editar Producto';
+                    document.getElementById('product-id').value = product.id;
+                    document.getElementById('title').value = product.title || '';
+                    document.getElementById('description').value = product.description || '';
+                    document.getElementById('price').value = product.price || '';
+                    document.getElementById('original_price').value = product.original_price || '';
+                    document.getElementById('category_id').value = product.category_id || '';
+                    document.getElementById('zone_id').value = product.zone_id || '';
+                    document.getElementById('condition').value = product.condition || 'new';
+                    document.getElementById('status').value = product.status || 'approved';
+                    document.getElementById('phone').value = product.phone || '';
+                    document.getElementById('whatsapp').value = product.whatsapp || '';
+                    document.getElementById('featured').checked = product.featured == 1;
+
+                    // Cargar previews de imagenes
+                    if (product.front_image_url) {
+                        setImagePreview('front_image_url', product.front_image_url);
+                    }
+                    if (product.back_image_url) {
+                        setImagePreview('back_image_url', product.back_image_url);
+                    }
+                } else {
+                    title.textContent = 'Nuevo Producto';
+                    document.getElementById('product-id').value = '';
+                    document.getElementById('status').value = 'approved';
+                }
+
+                modal.classList.add('active');
+                document.getElementById('product-modal-backdrop').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } catch (e) {
+                console.error('Error en openModal:', e);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.getElementById('product-modal-backdrop').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function clearImagePreviews() {
+            ['front_image_url', 'back_image_url'].forEach(field => {
+                document.getElementById(field).value = '';
+                document.getElementById(field + '_preview').style.display = 'none';
+                document.getElementById(field + '_placeholder').style.display = 'block';
+            });
+        }
+
+        function setImagePreview(field, url) {
+            document.getElementById(field).value = url;
+            const preview = document.getElementById(field + '_preview');
+            const placeholder = document.getElementById(field + '_placeholder');
+            preview.src = url;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+        }
+
+        async function uploadImage(input, field) {
+            if (!input.files || !input.files[0]) return;
+
+            const file = input.files[0];
+            const placeholder = document.getElementById(field + '_placeholder');
+            placeholder.textContent = 'Subiendo...';
+
+            try {
+                const response = await api.uploadFile(file);
+                if (response.success && response.data.url) {
+                    setImagePreview(field, response.data.url);
+                    Components.toast('Imagen subida', 'success');
+                } else {
+                    throw new Error('Error en la respuesta');
+                }
+            } catch (e) {
+                console.error('Error uploading:', e);
+                Components.toast('Error subiendo imagen', 'error');
+                placeholder.textContent = 'Click para subir';
             }
         }
 
         function editProduct(productId) {
-            // TODO: Implementar modal de edición
-            Components.showToast('Función de edición en desarrollo', 'info');
+            const product = allProducts.find(p => p.id == productId);
+            if (product) {
+                openModal(product);
+            } else {
+                Components.toast('Producto no encontrado', 'error');
+            }
         }
 
-        function addProduct() {
-            // TODO: Implementar modal de agregar producto
-            Components.showToast('Función en desarrollo', 'info');
-        }
+        // Form submit
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const productId = document.getElementById('product-id').value;
+            const data = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                price: parseFloat(document.getElementById('price').value),
+                original_price: document.getElementById('original_price').value ? parseFloat(document.getElementById('original_price').value) : null,
+                front_image_url: document.getElementById('front_image_url').value || null,
+                back_image_url: document.getElementById('back_image_url').value || null,
+                category_id: document.getElementById('category_id').value || null,
+                zone_id: document.getElementById('zone_id').value || null,
+                condition: document.getElementById('condition').value,
+                status: document.getElementById('status').value,
+                phone: document.getElementById('phone').value || null,
+                whatsapp: document.getElementById('whatsapp').value || null,
+                featured: document.getElementById('featured').checked
+            };
+
+            const submitBtn = document.getElementById('submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Guardando...';
+
+            try {
+                let response;
+                if (productId) {
+                    response = await api.updateComercianteProduct(productId, data);
+                } else {
+                    response = await api.createComercianteProduct(data);
+                }
+
+                if (response.success) {
+                    Components.toast(productId ? 'Producto actualizado' : 'Producto creado', 'success');
+                    closeModal();
+                    loadData();
+                } else {
+                    throw new Error(response.error || 'Error guardando');
+                }
+            } catch (e) {
+                console.error('Error saving product:', e);
+                Components.toast(e.message || 'Error guardando producto', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Guardar';
+            }
+        });
 
         // Event listeners
-        document.getElementById('search').addEventListener('input', applyFilters);
-        document.getElementById('filter-status').addEventListener('change', applyFilters);
+        document.getElementById('search').addEventListener('input', Utils.debounce(() => {
+            currentPage = 1;
+            loadData();
+        }, 300));
+
+        document.getElementById('filter-status').addEventListener('change', () => {
+            currentPage = 1;
+            loadData();
+        });
+
+        // Close modal on overlay click
+        document.getElementById('product-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
 
         // Load initial data
+        loadCategoriesAndZones();
         loadData();
     </script>
 </body>

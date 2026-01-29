@@ -61,3 +61,7 @@ export async function requirePublicista(request, env) {
 export async function requireVideoEditor(request, env) {
     return requireRole(request, env, ['admin', 'videoeditor']);
 }
+
+export async function requireComerciante(request, env) {
+    return requireRole(request, env, ['admin', 'comerciante']);
+}

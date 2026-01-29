@@ -340,15 +340,23 @@ function updateUserWidget() {
         let panelButtons = '';
         if (user.role === 'admin') {
             panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ef4444, #dc2626); border: none; color: #fff;" onclick="window.location.href='/admin/'">Panel Admin</button>`;
-        }
-        if (user.role === 'admin' || user.role === 'editor' || user.role === 'periodista') {
             panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
-        }
-        if (user.role === 'admin' || user.role === 'publicista') {
             panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
         }
-        if (user.role === 'admin' || user.role === 'videoeditor') {
+        else if (user.role === 'editor' || user.role === 'reporter') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #a855f7, #7c3aed); border: none; color: #fff;" onclick="window.location.href='/editor/'">Panel Editor</button>`;
+        }
+        else if (user.role === 'periodista') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: #fff;" onclick="window.location.href='/periodista/'">Panel Periodista</button>`;
+        }
+        else if (user.role === 'publicista') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); border: none; color: #fff;" onclick="window.location.href='/publicista/'">Panel Publicista</button>`;
+        }
+        else if (user.role === 'videoeditor') {
             panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #ec4899, #db2777); border: none; color: #fff;" onclick="window.location.href='/videoeditor/'">Panel Videos</button>`;
+        }
+        else if (user.role === 'merchant' || user.role === 'comerciante') {
+            panelButtons += `<button class="btn btn-block mb-2" style="background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff;" onclick="window.location.href='/comerciante/'">Mi Negocio</button>`;
         }
 
         widget.innerHTML = `

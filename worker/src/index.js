@@ -14,7 +14,12 @@ import { handleGetUsers, handleGetUser, handleCreateUser, handleUpdateUser, hand
 import { handleGetNews, handleGetNewsById, handleGetNewsBySlug, handleAdminGetNews, handleAdminCreateNews, handleAdminUpdateNews, handleAdminDeleteNews } from './routes/news.js';
 
 // Products routes
-import { handleGetProducts, handleGetProductById, handleCreateProduct, handleUpdateProduct, handleDeleteProduct, handleAdminGetProducts, handleAdminUpdateProductStatus, handleAdminCreateProduct, handleAdminUpdateProduct } from './routes/products.js';
+import {
+    handleGetProducts, handleGetProductById, handleCreateProduct, handleUpdateProduct, handleDeleteProduct,
+    handleAdminGetProducts, handleAdminUpdateProductStatus, handleAdminCreateProduct, handleAdminUpdateProduct,
+    handleComercianteGetProducts, handleComercianteGetStats, handleComercianteCreateProduct,
+    handleComercianteUpdateProduct, handleComercianteUpdateProductStatus, handleComercianteDeleteProduct
+} from './routes/products.js';
 
 // Categories routes
 import { handleGetCategories, handleGetCategoryById, handleAdminGetCategories, handleAdminCreateCategory, handleAdminUpdateCategory, handleAdminDeleteCategory } from './routes/categories.js';
@@ -288,6 +293,16 @@ const routes = [
     { method: 'POST', path: '/api/publicista/ads', handler: handlePublicistaCreateAd },
     { method: 'PUT', path: '/api/publicista/ads/:id', handler: (req, env, params) => handlePublicistaUpdateAd(req, env, params.id) },
     { method: 'DELETE', path: '/api/publicista/ads/:id', handler: (req, env, params) => handlePublicistaDeleteAd(req, env, params.id) },
+
+    // ========== COMERCIANTE ROUTES ==========
+
+    // Comerciante - Products (gestiona TODOS los productos)
+    { method: 'GET', path: '/api/comerciante/products', handler: handleComercianteGetProducts },
+    { method: 'GET', path: '/api/comerciante/products/stats', handler: handleComercianteGetStats },
+    { method: 'POST', path: '/api/comerciante/products', handler: handleComercianteCreateProduct },
+    { method: 'PUT', path: '/api/comerciante/products/:id', handler: (req, env, params) => handleComercianteUpdateProduct(req, env, params.id) },
+    { method: 'PATCH', path: '/api/comerciante/products/:id/status', handler: (req, env, params) => handleComercianteUpdateProductStatus(req, env, params.id) },
+    { method: 'DELETE', path: '/api/comerciante/products/:id', handler: (req, env, params) => handleComercianteDeleteProduct(req, env, params.id) },
 
     // ========== VIDEOEDITOR ROUTES ==========
 
